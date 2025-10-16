@@ -1,4 +1,5 @@
 #include "config_reader.hpp"
+#include "../utils/constants.hpp"
 #include <vector>
 
 namespace Core
@@ -50,18 +51,24 @@ namespace Core
         list<TCB *> tasks;
         string line;
         size_t pos = 0;
+        
         while (!(line = readLine()).empty())
         {
             while (pos = line.find(';'), pos != string::npos)
             {
                 configs.push_back(line.substr(0, pos));
-                printf("Config: %s\n", configs.back().c_str());
                 line.erase(0, pos + 1);
             }
             configs.push_back(line);
-            printf("Config: %s\n", configs.back().c_str());
 
-            TCB *tcb = new TCB(configs[0], configs[1], stoi(configs[2]), stoi(configs[3]), stoi(configs[4]));
+            TCB *tcb = new TCB(
+                configs[0],
+                Constants::COLORS[stoi(configs[1])],
+                stoi(configs[2]),
+                stoi(configs[3]),
+                stoi(configs[4])
+            );
+
             tasks.push_back(tcb);
             configs.clear();
         }

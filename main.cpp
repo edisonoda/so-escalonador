@@ -3,7 +3,6 @@
 #include "core/config_reader.hpp"
 #include "core/tcb.hpp"
 
-
 int main() {
     Core::ConfigReader reader("configs/fifo1.txt");
     if (!reader.openFile()) {
