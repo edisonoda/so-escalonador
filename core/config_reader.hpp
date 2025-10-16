@@ -10,17 +10,6 @@ namespace Core
 {
     class ConfigReader
     {
-    public:
-        ConfigReader(const string &filename);
-        ~ConfigReader();
-
-        bool openFile();
-        void closeFile();
-        void readPattern();
-        string getAlgorithm() { return algorithm; }
-        int getQuantum() { return quantum; }
-        list<TCB*> readTasks();
-
     private:
         string filename;
         ifstream file;
@@ -28,5 +17,16 @@ namespace Core
         int quantum;
 
         string readLine();
+    
+    public:
+        ConfigReader(const string &filename);
+        ~ConfigReader();
+
+        bool openFile();
+        void closeFile();
+        void readPattern();
+        string getAlgorithm() const { return algorithm; }
+        int getQuantum() const { return quantum; }
+        list<TCB*> readTasks();
     };
 } // namespace Core

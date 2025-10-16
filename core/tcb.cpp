@@ -2,12 +2,12 @@
 using namespace Core;
 
 TCB::TCB(string id, string color, int start, int duration, int priority, list<string> events)
+    : id(id)
+    , color(color)
+    , start(start)
+    , duration(duration)
+    , priority(priority)
 {
-    this->id = id;
-    this->color = color;
-    this->start = start;
-    this->duration = duration;
-    this->priority = priority;
     this->remaining = duration;
     this->state = "READY";
     this->events = events;
@@ -15,19 +15,19 @@ TCB::TCB(string id, string color, int start, int duration, int priority, list<st
 
 TCB::~TCB() {}
 
-string TCB::getId() { return id; }
+string TCB::getId() const { return id; }
 
-string TCB::getColor() { return color; }
+string TCB::getColor() const { return color; }
 
-int TCB::getStart() { return start; }
+int TCB::getStart() const { return start; }
 
-int TCB::getDuration() { return duration; }
+int TCB::getDuration() const { return duration; }
 
-int TCB::getPriority() { return priority; }
+int TCB::getPriority() const { return priority; }
 
-int TCB::getRemaining() { return remaining; }
+int TCB::getRemaining() const { return remaining; }
 
-string TCB::getState() { return state; }
+string TCB::getState() const { return state; }
 
 void TCB::setState(string state) { this->state = state; }
 
