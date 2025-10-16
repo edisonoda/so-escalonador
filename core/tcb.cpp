@@ -1,7 +1,7 @@
 #include "tcb.hpp"
 using namespace Core;
 
-TCB::TCB(int id, string color, int start, int duration, int priority)
+TCB::TCB(string id, string color, int start, int duration, int priority, list<string> events)
 {
     this->id = id;
     this->color = color;
@@ -10,11 +10,12 @@ TCB::TCB(int id, string color, int start, int duration, int priority)
     this->priority = priority;
     this->remaining = duration;
     this->state = "READY";
+    this->events = events;
 }
 
 TCB::~TCB() {}
 
-int TCB::getId() { return id; }
+string TCB::getId() { return id; }
 
 string TCB::getColor() { return color; }
 

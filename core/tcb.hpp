@@ -9,26 +9,27 @@ namespace Core
     class TCB
     {
     private:
-        int id;
+        string id;
         string color;
         int start;
         int duration;
         int priority;
         int remaining;
         string state;
+        list<string> events;
 
     public:
-        TCB(int id, string color, int start, int duration, int priority);
+        TCB(string id, string color, int start, int duration, int priority, list<string> events = {});
         ~TCB();
 
-        int getId();
+        string getId();
         string getColor();
         int getStart();
         int getDuration();
         int getPriority();
         int getRemaining();
         string getState();
-
+        
         void setState(string state);
         void decrementRemaining(int amount = 1);
     };
