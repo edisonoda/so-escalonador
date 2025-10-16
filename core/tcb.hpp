@@ -4,7 +4,10 @@
 #include <list>
 using namespace std;
 
-class TCB {
+namespace Core
+{
+    class TCB
+    {
     private:
         int id;
         string color;
@@ -27,5 +30,6 @@ class TCB {
         string getState();
 
         void setState(string state);
-        void decrementRemaining();
-};
+        void decrementRemaining(int amount = 1);
+    };
+} // namespace Core
