@@ -6,7 +6,7 @@
 
 using namespace Core;
 
-System* System::instance(NULL);
+System* System::instance(nullptr);
 
 System::System() : scheduler(Scheduler::Scheduler::getInstance()) {
     quantum = Constants::DEFAULT_QUANTUM;

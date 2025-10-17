@@ -2,7 +2,7 @@
 
 namespace Scheduler
 {
-    Scheduler* Scheduler::instance(NULL);
+    Scheduler* Scheduler::instance(nullptr);
 
     Scheduler::Scheduler() : task_list(nullptr), algorithm(nullptr) { }
 
