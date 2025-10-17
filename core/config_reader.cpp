@@ -4,15 +4,16 @@
 
 namespace Core
 {
-    ConfigReader::ConfigReader(const string &filename) : filename(filename) {}
+    ConfigReader::ConfigReader() { }
 
     ConfigReader::~ConfigReader()
     {
         closeFile();
     }
 
-    bool ConfigReader::openFile()
+    bool ConfigReader::openFile(const string &filename)
     {
+        closeFile();
         file.open(filename);
         return file.is_open();
     }
