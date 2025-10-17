@@ -6,11 +6,11 @@ int main() {
     Core::System* system = Core::System::getInstance();
 
     if (!system->loadConfig(CONFIG_FILE))
+    {
+        delete system;
         return 1;
-    
-    system->run();
+    }
     
     delete system;
-
     return 0;
 }
