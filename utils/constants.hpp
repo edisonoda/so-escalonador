@@ -6,8 +6,8 @@ using namespace std;
 
 namespace Constants
 {
-    constexpr float DEFAULT_FREQUENCY = 1;
-    constexpr float DEFAULT_QUANTUM = 5;
+    constexpr int DEFAULT_TICK_INTERVAL = 500; // Milliseconds
+    constexpr float DEFAULT_QUANTUM = 5.f;
 
     const string COLORS[8] = {
         "00F5FF",
