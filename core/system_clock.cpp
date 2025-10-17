@@ -6,6 +6,7 @@ using namespace Core;
 
 SystemClock::SystemClock() : tick_interval(Constants::DEFAULT_TICK_INTERVAL) {
     tick_counter = 0;
+    total_time = 0;
     ticked = true;
     start_time = system_clock::now();
 }
@@ -23,6 +24,7 @@ bool SystemClock::getTick()
     if (elap >= tick_interval && elap > 0)
     {
         ticked = true;
+        total_time ++;
 
         int t = (elap - (elap % tick_interval))/tick_interval;
 		tick_counter += t;

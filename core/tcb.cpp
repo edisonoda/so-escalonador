@@ -9,7 +9,7 @@ TCB::TCB(string id, string color, int start, int duration, int priority, list<st
     , priority(priority)
 {
     this->remaining = duration;
-    this->state = "READY";
+    this->state = TCBState::LOADED;
     this->events = events;
 }
 
@@ -27,8 +27,8 @@ int TCB::getPriority() const { return priority; }
 
 int TCB::getRemaining() const { return remaining; }
 
-string TCB::getState() const { return state; }
+TCBState TCB::getState() const { return state; }
 
-void TCB::setState(string state) { this->state = state; }
+void TCB::setState(TCBState state) { this->state = state; }
 
 void TCB::decrementRemaining(int amount) { this->remaining -= amount; } 

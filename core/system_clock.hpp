@@ -9,8 +9,9 @@ namespace Core
     class SystemClock
     {
     private:
-        int tick_interval;
+        const int tick_interval;
         int tick_counter;
+        int total_time;
         bool ticked;
 
         time_point<system_clock> start_time;
@@ -22,5 +23,6 @@ namespace Core
         ~SystemClock();
 
         bool getTick();
+        int getTotalTime() const { return total_time; }
     };
 }

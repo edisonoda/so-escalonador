@@ -1,4 +1,6 @@
+#include <iostream>
 #include "scheduler.hpp"
+using namespace std;
 
 namespace Scheduler
 {
@@ -27,8 +29,12 @@ namespace Scheduler
         
     }
 
-    void Scheduler::chooseTask()
+    Core::TCB* Scheduler::chooseTask()
     {
-
+        // temporário
+        Core::TCB* task = task_list->front();
+        task_list->pop_front();
+        cout << "Chosen task: " << task->getId() << endl;
+        return task;
     }
 }

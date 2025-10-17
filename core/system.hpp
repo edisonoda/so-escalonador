@@ -18,18 +18,23 @@ namespace Core
         Scheduler::Scheduler* scheduler;
         SystemClock clock;
         ConfigReader config_reader;
-        list<TCB*> task_list;
+        TCB* current_task;
+        list<TCB*> loaded_list;
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
 
         bool running;
         int quantum;
+        int tick_count;
 
         // Singleton
         System();
 
         void run();
         void tick();
+        void onQuantum();
+        void suspendCurrentTask(TCBState state);
+        void checkNewTasks();
     
     public:
         ~System();

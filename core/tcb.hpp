@@ -6,6 +6,15 @@ using namespace std;
 
 namespace Core
 {
+    enum class TCBState
+    {
+        LOADED,
+        READY,
+        RUNNING,
+        SUSPENDED,
+        TERMINATED
+    };
+
     class TCB
     {
     private:
@@ -15,7 +24,7 @@ namespace Core
         const int duration;
         const int priority;
         int remaining;
-        string state;
+        TCBState state;
         list<string> events;
 
     public:
@@ -28,9 +37,9 @@ namespace Core
         int getDuration() const;
         int getPriority() const;
         int getRemaining() const;
-        string getState() const;
-        
-        void setState(string state);
+        TCBState getState() const;
+
+        void setState(TCBState state);
         void decrementRemaining(int amount = 1);
     };
 } // namespace Core
