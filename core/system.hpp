@@ -3,6 +3,7 @@
 #include <list>
 #include "tcb.hpp"
 #include "config_reader.hpp"
+#include "system_clock.hpp"
 #include "../scheduler/scheduler.hpp"
 
 using namespace std;
@@ -13,19 +14,21 @@ namespace Core
     {
     private:
         static System* instance;
-        static float frequency;
         
         Scheduler::Scheduler* scheduler;
-        ConfigReader configReader;
+        SystemClock clock;
+        ConfigReader config_reader;
         list<TCB*> task_list;
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
 
+        bool running;
         int quantum;
 
         // Singleton
         System();
 
+        void run();
         void tick();
     
     public:
@@ -33,6 +36,5 @@ namespace Core
         static System* getInstance();
 
         bool loadConfig(const string &filename);
-        void run();
     };
 } // namespace Core
