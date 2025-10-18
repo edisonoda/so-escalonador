@@ -26,12 +26,15 @@ namespace Scheduler
 
     void Scheduler::setTaskList(list<Core::TCB*>* task_list)
     {
-        
+        this->task_list = task_list;
     }
 
     Core::TCB* Scheduler::chooseTask()
     {
         // temporário
+        if (task_list->empty())
+            return nullptr;
+
         Core::TCB* task = task_list->front();
         task_list->pop_front();
         cout << "Chosen task: " << task->getId() << endl;
