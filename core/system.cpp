@@ -14,6 +14,7 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
     scheduler->setTaskList(&ready_list);
     quantum = Constants::DEFAULT_QUANTUM;
     tick_count = 0;
+    task_count = 0;
     running = true;
 }
 
@@ -37,19 +38,12 @@ void System::run()
     {
         if (clock.getTick())
         {
+            cout << "============================================" << endl;
             cout << "System Tick: " << clock.getTotalTime() << endl;
             checkNewTasks();
             tick_count++;
             cout << "Tick Count: " << tick_count << endl;
-            if (tick_count >= quantum)
-            {
-                onQuantum();
-                tick_count = 0;
-            }
-            else
-            {
-                tick();
-            }
+            tick();
         }
     }
 }
@@ -60,24 +54,11 @@ void System::tick()
     if (current_task != nullptr)
     {
         current_task->decrementRemaining(1);
+
         if (current_task->getRemaining() <= 0)
-        {
             suspendCurrentTask(TCBState::TERMINATED);
-        }
-    }
-    else
-    {
-        current_task = scheduler->chooseTask();
-    }
-}
-
-void System::onQuantum()
-{
-    cout << "Quantum expired" << endl;
-
-    if (current_task != nullptr)
-    {
-        suspendCurrentTask(TCBState::READY);
+        else if (tick_count >= quantum)
+            suspendCurrentTask(TCBState::READY);
     }
     else
     {
@@ -90,6 +71,7 @@ void System::suspendCurrentTask(TCBState state)
     if (current_task != nullptr)
     {
         TCB *previous_task = current_task;
+
         switch (state)
         {
         case TCBState::SUSPENDED:
@@ -102,33 +84,42 @@ void System::suspendCurrentTask(TCBState state)
             cout << "Re-queuing task: " << current_task->getId() << endl;
             current_task->setState(TCBState::READY);
             ready_list.push_back(current_task);
+            tick_count = 0;
             break;
 
         default:
             cout << "Terminating task: " << current_task->getId() << endl;
             current_task->setState(TCBState::TERMINATED);
+            task_count--;
+            
+            if (task_count <= 0)
+                running = false;
+
             break;
         }
+
         current_task = scheduler->chooseTask();
         if (current_task != previous_task)
-        {
             tick_count = 0;
-        }
     }
 }
 
 void System::checkNewTasks()
 {
-    // Fazer remoção depois do for
-    for (TCB *task : loaded_list)
+    list<TCB*>::iterator i = loaded_list.begin();
+
+    while (i != loaded_list.end())
     {
-        if (task->getStart() >= clock.getTotalTime())
+        if ((*i)->getStart() <= clock.getTotalTime())
         {
-            cout << "Loading task: " << task->getId() << endl;
-            task->setState(TCBState::READY);
-            ready_list.push_back(task);
-            loaded_list.remove(task);
-            cout << "Task loaded: " << task->getId() << endl;
+            cout << "Loading task: " << (*i)->getId() << endl;
+            (*i)->setState(TCBState::READY);
+            ready_list.push_back((*i));
+            loaded_list.erase(i++);
+        }
+        else
+        {
+            i++;
         }
     }
 }
@@ -146,6 +137,7 @@ bool System::loadConfig(const string &filename)
     scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
 
     loaded_list = config_reader.readTasks();
+    task_count = loaded_list.size();
 
     for (TCB *task : loaded_list)
     {

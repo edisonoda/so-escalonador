@@ -26,13 +26,13 @@ namespace Core
         bool running;
         int quantum;
         int tick_count;
+        int task_count;
 
         // Singleton
         System();
 
         void run();
         void tick();
-        void onQuantum();
         void suspendCurrentTask(TCBState state);
         void checkNewTasks();
     
