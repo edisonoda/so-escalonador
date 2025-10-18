@@ -8,7 +8,7 @@ namespace Core
 {
     enum class TCBState
     {
-        LOADED,
+        NEW,
         READY,
         RUNNING,
         SUSPENDED,

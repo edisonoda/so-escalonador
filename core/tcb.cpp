@@ -9,7 +9,7 @@ TCB::TCB(string id, string color, int start, int duration, int priority, list<st
     , priority(priority)
 {
     this->remaining = duration;
-    this->state = TCBState::LOADED;
+    this->state = TCBState::NEW;
     this->events = events;
 }
 

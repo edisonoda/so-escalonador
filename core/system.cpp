@@ -106,16 +106,16 @@ void System::suspendCurrentTask(TCBState state)
 
 void System::checkNewTasks()
 {
-    list<TCB*>::iterator i = loaded_list.begin();
+    list<TCB*>::iterator i = new_list.begin();
 
-    while (i != loaded_list.end())
+    while (i != new_list.end())
     {
         if ((*i)->getStart() <= clock.getTotalTime())
         {
             cout << "Loading task: " << (*i)->getId() << endl;
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
-            loaded_list.erase(i++);
+            new_list.erase(i++);
         }
         else
         {
@@ -136,10 +136,10 @@ bool System::loadConfig(const string &filename)
     quantum = config_reader.getQuantum();
     scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
 
-    loaded_list = config_reader.readTasks();
-    task_count = loaded_list.size();
+    new_list = config_reader.readTasks();
+    task_count = new_list.size();
 
-    for (TCB *task : loaded_list)
+    for (TCB *task : new_list)
     {
         cout << "Loaded Task: " << task->getId()
              << ", Start: " << task->getStart()

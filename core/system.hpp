@@ -19,7 +19,7 @@ namespace Core
         SystemClock clock;
         ConfigReader config_reader;
         TCB* current_task;
-        list<TCB*> loaded_list;
+        list<TCB*> new_list;
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
 
