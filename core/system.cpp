@@ -51,18 +51,22 @@ void System::run()
 void System::tick()
 {
     cout << "Ticked" << endl;
+
+    if (current_task == nullptr) {
+        current_task = scheduler->chooseTask();
+        tick_count = 0;
+    }
+
     if (current_task != nullptr)
     {
         current_task->decrementRemaining(1);
+        cout << "Running task: " << current_task->getId()
+             << ", Remaining time: " << current_task->getRemaining() << endl;
 
         if (current_task->getRemaining() <= 0)
             suspendCurrentTask(TCBState::TERMINATED);
         else if (tick_count >= quantum)
             suspendCurrentTask(TCBState::READY);
-    }
-    else
-    {
-        current_task = scheduler->chooseTask();
     }
 }
 
@@ -76,21 +80,22 @@ void System::suspendCurrentTask(TCBState state)
         {
         case TCBState::SUSPENDED:
             cout << "Suspending task: " << current_task->getId() << endl;
-            current_task->setState(TCBState::SUSPENDED);
+            current_task->setState(state);
             suspended_list.push_back(current_task);
             break;
 
         case TCBState::READY:
             cout << "Re-queuing task: " << current_task->getId() << endl;
-            current_task->setState(TCBState::READY);
-            ready_list.push_back(current_task);
+            // current_task->setState(TCBState::READY);
+            // ready_list.push_back(current_task);
             tick_count = 0;
             break;
 
         default:
             cout << "Terminating task: " << current_task->getId() << endl;
-            current_task->setState(TCBState::TERMINATED);
+            current_task->setState(state);
             task_count--;
+            cout << "Remaining tasks: " << task_count << endl;
             
             if (task_count <= 0)
                 running = false;
@@ -98,7 +103,7 @@ void System::suspendCurrentTask(TCBState state)
             break;
         }
 
-        current_task = scheduler->chooseTask();
+        current_task = scheduler->chooseTask(current_task);
         if (current_task != previous_task)
             tick_count = 0;
     }

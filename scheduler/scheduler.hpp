@@ -26,6 +26,6 @@ namespace Scheduler
         // void setAlgorithm(AlgorithmID id);
         void setAlgorithm(string id);
         void setTaskList(list<Core::TCB*>* task_list);
-        Core::TCB* chooseTask();
+        Core::TCB* chooseTask(Core::TCB* current_task = nullptr);
     };
 } // namespace Scheduler

@@ -29,9 +29,12 @@ namespace Scheduler
         this->task_list = task_list;
     }
 
-    Core::TCB* Scheduler::chooseTask()
+    Core::TCB* Scheduler::chooseTask(Core::TCB* current_task)
     {
         // temporário
+        if (current_task != nullptr && current_task->getState() == Core::TCBState::READY)
+            return current_task;
+
         if (task_list->empty())
             return nullptr;
 
