@@ -1,7 +1,7 @@
 #include "tcb.hpp"
 using namespace Core;
 
-TCB::TCB(string id, string color, int start, int duration, int priority, list<string> events)
+TCB::TCB(string id, int color, int start, int duration, int priority, list<string> events)
     : id(id)
     , color(color)
     , start(start)
@@ -17,7 +17,7 @@ TCB::~TCB() {}
 
 string TCB::getId() const { return id; }
 
-string TCB::getColor() const { return color; }
+int TCB::getColor() const { return color; }
 
 int TCB::getStart() const { return start; }
 

@@ -11,6 +11,10 @@ namespace UI
     public:
         ~Screen();
         static Screen* getInstance();
-
+        void sprint(int x, int y, char ch = '*');
+        void srefresh();
+        void sclear();
+        void setColor(int color);
+        int sgetch();
     };
-} // namespace Screen
+} // namespace UI

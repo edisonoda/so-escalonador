@@ -64,7 +64,7 @@ list<TCB *> ConfigReader::readTasks()
 
         TCB *tcb = new TCB(
             configs[0],
-            Constants::COLORS[stoi(configs[1])],
+            stoi(configs[1]),
             stoi(configs[2]),
             stoi(configs[3]),
             stoi(configs[4])

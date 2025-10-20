@@ -19,7 +19,7 @@ namespace Core
     {
     private:
         const string id;
-        const string color;
+        const int color;
         const int start;
         const int duration;
         const int priority;
@@ -28,11 +28,11 @@ namespace Core
         list<string> events;
 
     public:
-        TCB(string id, string color, int start, int duration, int priority, list<string> events = {});
+        TCB(string id, int color, int start, int duration, int priority, list<string> events = {});
         ~TCB();
 
         string getId() const;
-        string getColor() const;
+        int getColor() const;
         int getStart() const;
         int getDuration() const;
         int getPriority() const;
