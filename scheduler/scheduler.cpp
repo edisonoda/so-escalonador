@@ -8,7 +8,11 @@ namespace Scheduler
 
     Scheduler::Scheduler() : task_list(nullptr), algorithm(nullptr) { }
 
-    Scheduler::~Scheduler() { }
+    Scheduler::~Scheduler() 
+    {
+        instance = nullptr;
+        delete algorithm;
+    }
 
     Scheduler* Scheduler::getInstance()
     {
@@ -41,6 +45,7 @@ namespace Scheduler
         Core::TCB* task = task_list->front();
         task_list->pop_front();
         cout << "Chosen task: " << task->getId() << endl;
+        task->setState(Core::TCBState::RUNNING);
         return task;
     }
 }

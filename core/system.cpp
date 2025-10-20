@@ -20,6 +20,7 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
 
 System::~System()
 {
+    instance = nullptr;
     delete scheduler;
 }
 
