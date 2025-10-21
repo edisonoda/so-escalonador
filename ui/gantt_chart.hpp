@@ -18,6 +18,7 @@ namespace UI
 
     public:
         static GanttChart* getInstance();
+        void setScreen(Screen* scr) { screen = scr; }
         void draw(int tick);
         void setTasks(vector<Core::TCB*>* tasks);
 

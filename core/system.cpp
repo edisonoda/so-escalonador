@@ -16,6 +16,8 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
     tick_count = 0;
     task_count = 0;
     running = true;
+    screen = UI::Screen::getInstance();
+    gantt_chart = UI::GanttChart::getInstance();
 }
 
 System::~System()
@@ -38,11 +40,11 @@ void System::run()
     {
         if (clock.getTick())
         {
-            cout << "============================================" << endl;
-            cout << "System Tick: " << clock.getTotalTime() << endl;
+            // cout << "============================================" << endl;
+            // cout << "System Tick: " << clock.getTotalTime() << endl;
             checkNewTasks();
             tick_count++;
-            cout << "Tick Count: " << tick_count << endl;
+            // cout << "Tick Count: " << tick_count << endl;
             tick();
         }
     }
@@ -50,7 +52,7 @@ void System::run()
 
 void System::tick()
 {
-    cout << "Ticked" << endl;
+    // cout << "Ticked" << endl;
 
     if (current_task == nullptr) {
         current_task = scheduler->chooseTask();
@@ -60,8 +62,8 @@ void System::tick()
     if (current_task != nullptr)
     {
         current_task->decrementRemaining(1);
-        cout << "Running task: " << current_task->getId()
-             << ", Remaining time: " << current_task->getRemaining() << endl;
+        // cout << "Running task: " << current_task->getId()
+            // << ", Remaining time: " << current_task->getRemaining() << endl;
 
         if (current_task->getRemaining() <= 0)
             suspendCurrentTask(TCBState::TERMINATED);
@@ -79,23 +81,23 @@ void System::suspendCurrentTask(TCBState state)
         switch (state)
         {
         case TCBState::SUSPENDED:
-            cout << "Suspending task: " << current_task->getId() << endl;
+            // cout << "Suspending task: " << current_task->getId() << endl;
             current_task->setState(state);
             suspended_list.push_back(current_task);
             break;
 
         case TCBState::READY:
-            cout << "Re-queuing task: " << current_task->getId() << endl;
+            // cout << "Re-queuing task: " << current_task->getId() << endl;
             // current_task->setState(TCBState::READY);
             // ready_list.push_back(current_task);
             tick_count = 0;
             break;
 
         default:
-            cout << "Terminating task: " << current_task->getId() << endl;
+            // cout << "Terminating task: " << current_task->getId() << endl;
             current_task->setState(state);
             task_count--;
-            cout << "Remaining tasks: " << task_count << endl;
+            // cout << "Remaining tasks: " << task_count << endl;
             
             if (task_count <= 0)
                 running = false;
@@ -117,7 +119,7 @@ void System::checkNewTasks()
     {
         if ((*i)->getStart() <= clock.getTotalTime())
         {
-            cout << "Loading task: " << (*i)->getId() << endl;
+            // cout << "Loading task: " << (*i)->getId() << endl;
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
             new_list.erase(i++);
@@ -142,23 +144,23 @@ bool System::loadConfig(const string &filename)
     scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
 
     new_list = config_reader.readTasks();
-    
+
     ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
-    
-    /*for (TCB* task : new_list)
-        ord_tasks.push_back(task);*/
-    
+
+    gantt_chart->setScreen(screen);
+    gantt_chart->setTasks(&ord_tasks);
+
     task_count = new_list.size();
 
     for (TCB *task : new_list)
     {
-        cout << "Loaded Task: " << task->getId()
-             << ", Start: " << task->getStart()
-             << ", Duration: " << task->getDuration()
-             << ", Priority: " << task->getPriority() << endl;
+        // cout << "Loaded Task: " << task->getId()
+            //  << ", Start: " << task->getStart()
+            //  << ", Duration: " << task->getDuration()
+            //  << ", Priority: " << task->getPriority() << endl;
     }
 
-    cout << "Starting system with quantum: " << quantum << endl;
+    // cout << "Starting system with quantum: " << quantum << endl;
 
     run();
 

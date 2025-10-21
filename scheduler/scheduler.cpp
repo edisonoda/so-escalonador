@@ -43,7 +43,7 @@ namespace Scheduler
 
         Core::TCB* task = task_list->front();
         task_list->pop_front();
-        cout << "Chosen task: " << task->getId() << endl;
+        // cout << "Chosen task: " << task->getId() << endl;
         task->setState(Core::TCBState::RUNNING);
         return task;
     }

@@ -6,6 +6,8 @@
 #include "config_reader.hpp"
 #include "system_clock.hpp"
 #include "../scheduler/scheduler.hpp"
+#include "../ui/screen.hpp"
+#include "../ui/gantt_chart.hpp"
 
 using namespace std;
 
@@ -24,6 +26,9 @@ namespace Core
         list<TCB*> new_list;
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
+
+        UI::Screen* screen;
+        UI::GanttChart* gantt_chart;
 
         bool running;
         int quantum;
