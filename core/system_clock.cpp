@@ -6,7 +6,7 @@ using namespace Core;
 
 SystemClock::SystemClock() : tick_interval(Constants::DEFAULT_TICK_INTERVAL) {
     tick_counter = 0;
-    total_time = 0;
+    total_time = -1;
     ticked = true;
     start_time = system_clock::now();
 }

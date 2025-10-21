@@ -10,6 +10,7 @@ namespace UI
         static Screen* instance;
         int screen_edge_x;
         int screen_edge_y;
+        int color_pair_count;
         Screen();
         void checkScreenEdges(int x, int y);
 
@@ -22,7 +23,8 @@ namespace UI
         void sprint(int x, int y, string str);
         void srefresh();
         void sclear();
-        void setColor(int color, int bg_color);
+        void initColor(int color, int bg_color);
+        void setColor(int color_index);
         int sgetch();
     };
 } // namespace UI

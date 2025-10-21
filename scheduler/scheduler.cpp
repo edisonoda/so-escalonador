@@ -36,7 +36,10 @@ namespace Scheduler
     {
         // temporário
         if (current_task != nullptr && current_task->getState() == Core::TCBState::READY)
+        {
+            current_task->setState(Core::TCBState::RUNNING);
             return current_task;
+        }
 
         if (task_list->empty())
             return nullptr;

@@ -23,6 +23,8 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
 System::~System()
 {
     instance = nullptr;
+    delete screen;
+    delete gantt_chart;
     delete scheduler;
 }
 
@@ -48,6 +50,8 @@ void System::run()
             tick();
         }
     }
+
+    screen->sgetch();
 }
 
 void System::tick()
@@ -58,6 +62,8 @@ void System::tick()
         current_task = scheduler->chooseTask();
         tick_count = 0;
     }
+
+    gantt_chart->draw(clock.getTotalTime());
 
     if (current_task != nullptr)
     {
@@ -88,7 +94,7 @@ void System::suspendCurrentTask(TCBState state)
 
         case TCBState::READY:
             // cout << "Re-queuing task: " << current_task->getId() << endl;
-            // current_task->setState(TCBState::READY);
+            current_task->setState(state);
             // ready_list.push_back(current_task);
             tick_count = 0;
             break;
@@ -154,11 +160,13 @@ bool System::loadConfig(const string &filename)
 
     for (TCB *task : new_list)
     {
-        // cout << "Loaded Task: " << task->getId()
+        screen->initColor(0, task->getColor());
+    }
+
+    // cout << "Loaded Task: " << task->getId()
             //  << ", Start: " << task->getStart()
             //  << ", Duration: " << task->getDuration()
             //  << ", Priority: " << task->getPriority() << endl;
-    }
 
     // cout << "Starting system with quantum: " << quantum << endl;
 
