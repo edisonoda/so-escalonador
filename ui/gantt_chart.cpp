@@ -1,4 +1,5 @@
 #include "gantt_chart.hpp"
+#include "screen.hpp"
 using namespace UI;
 
 GanttChart* GanttChart::instance = nullptr;
@@ -33,23 +34,23 @@ void GanttChart::draw(int tick)
         switch (task->getState())
         {
             case Core::TCBState::READY:
-                screen->setColor(3); // cinza
+                screen->setColor(DefaultColor::GRAY); // cinza
                 break;
             case Core::TCBState::RUNNING:
-                screen->setColor(i + 4); // cor da tarefa no fundo
+                screen->setColor(i); // cor da tarefa no fundo
                 break;
             case Core::TCBState::SUSPENDED:
-                screen->setColor(3); // cinza
+                screen->setColor(DefaultColor::GRAY); // cinza
                 break;
             default:
-                screen->setColor(2); // preto
+                screen->setColor(DefaultColor::BLACK); // preto
                 break;
         }
 
         screen->sprint(x, i, "   ");
     }
 
-    screen->setColor(1); // branco no preto
+    screen->setColor(DefaultColor::WHITE); // branco no preto
     screen->sprint(x, ord_tasks->size(), to_string(tick));
 
     screen->srefresh();
@@ -58,12 +59,15 @@ void GanttChart::draw(int tick)
 void GanttChart::setTasks(vector<Core::TCB*>* tasks)
 {
     ord_tasks = tasks;
+    screen->invertColor(true);
     // imprime o eixo y
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
         Core::TCB* task = (*ord_tasks)[i];
+        screen->setColor(i);
         screen->sprint(0, i, task->getId());
         screen->sprint(screen->getScreenEdgeX(), i, '|');     
     }
+    screen->invertColor(false);
     screen->srefresh();
 }

@@ -8,6 +8,7 @@ Screen* Screen::instance(nullptr);
 Screen::Screen()
 {
     color_pair_count = 0;
+    inverted = false;
     initscr();
     start_color();
     initColor(7, 0); // branco no preto
@@ -66,9 +67,30 @@ void Screen::initColor(int color, int bg_color)
     init_pair(++color_pair_count, color, bg_color);
 }
 
+void Screen::setColor(DefaultColor color)
+{
+    attron(COLOR_PAIR(static_cast<int>(color)));
+}
+
 void Screen::setColor(int color_index)
 {
-    attron(COLOR_PAIR(color_index));
+    attron(COLOR_PAIR(color_index + 4));
+}
+
+void Screen::invertColor()
+{
+    if (inverted)
+        attroff(A_REVERSE);
+    else
+        attron(A_REVERSE);
+
+    inverted = !inverted;
+}
+
+void Screen::invertColor(bool inv)
+{
+    inverted = !inv;
+    invertColor();
 }
 
 int Screen::sgetch()

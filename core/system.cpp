@@ -2,7 +2,7 @@
 
 #include "../utils/constants.hpp"
 
-#include <iostream>
+// #include <iostream>
 
 using namespace Core;
 
@@ -51,6 +51,7 @@ void System::run()
         }
     }
 
+    gantt_chart->draw(clock.getTotalTime() + 1);
     screen->sgetch();
 }
 
@@ -150,18 +151,15 @@ bool System::loadConfig(const string &filename)
     scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
 
     new_list = config_reader.readTasks();
+    task_count = new_list.size();
+
+    for (TCB *task : new_list)
+        screen->initColor(0, task->getColor());
 
     ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
 
     gantt_chart->setScreen(screen);
     gantt_chart->setTasks(&ord_tasks);
-
-    task_count = new_list.size();
-
-    for (TCB *task : new_list)
-    {
-        screen->initColor(0, task->getColor());
-    }
 
     // cout << "Loaded Task: " << task->getId()
             //  << ", Start: " << task->getStart()
