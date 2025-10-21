@@ -1,7 +1,7 @@
 #include "core/system.hpp"
 // #include "ui/screen.hpp"
 
-#define CONFIG_FILE "configs/fifo1.txt"
+#define CONFIG_FILE "configs/fcfs_maziero.txt"
 
 int main() {
     Core::System* system = Core::System::getInstance();
