@@ -26,10 +26,9 @@ System::~System()
 
 System *System::getInstance()
 {
-    if (instance != nullptr)
-        return instance;
+    if (instance == nullptr)
+        instance = new System();
 
-    instance = new System();
     return instance;
 }
 
@@ -143,6 +142,12 @@ bool System::loadConfig(const string &filename)
     scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
 
     new_list = config_reader.readTasks();
+    
+    ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
+    
+    /*for (TCB* task : new_list)
+        ord_tasks.push_back(task);*/
+    
     task_count = new_list.size();
 
     for (TCB *task : new_list)

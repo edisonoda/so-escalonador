@@ -16,10 +16,9 @@ namespace Scheduler
 
     Scheduler* Scheduler::getInstance()
     {
-        if (instance != nullptr)
-            return instance;
-
-        instance = new Scheduler();
+        if (instance == nullptr)
+            instance = new Scheduler();
+            
         return instance;
     }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <vector>
 #include "tcb.hpp"
 #include "config_reader.hpp"
 #include "system_clock.hpp"
@@ -19,6 +20,7 @@ namespace Core
         SystemClock clock;
         ConfigReader config_reader;
         TCB* current_task;
+        vector<TCB*> ord_tasks;
         list<TCB*> new_list;
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
