@@ -5,6 +5,7 @@
 #include "scheduling_algorithm.hpp"
 
 using namespace std;
+using namespace Core;
 
 namespace Scheduler
 {
@@ -13,7 +14,7 @@ namespace Scheduler
     private:
         static Scheduler* instance;
 
-        list<Core::TCB*>* task_list;
+        list<TCB*>* task_list;
         SchedulingAlgorithm* algorithm;
 
         // Singleton
@@ -25,7 +26,7 @@ namespace Scheduler
 
         // void setAlgorithm(AlgorithmID id);
         void setAlgorithm(string id);
-        void setTaskList(list<Core::TCB*>* task_list);
-        Core::TCB* chooseTask(Core::TCB* current_task = nullptr);
+        void setTaskList(list<TCB*>* task_list);
+        TCB* chooseTask(TCB* current_task = nullptr);
     };
 } // namespace Scheduler

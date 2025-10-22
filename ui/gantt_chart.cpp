@@ -29,17 +29,17 @@ void GanttChart::draw(int tick)
 
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
-        Core::TCB* task = (*ord_tasks)[i];
+        TCB* task = (*ord_tasks)[i];
 
         switch (task->getState())
         {
-            case Core::TCBState::READY:
+            case TCBState::READY:
                 screen->setColor(DefaultColor::GRAY); // cinza
                 break;
-            case Core::TCBState::RUNNING:
+            case TCBState::RUNNING:
                 screen->setColor(i); // cor da tarefa no fundo
                 break;
-            case Core::TCBState::SUSPENDED:
+            case TCBState::SUSPENDED:
                 screen->setColor(DefaultColor::GRAY); // cinza
                 break;
             default:
@@ -56,14 +56,14 @@ void GanttChart::draw(int tick)
     screen->srefresh();
 }
 
-void GanttChart::setTasks(vector<Core::TCB*>* tasks)
+void GanttChart::setTasks(vector<TCB*>* tasks)
 {
     ord_tasks = tasks;
     screen->invertColor(true);
     // imprime o eixo y
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
-        Core::TCB* task = (*ord_tasks)[i];
+        TCB* task = (*ord_tasks)[i];
         screen->setColor(i);
         screen->sprint(0, i, task->getId());
         screen->sprint(screen->getScreenEdgeX(), i, '|');     

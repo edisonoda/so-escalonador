@@ -3,7 +3,9 @@
 #include <vector>
 #include "../core/tcb.hpp"
 #include "screen.hpp"
+
 using namespace std;
+using namespace Core;
 
 namespace UI
 {
@@ -11,7 +13,7 @@ namespace UI
     {
     private:
         static GanttChart* instance;
-        vector<Core::TCB*>* ord_tasks; 
+        vector<TCB*>* ord_tasks; 
         Screen* screen;
 
         GanttChart();
@@ -20,7 +22,7 @@ namespace UI
         static GanttChart* getInstance();
         void setScreen(Screen* scr) { screen = scr; }
         void draw(int tick);
-        void setTasks(vector<Core::TCB*>* tasks);
+        void setTasks(vector<TCB*>* tasks);
 
         ~GanttChart();
     };

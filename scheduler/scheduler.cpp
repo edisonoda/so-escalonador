@@ -27,27 +27,27 @@ namespace Scheduler
         
     }
 
-    void Scheduler::setTaskList(list<Core::TCB*>* task_list)
+    void Scheduler::setTaskList(list<TCB*>* task_list)
     {
         this->task_list = task_list;
     }
 
-    Core::TCB* Scheduler::chooseTask(Core::TCB* current_task)
+    TCB* Scheduler::chooseTask(TCB* current_task)
     {
         // temporário
-        if (current_task != nullptr && current_task->getState() == Core::TCBState::READY)
+        if (current_task != nullptr && current_task->getState() == TCBState::READY)
         {
-            current_task->setState(Core::TCBState::RUNNING);
+            current_task->setState(TCBState::RUNNING);
             return current_task;
         }
 
         if (task_list->empty())
             return nullptr;
 
-        Core::TCB* task = task_list->front();
+        TCB* task = task_list->front();
         task_list->pop_front();
         // cout << "Chosen task: " << task->getId() << endl;
-        task->setState(Core::TCBState::RUNNING);
+        task->setState(TCBState::RUNNING);
         return task;
     }
 }

@@ -5,6 +5,7 @@
 #include "../core/tcb.hpp"
 
 using namespace std;
+using namespace Core;
 
 namespace Scheduler
 {
@@ -18,10 +19,10 @@ namespace Scheduler
     {
     protected:
         const static string name;
-        list<Core::TCB*>* task_list;
+        list<TCB*>* task_list;
     
     public:
-        SchedulingAlgorithm(list<Core::TCB*>* task_list):task_list(task_list) { };
+        SchedulingAlgorithm(list<TCB*>* task_list):task_list(task_list) { };
         ~SchedulingAlgorithm() { };
 
         string getName() const { return name; }
