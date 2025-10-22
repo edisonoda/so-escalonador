@@ -17,15 +17,12 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
     task_count = 0;
     running = true;
     screen = UI::Screen::getInstance();
-    gantt_chart = UI::GanttChart::getInstance();
-    system_monitor = UI::SystemMonitor::getInstance();
 }
 
 System::~System()
 {
     instance = nullptr;
     delete screen;
-    delete gantt_chart;
     delete scheduler;
 }
 
@@ -52,8 +49,8 @@ void System::run()
         }
     }
 
-    gantt_chart->drawTick(clock.getTotalTime() + 1);
-    system_monitor->draw();
+    gantt_chart.drawTick(clock.getTotalTime() + 1);
+    system_monitor.drawTick(clock.getTotalTime() + 1);
     screen->getCh();
 }
 
@@ -66,8 +63,8 @@ void System::tick()
         tick_count = 0;
     }
 
-    gantt_chart->drawTick(clock.getTotalTime());
-    system_monitor->draw();
+    gantt_chart.drawTick(clock.getTotalTime());
+    system_monitor.drawTick(clock.getTotalTime());
 
     if (current_task != nullptr)
     {
@@ -161,13 +158,13 @@ bool System::loadConfig(const string &filename)
 
     ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
 
-    gantt_chart->setScreen(screen);
-    gantt_chart->setTasks(&ord_tasks);
+    gantt_chart.setScreen(screen);
+    gantt_chart.setTasks(&ord_tasks);
 
-    system_monitor->setOffset(task_count + 2);
-    system_monitor->setScreen(screen);
-    system_monitor->setTasks(&ord_tasks);
-    system_monitor->draw();
+    system_monitor.setOffset(task_count + 2);
+    system_monitor.setScreen(screen);
+    system_monitor.setTasks(&ord_tasks);
+    system_monitor.drawTick(0);
 
     // cout << "Loaded Task: " << task->getId()
             //  << ", Start: " << task->getStart()

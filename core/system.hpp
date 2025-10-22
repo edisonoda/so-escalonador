@@ -29,8 +29,8 @@ namespace Core
         list<TCB*> suspended_list;
 
         UI::Screen* screen;
-        UI::GanttChart* gantt_chart;
-        UI::SystemMonitor* system_monitor;
+        UI::GanttChart gantt_chart;
+        UI::SystemMonitor system_monitor;
 
         bool running;
         int quantum;

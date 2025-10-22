@@ -1,33 +1,15 @@
 #pragma once
 
-#include <vector>
-#include <string>
-#include "screen.hpp"
-#include "../core/tcb.hpp"
-
-using namespace std;
-using namespace Core;
+#include "task_visual.hpp"
 
 namespace UI
 {
-    class SystemMonitor
+    class SystemMonitor : public TaskVisual
     {
-    private:
-        static SystemMonitor *instance;
-        Screen *screen;
-        vector<TCB *> *ord_tasks;
-
-        int offset;
-
-        SystemMonitor();
-
     public:
-        static SystemMonitor *getInstance();
-        void setScreen(Screen *scr) { screen = scr; }
-        void setTasks(vector<TCB *> *tasks);
-        void setOffset(const int off);
-        void draw();
-
+        SystemMonitor();
         ~SystemMonitor();
+        
+        virtual void drawTick(int tick);
     };
 } // namespace UI
