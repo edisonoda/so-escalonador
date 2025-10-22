@@ -48,14 +48,13 @@ void System::run()
             checkNewTasks();
             tick_count++;
             // cout << "Tick Count: " << tick_count << endl;
-            system_monitor->draw();
             tick();
         }
     }
 
-    gantt_chart->draw(clock.getTotalTime() + 1);
+    gantt_chart->drawTick(clock.getTotalTime() + 1);
     system_monitor->draw();
-    screen->sgetch();
+    screen->getCh();
 }
 
 void System::tick()
@@ -67,7 +66,8 @@ void System::tick()
         tick_count = 0;
     }
 
-    gantt_chart->draw(clock.getTotalTime());
+    gantt_chart->drawTick(clock.getTotalTime());
+    system_monitor->draw();
 
     if (current_task != nullptr)
     {
@@ -161,11 +161,13 @@ bool System::loadConfig(const string &filename)
 
     ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
 
-    system_monitor->setScreen(screen);
-    system_monitor->setTasks(&ord_tasks);
-
     gantt_chart->setScreen(screen);
     gantt_chart->setTasks(&ord_tasks);
+
+    system_monitor->setOffset(task_count + 2);
+    system_monitor->setScreen(screen);
+    system_monitor->setTasks(&ord_tasks);
+    system_monitor->draw();
 
     // cout << "Loaded Task: " << task->getId()
             //  << ", Start: " << task->getStart()

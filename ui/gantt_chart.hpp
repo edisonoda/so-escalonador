@@ -15,13 +15,18 @@ namespace UI
         static GanttChart* instance;
         vector<TCB*>* ord_tasks; 
         Screen* screen;
+        int screen_edge_x;
+        int screen_edge_y;
 
         GanttChart();
+        void checkScreenEdges(int x, int y);
+        void print(int x, int y, string str);
+        void print(int x, int y, char ch);
 
     public:
         static GanttChart* getInstance();
         void setScreen(Screen* scr) { screen = scr; }
-        void draw(int tick);
+        void drawTick(int tick);
         void setTasks(vector<TCB*>* tasks);
 
         ~GanttChart();

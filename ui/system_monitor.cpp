@@ -1,5 +1,4 @@
 #include "system_monitor.hpp"
-#include <iostream>
 
 using namespace std;
 
@@ -9,6 +8,7 @@ SystemMonitor *SystemMonitor::instance = nullptr;
 
 SystemMonitor::SystemMonitor()
 {
+    offset = 0;
 }
 
 SystemMonitor::~SystemMonitor()
@@ -58,13 +58,13 @@ void SystemMonitor::draw()
             break;
         }
 
-        screen->sprint(x, i, status_str);
+        screen->print(x, i + offset, status_str);
         
         screen->setColor(DefaultColor::WHITE);
-        screen->sprint(x + 10, i, rem_str);
+        screen->print(x + 10, i + offset, rem_str);
     }
 
-    screen->srefresh();
+    screen->refresh();
 }
 
 void SystemMonitor::setTasks(vector<TCB *> *tasks)
@@ -76,9 +76,14 @@ void SystemMonitor::setTasks(vector<TCB *> *tasks)
     {
         TCB *task = (*ord_tasks)[i];
         screen->setColor(i);
-        screen->sprint(0, i, task->getId());
-        screen->sprint(3, i, '|');
+        screen->print(0, i + offset, task->getId());
+        screen->print(task->getId().length(), i + offset, "|");
     }
     screen->invertColor(false);
-    screen->srefresh();
+    screen->refresh();
+}
+
+void SystemMonitor::setOffset(const int off)
+{
+    offset = off;
 }

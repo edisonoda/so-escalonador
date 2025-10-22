@@ -17,12 +17,15 @@ namespace UI
         Screen *screen;
         vector<TCB *> *ord_tasks;
 
+        int offset;
+
         SystemMonitor();
 
     public:
         static SystemMonitor *getInstance();
         void setScreen(Screen *scr) { screen = scr; }
         void setTasks(vector<TCB *> *tasks);
+        void setOffset(const int off);
         void draw();
 
         ~SystemMonitor();

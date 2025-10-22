@@ -2,10 +2,14 @@
 #include "screen.hpp"
 using namespace UI;
 
+#define PRINT_UNIT "   "
+
 GanttChart* GanttChart::instance = nullptr;
 
 GanttChart::GanttChart()
 {
+    screen_edge_x = 0;
+    screen_edge_y = 0;
 }
 
 GanttChart::~GanttChart()
@@ -21,11 +25,11 @@ GanttChart* GanttChart::getInstance()
     return instance;
 }
 
-void GanttChart::draw(int tick)
+void GanttChart::drawTick(int tick)
 {
     // um tick = três colunas
     // vamos desenhar coluna por coluna
-    int x = screen->getScreenEdgeX();
+    int x = screen_edge_x;
 
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
@@ -47,13 +51,13 @@ void GanttChart::draw(int tick)
                 break;
         }
 
-        screen->sprint(x, i, "   ");
+        print(x, i, PRINT_UNIT);
     }
 
     screen->setColor(DefaultColor::WHITE); // branco no preto
-    screen->sprint(x, ord_tasks->size(), to_string(tick));
+    print(x, ord_tasks->size(), to_string(tick));
 
-    screen->srefresh();
+    screen->refresh();
 }
 
 void GanttChart::setTasks(vector<TCB*>* tasks)
@@ -65,10 +69,30 @@ void GanttChart::setTasks(vector<TCB*>* tasks)
     {
         TCB* task = (*ord_tasks)[i];
         screen->setColor(i);
-        screen->sprint(28, i, task->getId());
-        screen->sprint(31, i, '|');
-        // screen->sprint(screen->getScreenEdgeX(), i, '|');     
+        print(0, i, task->getId());
+        print(screen_edge_x, i, '|');
     }
     screen->invertColor(false);
-    screen->srefresh();
+    screen->refresh();
+}
+
+void GanttChart::print(int x, int y, string str)
+{
+    checkScreenEdges(x + str.length(), y);
+    screen->print(x, y, str);
+}
+
+void GanttChart::print(int x, int y, char ch)
+{
+    checkScreenEdges(x, y);
+    screen->print(x, y, ch);
+}
+
+void GanttChart::checkScreenEdges(int x, int y)
+{
+    if (x > screen_edge_x)
+        screen_edge_x = x;
+
+    if (y > screen_edge_y)
+        screen_edge_y = y;
 }

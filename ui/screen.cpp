@@ -31,33 +31,22 @@ Screen* Screen::getInstance()
     return instance;
 }
 
-void Screen::checkScreenEdges(int x, int y)
+void Screen::print(int x, int y, char ch)
 {
-    if (x > screen_edge_x)
-        screen_edge_x = x;
-
-    if (y > screen_edge_y)
-        screen_edge_y = y;
-}
-
-void Screen::sprint(int x, int y, char ch)
-{
-    checkScreenEdges(x, y);
     mvprintw(y, x, "%c", ch);
 }
 
-void Screen::sprint(int x, int y, string str)
+void Screen::print(int x, int y, string str)
 {
-    checkScreenEdges(x + str.length(), y);
     mvprintw(y, x, "%s", str.c_str());
 }
 
-void Screen::srefresh()
+void Screen::refresh()
 {
     ::refresh();
 }
 
-void Screen::sclear()
+void Screen::clear()
 {
     ::clear();
 }
@@ -93,7 +82,7 @@ void Screen::invertColor(bool inv)
     invertColor();
 }
 
-int Screen::sgetch()
+int Screen::getCh()
 {
     return ::getch();
 }
