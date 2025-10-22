@@ -49,8 +49,6 @@ void System::run()
         }
     }
 
-    gantt_chart.drawTick(clock.getTotalTime() + 1);
-    system_monitor.drawTick(clock.getTotalTime() + 1);
     screen->getCh();
 }
 
@@ -63,20 +61,21 @@ void System::tick()
         tick_count = 0;
     }
 
-    gantt_chart.drawTick(clock.getTotalTime());
-    system_monitor.drawTick(clock.getTotalTime());
-
     if (current_task != nullptr)
     {
-        current_task->decrementRemaining(1);
-        // cout << "Running task: " << current_task->getId()
-            // << ", Remaining time: " << current_task->getRemaining() << endl;
-
         if (current_task->getRemaining() <= 0)
             suspendCurrentTask(TCBState::TERMINATED);
         else if (tick_count >= quantum)
             suspendCurrentTask(TCBState::READY);
+
+        if (current_task != nullptr)
+            current_task->decrementRemaining(1);
+        // cout << "Running task: " << current_task->getId()
+            // << ", Remaining time: " << current_task->getRemaining() << endl;
     }
+
+    gantt_chart.drawTick(clock.getTotalTime());
+    system_monitor.drawTick(clock.getTotalTime());
 }
 
 void System::suspendCurrentTask(TCBState state)
@@ -84,25 +83,23 @@ void System::suspendCurrentTask(TCBState state)
     if (current_task != nullptr)
     {
         TCB *previous_task = current_task;
+        current_task->setState(state);
 
         switch (state)
         {
         case TCBState::SUSPENDED:
             // cout << "Suspending task: " << current_task->getId() << endl;
-            current_task->setState(state);
             suspended_list.push_back(current_task);
             break;
 
         case TCBState::READY:
             // cout << "Re-queuing task: " << current_task->getId() << endl;
-            current_task->setState(state);
             // ready_list.push_back(current_task);
             tick_count = 0;
             break;
 
         default:
             // cout << "Terminating task: " << current_task->getId() << endl;
-            current_task->setState(state);
             task_count--;
             // cout << "Remaining tasks: " << task_count << endl;
             
