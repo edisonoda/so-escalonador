@@ -18,6 +18,7 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
     running = true;
     screen = UI::Screen::getInstance();
     gantt_chart = UI::GanttChart::getInstance();
+    system_monitor = UI::SystemMonitor::getInstance();
 }
 
 System::~System()
@@ -47,11 +48,13 @@ void System::run()
             checkNewTasks();
             tick_count++;
             // cout << "Tick Count: " << tick_count << endl;
+            system_monitor->draw();
             tick();
         }
     }
 
     gantt_chart->draw(clock.getTotalTime() + 1);
+    system_monitor->draw();
     screen->sgetch();
 }
 
@@ -157,6 +160,9 @@ bool System::loadConfig(const string &filename)
         screen->initColor(0, task->getColor());
 
     ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
+
+    system_monitor->setScreen(screen);
+    system_monitor->setTasks(&ord_tasks);
 
     gantt_chart->setScreen(screen);
     gantt_chart->setTasks(&ord_tasks);

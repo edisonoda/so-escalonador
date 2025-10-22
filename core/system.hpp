@@ -8,6 +8,7 @@
 #include "../scheduler/scheduler.hpp"
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
+#include "../ui/system_monitor.hpp"
 
 using namespace std;
 
@@ -29,6 +30,7 @@ namespace Core
 
         UI::Screen* screen;
         UI::GanttChart* gantt_chart;
+        UI::SystemMonitor* system_monitor;
 
         bool running;
         int quantum;

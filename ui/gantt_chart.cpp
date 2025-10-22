@@ -65,8 +65,9 @@ void GanttChart::setTasks(vector<TCB*>* tasks)
     {
         TCB* task = (*ord_tasks)[i];
         screen->setColor(i);
-        screen->sprint(0, i, task->getId());
-        screen->sprint(screen->getScreenEdgeX(), i, '|');     
+        screen->sprint(28, i, task->getId());
+        screen->sprint(31, i, '|');
+        // screen->sprint(screen->getScreenEdgeX(), i, '|');     
     }
     screen->invertColor(false);
     screen->srefresh();
