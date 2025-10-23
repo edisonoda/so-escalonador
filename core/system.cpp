@@ -46,6 +46,7 @@ void System::run()
             tick_count++;
             // cout << "Tick Count: " << tick_count << endl;
             tick();
+            screen->getCh();
         }
     }
 
