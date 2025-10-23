@@ -17,6 +17,7 @@ System::System() : scheduler(Scheduler::Scheduler::getInstance())
     task_count = 0;
     running = true;
     screen = UI::Screen::getInstance();
+    mode = '\0';
 }
 
 System::~System()
@@ -36,17 +37,35 @@ System *System::getInstance()
 
 void System::run()
 {
-    while (running)
+    if (mode == 'A')
     {
-        if (clock.getTick())
+        while (running)
         {
-            // cout << "============================================" << endl;
-            // cout << "System Tick: " << clock.getTotalTime() << endl;
-            checkNewTasks();
-            tick_count++;
-            // cout << "Tick Count: " << tick_count << endl;
-            tick();
-            screen->getCh();
+            if (clock.getTick())
+            {
+                // cout << "============================================" << endl;
+                // cout << "System Tick: " << clock.getTotalTime() << endl;
+                checkNewTasks();
+                tick_count++;
+                // cout << "Tick Count: " << tick_count << endl;
+                tick();
+            }
+        }
+    }
+    else
+    {
+        while (running)
+        {
+            if (clock.getTick())
+            {
+                // cout << "============================================" << endl;
+                // cout << "System Tick: " << clock.getTotalTime() << endl;
+                checkNewTasks();
+                tick_count++;
+                // cout << "Tick Count: " << tick_count << endl;
+                tick();
+                screen->getCh();
+            }
         }
     }
 
@@ -57,7 +76,8 @@ void System::tick()
 {
     // cout << "Ticked" << endl;
 
-    if (current_task == nullptr) {
+    if (current_task == nullptr)
+    {
         current_task = scheduler->chooseTask();
         tick_count = 0;
     }
@@ -72,7 +92,7 @@ void System::tick()
         if (current_task != nullptr)
             current_task->decrementRemaining(1);
         // cout << "Running task: " << current_task->getId()
-            // << ", Remaining time: " << current_task->getRemaining() << endl;
+        // << ", Remaining time: " << current_task->getRemaining() << endl;
     }
 
     gantt_chart.drawTick(clock.getTotalTime());
@@ -103,7 +123,7 @@ void System::suspendCurrentTask(TCBState state)
             // cout << "Terminating task: " << current_task->getId() << endl;
             task_count--;
             // cout << "Remaining tasks: " << task_count << endl;
-            
+
             if (task_count <= 0)
                 running = false;
 
@@ -118,7 +138,7 @@ void System::suspendCurrentTask(TCBState state)
 
 void System::checkNewTasks()
 {
-    list<TCB*>::iterator i = new_list.begin();
+    list<TCB *>::iterator i = new_list.begin();
 
     while (i != new_list.end())
     {
@@ -138,6 +158,17 @@ void System::checkNewTasks()
 
 bool System::loadConfig(const string &filename)
 {
+    screen->print(0, 0, "Para executar de maneira automática digite 'A' ou passo a passo digite 'P': ");
+    screen->refresh();
+
+    while (mode != 'A' && mode != 'P')
+    {
+        mode = toupper(screen->getCh());
+    }
+
+    screen->clear();
+    screen->refresh();
+
     if (!config_reader.openFile(filename))
     {
         printf("Failed to open config file.\n");
@@ -154,7 +185,7 @@ bool System::loadConfig(const string &filename)
     for (TCB *task : new_list)
         screen->initColor(0, task->getColor());
 
-    ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
+    ord_tasks = vector<TCB *>(begin(new_list), end(new_list));
 
     gantt_chart.setScreen(screen);
     gantt_chart.setTasks(&ord_tasks);
@@ -165,9 +196,9 @@ bool System::loadConfig(const string &filename)
     system_monitor.drawTick(0);
 
     // cout << "Loaded Task: " << task->getId()
-            //  << ", Start: " << task->getStart()
-            //  << ", Duration: " << task->getDuration()
-            //  << ", Priority: " << task->getPriority() << endl;
+    //  << ", Start: " << task->getStart()
+    //  << ", Duration: " << task->getDuration()
+    //  << ", Priority: " << task->getPriority() << endl;
 
     // cout << "Starting system with quantum: " << quantum << endl;
 

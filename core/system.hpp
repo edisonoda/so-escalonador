@@ -36,6 +36,7 @@ namespace Core
         int quantum;
         int tick_count;
         int task_count;
+        char mode;
 
         // Singleton
         System();
