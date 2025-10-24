@@ -1,7 +1,5 @@
 #include "system.hpp"
 
-// #include <iostream>
-
 using namespace Core;
 
 System *System::instance(nullptr);
@@ -34,10 +32,10 @@ System *System::getInstance()
 
 void System::tick()
 {
-    // cout << "Ticked" << endl;
     checkNewTasks();
 
-    if (current_task == nullptr) {
+    if (current_task == nullptr)
+    {
         current_task = scheduler->chooseTask();
         clock.resetQuantum();
     }
@@ -49,8 +47,6 @@ void System::tick()
 
         if (current_task != nullptr)
             current_task->decrementRemaining(1);
-        // cout << "Running task: " << current_task->getId()
-            // << ", Remaining time: " << current_task->getRemaining() << endl;
     }
 
     gantt_chart.drawTick(clock.getTotalTime());
@@ -80,20 +76,15 @@ void System::suspendCurrentTask(TCBState state)
         switch (state)
         {
         case TCBState::SUSPENDED:
-            // cout << "Suspending task: " << current_task->getId() << endl;
             suspended_list.push_back(current_task);
             break;
 
         case TCBState::READY:
-            // cout << "Re-queuing task: " << current_task->getId() << endl;
-            // ready_list.push_back(current_task);
             clock.resetQuantum();
             break;
 
         default:
-            // cout << "Terminating task: " << current_task->getId() << endl;
             task_count--;
-            // cout << "Remaining tasks: " << task_count << endl;
             
             if (task_count <= 0)
                 clock.stop();
@@ -115,7 +106,6 @@ void System::checkNewTasks()
     {
         if ((*i)->getStart() <= clock.getTotalTime())
         {
-            // cout << "Loading task: " << (*i)->getId() << endl;
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
             new_list.erase(i++);
@@ -154,13 +144,6 @@ bool System::loadConfig(const string &filename)
     system_monitor.setScreen(screen);
     system_monitor.setTasks(&ord_tasks);
     system_monitor.drawTick(0);
-
-    // cout << "Loaded Task: " << task->getId()
-            //  << ", Start: " << task->getStart()
-            //  << ", Duration: " << task->getDuration()
-            //  << ", Priority: " << task->getPriority() << endl;
-
-    // cout << "Starting system with quantum: " << quantum << endl;
 
     clock.run();
 
