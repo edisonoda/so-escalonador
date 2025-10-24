@@ -1,21 +1,19 @@
 #include "system.hpp"
 
-#include "../utils/constants.hpp"
-
 // #include <iostream>
 
 using namespace Core;
 
 System *System::instance(nullptr);
 
-System::System() : scheduler(Scheduler::Scheduler::getInstance())
+System::System()
+    : scheduler(Scheduler::Scheduler::getInstance())
+    , clock(this)
 {
     current_task = nullptr;
-    scheduler->setTaskList(&ready_list);
-    quantum = Constants::DEFAULT_QUANTUM;
-    tick_count = 0;
     task_count = 0;
-    running = true;
+
+    scheduler->setTaskList(&ready_list);
     screen = UI::Screen::getInstance();
 }
 
@@ -34,40 +32,20 @@ System *System::getInstance()
     return instance;
 }
 
-void System::run()
-{
-    while (running)
-    {
-        if (clock.getTick())
-        {
-            // cout << "============================================" << endl;
-            // cout << "System Tick: " << clock.getTotalTime() << endl;
-            checkNewTasks();
-            tick_count++;
-            // cout << "Tick Count: " << tick_count << endl;
-            tick();
-            screen->getCh();
-        }
-    }
-
-    screen->getCh();
-}
-
 void System::tick()
 {
     // cout << "Ticked" << endl;
+    checkNewTasks();
 
     if (current_task == nullptr) {
         current_task = scheduler->chooseTask();
-        tick_count = 0;
+        clock.resetQuantum();
     }
 
     if (current_task != nullptr)
     {
         if (current_task->getRemaining() <= 0)
             suspendCurrentTask(TCBState::TERMINATED);
-        else if (tick_count >= quantum)
-            suspendCurrentTask(TCBState::READY);
 
         if (current_task != nullptr)
             current_task->decrementRemaining(1);
@@ -77,6 +55,19 @@ void System::tick()
 
     gantt_chart.drawTick(clock.getTotalTime());
     system_monitor.drawTick(clock.getTotalTime());
+}
+
+void System::handleInterruption(Interruption irq)
+{
+    switch (irq)
+    {
+    case Interruption::QUANTUM:
+        suspendCurrentTask(TCBState::READY);
+        break;
+    case Interruption::FULL_STOP:
+        screen->getCh();
+        break;
+    }
 }
 
 void System::suspendCurrentTask(TCBState state)
@@ -96,7 +87,7 @@ void System::suspendCurrentTask(TCBState state)
         case TCBState::READY:
             // cout << "Re-queuing task: " << current_task->getId() << endl;
             // ready_list.push_back(current_task);
-            tick_count = 0;
+            clock.resetQuantum();
             break;
 
         default:
@@ -105,14 +96,14 @@ void System::suspendCurrentTask(TCBState state)
             // cout << "Remaining tasks: " << task_count << endl;
             
             if (task_count <= 0)
-                running = false;
+                clock.stop();
 
             break;
         }
 
         current_task = scheduler->chooseTask(current_task);
         if (current_task != previous_task)
-            tick_count = 0;
+            clock.resetQuantum();
     }
 }
 
@@ -145,7 +136,7 @@ bool System::loadConfig(const string &filename)
     }
 
     config_reader.readPattern();
-    quantum = config_reader.getQuantum();
+    clock.setQuantum(config_reader.getQuantum());
     scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
 
     new_list = config_reader.readTasks();
@@ -171,7 +162,7 @@ bool System::loadConfig(const string &filename)
 
     // cout << "Starting system with quantum: " << quantum << endl;
 
-    run();
+    clock.run();
 
     return true;
 }

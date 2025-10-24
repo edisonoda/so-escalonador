@@ -14,6 +14,12 @@ using namespace std;
 
 namespace Core
 {
+    enum class Interruption
+    {
+        QUANTUM,
+        FULL_STOP
+    };
+
     class System
     {
     private:
@@ -32,16 +38,11 @@ namespace Core
         UI::GanttChart gantt_chart;
         UI::SystemMonitor system_monitor;
 
-        bool running;
-        int quantum;
-        int tick_count;
         int task_count;
 
         // Singleton
         System();
 
-        void run();
-        void tick();
         void suspendCurrentTask(TCBState state);
         void checkNewTasks();
     
@@ -50,5 +51,7 @@ namespace Core
         static System* getInstance();
 
         bool loadConfig(const string &filename);
+        void handleInterruption(Interruption irq);
+        void tick();
     };
 } // namespace Core
