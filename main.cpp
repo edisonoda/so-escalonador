@@ -1,3 +1,4 @@
+#include <locale.h>
 #include "core/system.hpp"
 // #include "ui/screen.hpp"
 
@@ -7,6 +8,8 @@ using namespace Core;
 
 int main()
 {
+    setlocale(LC_ALL, "pt_BR.UTF-8");
+
     System *system = System::getInstance();
 
     if (!system->loadConfig(CONFIG_FILE))

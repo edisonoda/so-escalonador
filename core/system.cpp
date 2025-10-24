@@ -144,9 +144,9 @@ bool System::loadConfig(const string &filename)
 {
     char mode = '\0';
 
-    screen->print(0, 0, "Modo de execução: automática digite 'A'");
-    screen->print(0, 1, "- Automática: digite 'A'");
-    screen->print(0, 2, "- Passo a passo: digite 'P'");
+    screen->print(0, 0, "Selecione um modo de execução:");
+    screen->print(0, 1, "- Automático = digite 'A'");
+    screen->print(0, 2, "- Passo a passo = digite 'P'");
     screen->print(0, 3, "Escolha: ");
     screen->refresh();
 
