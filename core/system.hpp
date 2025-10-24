@@ -4,7 +4,7 @@
 #include <vector>
 #include "tcb.hpp"
 #include "config_reader.hpp"
-#include "system_clock.hpp"
+#include "clock/clock.hpp"
 #include "../scheduler/scheduler.hpp"
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
@@ -26,7 +26,7 @@ namespace Core
         static System* instance;
         
         Scheduler::Scheduler* scheduler;
-        SystemClock clock;
+        Clock* clock;
         ConfigReader config_reader;
         TCB* current_task;
         vector<TCB*> ord_tasks;
@@ -45,6 +45,7 @@ namespace Core
 
         void suspendCurrentTask(TCBState state);
         void checkNewTasks();
+        void selectClock(char mode);
     
     public:
         ~System();

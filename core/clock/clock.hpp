@@ -9,9 +9,9 @@ namespace Core { class System; }
 
 namespace Core
 {
-    class SystemClock
+    class Clock
     {
-    private:
+    protected:
         System* system;
 
         const int tick_interval;
@@ -26,11 +26,11 @@ namespace Core
         time_point<system_clock> end_time;
         duration<double> elapsed;
 
-        bool getTick();
+        virtual bool getTick() = 0;
 
     public:
-        SystemClock(System* sys);
-        ~SystemClock();
+        Clock(System* sys, int total_t = 0);
+        virtual ~Clock();
 
         int getTotalTime() const { return total_time; }
         void setQuantum(const int q) { quantum_interval = q; }
