@@ -13,21 +13,21 @@ namespace Scheduler
     class Scheduler
     {
     private:
-        static Scheduler* instance;
+        static Scheduler *instance;
 
-        list<TCB*>* task_list;
-        SchedulingAlgorithm* algorithm;
+        list<TCB *> *task_list;
+        SchedulingAlgorithm *algorithm;
 
         // Singleton
         Scheduler();
-    
+
     public:
         ~Scheduler();
-        static Scheduler* getInstance();
+        static Scheduler *getInstance();
 
         // void setAlgorithm(AlgorithmID id);
         void setAlgorithm(string id);
-        void setTaskList(list<TCB*>* task_list);
-        TCB* chooseTask(TCB* current_task = nullptr);
+        void setTaskList(list<TCB *> *task_list);
+        TCB *chooseTask(TCB *current_task = nullptr);
     };
 } // namespace Scheduler

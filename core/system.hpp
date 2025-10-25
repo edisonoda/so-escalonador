@@ -43,9 +43,12 @@ namespace Core
         // Singleton
         System();
 
-        void suspendCurrentTask(TCBState state);
+        void changeState(TCBState state);
         void checkNewTasks();
         void selectClock(char mode);
+        void terminateTask();
+        void suspendTask();
+        void preemptTask();
     
     public:
         ~System();

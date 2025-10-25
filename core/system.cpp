@@ -38,14 +38,14 @@ void System::tick()
 
     if (current_task == nullptr)
     {
-        current_task = scheduler->chooseTask();
+        changeState(TCBState::RUNNING);
         clock->resetQuantum();
     }
 
     if (current_task != nullptr)
     {
         if (current_task->getRemaining() <= 0)
-            suspendCurrentTask(TCBState::TERMINATED);
+            terminateTask();
 
         if (current_task != nullptr)
             current_task->decrementRemaining(1);
@@ -60,7 +60,7 @@ void System::handleInterruption(Interruption irq)
     switch (irq)
     {
     case Interruption::QUANTUM:
-        suspendCurrentTask(TCBState::READY);
+        preemptTask();
         break;
     case Interruption::FULL_STOP:
         screen->getCh();
@@ -68,41 +68,37 @@ void System::handleInterruption(Interruption irq)
     }
 }
 
-void System::suspendCurrentTask(TCBState state)
+void System::changeState(TCBState state)
 {
+    TCB *previous_task = current_task;
     if (current_task != nullptr)
-    {
-        TCB *previous_task = current_task;
         current_task->setState(state);
 
-        switch (state)
+    current_task = scheduler->chooseTask(current_task);
+
+    if (previous_task != current_task && current_task != nullptr)
+    {
+        switch (current_task->getState())
         {
         case TCBState::SUSPENDED:
-            suspended_list.push_back(current_task);
+            suspended_list.remove(current_task);
             break;
 
         case TCBState::READY:
-            clock->resetQuantum();
-            break;
-
-        default:
-            task_count--;
-            
-            if (task_count <= 0)
-                clock->stop();
-
+            ready_list.remove(current_task);
             break;
         }
 
-        current_task = scheduler->chooseTask(current_task);
-        if (current_task != previous_task)
-            clock->resetQuantum();
+        clock->resetQuantum();
     }
+
+    if (current_task != nullptr)
+        current_task->setState(TCBState::RUNNING);
 }
 
 void System::checkNewTasks()
 {
-    list<TCB*>::iterator i = new_list.begin();
+    list<TCB *>::iterator i = new_list.begin();
 
     while (i != new_list.end())
     {
@@ -140,6 +136,28 @@ void System::selectClock(char mode)
     }
 }
 
+void System::terminateTask()
+{
+    task_count--;
+
+    if (task_count <= 0)
+        clock->stop();
+
+    changeState(TCBState::TERMINATED);
+}
+
+void System::suspendTask()
+{
+    suspended_list.push_back(current_task);
+    changeState(TCBState::SUSPENDED);
+}
+
+void System::preemptTask()
+{
+    clock->resetQuantum();
+    changeState(TCBState::READY);
+}
+
 bool System::loadConfig(const string &filename)
 {
     char mode = '\0';
@@ -172,7 +190,7 @@ bool System::loadConfig(const string &filename)
     for (TCB *task : new_list)
         screen->initColor(0, task->getColor());
 
-    ord_tasks = vector<TCB*>(begin(new_list), end(new_list));
+    ord_tasks = vector<TCB *>(begin(new_list), end(new_list));
 
     gantt_chart.setScreen(screen);
     gantt_chart.setTasks(&ord_tasks);

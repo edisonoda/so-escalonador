@@ -14,7 +14,6 @@ TCB *FCFS::chooseTask(TCB *current_task)
 {
     if (current_task != nullptr && current_task->getState() == TCBState::READY)
     {
-        current_task->setState(TCBState::RUNNING);
         return current_task;
     }
 
@@ -23,6 +22,5 @@ TCB *FCFS::chooseTask(TCB *current_task)
 
     TCB *task = task_list->front();
     task_list->pop_front();
-    task->setState(TCBState::RUNNING);
     return task;
 }
