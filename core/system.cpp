@@ -108,6 +108,7 @@ void System::checkNewTasks()
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
             new_list.erase(i++);
+            preemptTask();
         }
         else
         {
@@ -156,7 +157,10 @@ void System::suspendTask()
 void System::preemptTask()
 {
     clock->resetQuantum();
-    ready_list.push_back(current_task);
+    
+    if (current_task != nullptr)
+        ready_list.push_back(current_task);
+
     changeState(TCBState::READY);
 }
 
