@@ -23,7 +23,7 @@ namespace Scheduler
     
     public:
         SchedulingAlgorithm(list<TCB*>* task_list):task_list(task_list) { };
-        ~SchedulingAlgorithm() { };
+        virtual ~SchedulingAlgorithm() { };
 
         string getName() const { return name; }
 

@@ -1,4 +1,3 @@
-#include <iostream>
 #include "scheduler.hpp"
 using namespace std;
 
@@ -46,7 +45,6 @@ namespace Scheduler
 
         TCB* task = task_list->front();
         task_list->pop_front();
-        // cout << "Chosen task: " << task->getId() << endl;
         task->setState(TCBState::RUNNING);
         return task;
     }
