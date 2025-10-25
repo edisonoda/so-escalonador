@@ -76,7 +76,7 @@ void System::changeState(TCBState state)
 
     current_task = scheduler->chooseTask(current_task);
 
-    if (previous_task != current_task && current_task != nullptr)
+    if (current_task != nullptr)
     {
         switch (current_task->getState())
         {
@@ -89,7 +89,8 @@ void System::changeState(TCBState state)
             break;
         }
 
-        clock->resetQuantum();
+        if (previous_task != current_task)
+            clock->resetQuantum();
     }
 
     if (current_task != nullptr)
@@ -155,6 +156,7 @@ void System::suspendTask()
 void System::preemptTask()
 {
     clock->resetQuantum();
+    ready_list.push_back(current_task);
     changeState(TCBState::READY);
 }
 

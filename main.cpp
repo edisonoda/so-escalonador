@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-#define CONFIG_FILE "configs/fcfs_maziero.txt"
+#define CONFIG_FILE "configs/srtf_maziero.txt"
 
 int main()
 {
