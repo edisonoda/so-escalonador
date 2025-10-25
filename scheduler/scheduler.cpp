@@ -1,6 +1,7 @@
 #include "scheduler.hpp"
 #include "fcfs_algorithm.hpp"
 #include "srtf_algorithm.hpp"
+#include "priop_algorithm.hpp"
 
 using namespace std;
 
@@ -34,6 +35,11 @@ namespace Scheduler
 
         case AlgorithmID::SRTF:
             algorithm = new SRTF(task_list);
+            break;
+
+        case AlgorithmID::PRIOp:
+            algorithm = new PRIOp(task_list);
+            break;
         }
     }
 

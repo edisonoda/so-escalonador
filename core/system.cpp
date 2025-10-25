@@ -157,7 +157,7 @@ void System::suspendTask()
 void System::preemptTask()
 {
     clock->resetQuantum();
-    
+
     if (current_task != nullptr)
         ready_list.push_back(current_task);
 
@@ -205,7 +205,7 @@ bool System::loadConfig(const string &filename)
     system_monitor.setScreen(screen);
     system_monitor.setTasks(&ord_tasks);
     system_monitor.drawTick(0);
-
+    
     clock->run();
 
     return true;

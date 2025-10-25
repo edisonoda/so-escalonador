@@ -74,6 +74,7 @@ list<TCB *> ConfigReader::readTasks()
         configs.push_back(line);
 
         TCB *tcb = new TCB(
+            // id, cor, inicio, duracão e prioridade
             configs[0],
             stoi(configs[1]),
             stoi(configs[2]),
