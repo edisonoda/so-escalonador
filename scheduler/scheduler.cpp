@@ -1,4 +1,7 @@
 #include "scheduler.hpp"
+#include "fcfs_algorithm.hpp"
+#include "srtf_algorithm.hpp"
+
 using namespace std;
 
 namespace Scheduler
@@ -21,9 +24,17 @@ namespace Scheduler
         return instance;
     }
 
-    void Scheduler::setAlgorithm(string id)
+    void Scheduler::setAlgorithm(AlgorithmID id)
     {
-        algorithm = new FCFS(task_list);
+        switch (id)
+        {
+        case AlgorithmID::FCFS:
+            algorithm = new FCFS(task_list);
+            break;
+
+        case AlgorithmID::SRTF:
+            algorithm = new SRTF(task_list);
+        }
     }
 
     void Scheduler::setTaskList(list<TCB *> *task_list)

@@ -3,11 +3,23 @@
 
 using namespace Core;
 
-ConfigReader::ConfigReader() { }
+ConfigReader::ConfigReader() : alg_map({
+    {"FCFS", AlgorithmID::FCFS}, 
+    {"PRIOp", AlgorithmID::PRIOp},
+    {"SRTF", AlgorithmID::SRTF},
+    {"FIFO", AlgorithmID::FCFS}
+}) 
+{
+}
 
 ConfigReader::~ConfigReader()
 {
     closeFile();
+}
+
+AlgorithmID ConfigReader::getAlgorithm() const
+{
+    return alg_map.find(algorithm)->second;
 }
 
 bool ConfigReader::openFile(const string &filename)

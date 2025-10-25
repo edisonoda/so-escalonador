@@ -182,7 +182,7 @@ bool System::loadConfig(const string &filename)
 
     config_reader.readPattern();
     clock->setQuantum(config_reader.getQuantum());
-    scheduler->setAlgorithm(config_reader.getAlgorithm().c_str());
+    scheduler->setAlgorithm(config_reader.getAlgorithm());
 
     new_list = config_reader.readTasks();
     task_count = new_list.size();

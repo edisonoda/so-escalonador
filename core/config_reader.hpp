@@ -3,8 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <map>
 #include "tcb.hpp"
+#include "../scheduler/scheduling_algorithm.hpp"
+
 using namespace std;
+using namespace Scheduler;
 
 namespace Core
 {
@@ -14,6 +18,7 @@ namespace Core
         ifstream file;
         string algorithm;
         int quantum;
+        const map<string, AlgorithmID> alg_map;
 
         string readLine();
     
@@ -24,7 +29,7 @@ namespace Core
         bool openFile(const string &filename);
         void closeFile();
         void readPattern();
-        string getAlgorithm() const { return algorithm; }
+        AlgorithmID getAlgorithm() const;
         int getQuantum() const { return quantum; }
         list<TCB*> readTasks();
     };

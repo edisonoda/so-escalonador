@@ -9,24 +9,25 @@ using namespace Core;
 
 namespace Scheduler
 {
-    // enum class AlgorithmID {
-    //     FCFS,
-    //     SRTF,
-    //     PRIOp
-    // };
+    enum class AlgorithmID
+    {
+        FCFS,
+        SRTF,
+        PRIOp
+    };
 
     class SchedulingAlgorithm
     {
     protected:
         const static string name;
-        list<TCB*>* task_list;
-    
+        list<TCB *> *task_list;
+
     public:
-        SchedulingAlgorithm(list<TCB*>* task_list):task_list(task_list) { };
-        virtual ~SchedulingAlgorithm() { };
+        SchedulingAlgorithm(list<TCB *> *task_list) : task_list(task_list) {};
+        virtual ~SchedulingAlgorithm() {};
 
         string getName() const { return name; }
 
-        virtual TCB* chooseTask(TCB* current_task = nullptr) = 0;
+        virtual TCB *chooseTask(TCB *current_task = nullptr) = 0;
     };
 } // namespace Scheduler

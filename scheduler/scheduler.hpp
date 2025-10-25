@@ -3,7 +3,6 @@
 #include <list>
 #include "../core/tcb.hpp"
 #include "scheduling_algorithm.hpp"
-#include "fcfs_algorithm.hpp"
 
 using namespace std;
 using namespace Core;
@@ -25,8 +24,7 @@ namespace Scheduler
         ~Scheduler();
         static Scheduler *getInstance();
 
-        // void setAlgorithm(AlgorithmID id);
-        void setAlgorithm(string id);
+        void setAlgorithm(AlgorithmID id);
         void setTaskList(list<TCB *> *task_list);
         TCB *chooseTask(TCB *current_task = nullptr);
     };
