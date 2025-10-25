@@ -23,7 +23,7 @@ namespace Scheduler
 
     void Scheduler::setAlgorithm(string id)
     {
-        
+        algorithm = new FCFS(task_list);
     }
 
     void Scheduler::setTaskList(list<TCB*>* task_list)
@@ -33,19 +33,6 @@ namespace Scheduler
 
     TCB* Scheduler::chooseTask(TCB* current_task)
     {
-        // temporário
-        if (current_task != nullptr && current_task->getState() == TCBState::READY)
-        {
-            current_task->setState(TCBState::RUNNING);
-            return current_task;
-        }
-
-        if (task_list->empty())
-            return nullptr;
-
-        TCB* task = task_list->front();
-        task_list->pop_front();
-        task->setState(TCBState::RUNNING);
-        return task;
+        return algorithm->chooseTask(current_task);
     }
 }

@@ -27,6 +27,6 @@ namespace Scheduler
 
         string getName() const { return name; }
 
-        virtual string chooseTask() = 0;
+        virtual TCB* chooseTask(TCB* current_task = nullptr) = 0;
     };
 } // namespace Scheduler

@@ -3,6 +3,7 @@
 #include <list>
 #include "../core/tcb.hpp"
 #include "scheduling_algorithm.hpp"
+#include "fcfs_algorithm.hpp"
 
 using namespace std;
 using namespace Core;
