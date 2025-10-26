@@ -23,6 +23,9 @@ void SystemMonitor::drawTick(int tick)
 
         switch (status)
         {
+        case TCBState::NEW:
+            status_str = "NEW       ";
+            break;
         case TCBState::READY:
             status_str = "READY     ";
             break;
@@ -37,7 +40,7 @@ void SystemMonitor::drawTick(int tick)
             status_str = "TERMINATED";
             break;
         default:
-            status_str = "NEW       ";
+            status_str = "ERROR     ";
             break;
         }
 

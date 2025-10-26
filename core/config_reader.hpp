@@ -8,7 +8,6 @@
 #include "../scheduler/scheduling_algorithm.hpp"
 
 using namespace std;
-using namespace Scheduler;
 
 namespace Core
 {
@@ -18,7 +17,7 @@ namespace Core
         ifstream file;
         string algorithm;
         int quantum;
-        const map<string, AlgorithmID> alg_map;
+        const map<string, Scheduler::AlgorithmID> alg_map;
 
         string readLine();
     
@@ -29,7 +28,7 @@ namespace Core
         bool openFile(const string &filename);
         void closeFile();
         void readPattern();
-        AlgorithmID getAlgorithm() const;
+        Scheduler::AlgorithmID getAlgorithm() const;
         int getQuantum() const { return quantum; }
         list<TCB*> readTasks();
     };

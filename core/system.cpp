@@ -65,6 +65,8 @@ void System::handleInterruption(Interruption irq)
     case Interruption::FULL_STOP:
         screen->getCh();
         break;
+    default:
+        break;
     }
 }
 
@@ -86,6 +88,8 @@ void System::changeState(TCBState state)
 
         case TCBState::READY:
             ready_list.remove(current_task);
+            break;
+        default:
             break;
         }
 
@@ -129,6 +133,9 @@ void System::selectClock(char mode)
 
     switch (mode)
     {
+    case 'A':
+        clock = new AutoClock(this, total_time);
+        break;
     case 'P':
         clock = new ManualClock(this, total_time);
         break;

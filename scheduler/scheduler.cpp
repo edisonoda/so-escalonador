@@ -40,6 +40,10 @@ namespace Scheduler
         case AlgorithmID::PRIOp:
             algorithm = new PRIOp(task_list);
             break;
+
+        default:
+            algorithm = new FCFS(task_list);
+            break;
         }
     }
 
