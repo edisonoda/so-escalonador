@@ -1,6 +1,5 @@
 #include "system.hpp"
-#include "clock/auto_clock.hpp"
-#include "clock/manual_clock.hpp"
+#include "clock/clock.hpp"
 
 using namespace Core;
 
@@ -8,20 +7,25 @@ System *System::instance(nullptr);
 
 System::System()
     : scheduler(Scheduler::Scheduler::getInstance())
+    , clock(this)
 {
     current_task = nullptr;
     task_count = 0;
 
     scheduler->setTaskList(&ready_list);
-    clock = nullptr;
     screen = UI::Screen::getInstance();
 }
 
 System::~System()
 {
-    instance = nullptr;
     delete screen;
     delete scheduler;
+    
+    instance = nullptr;
+    screen = nullptr;
+    scheduler = nullptr;
+
+    // TODO: delete all tasks
 }
 
 System *System::getInstance()
@@ -39,7 +43,7 @@ void System::tick()
     if (current_task == nullptr)
     {
         changeState(TCBState::RUNNING);
-        clock->resetQuantum();
+        clock.resetQuantum();
     }
 
     if (current_task != nullptr)
@@ -51,8 +55,8 @@ void System::tick()
             current_task->decrementRemaining(1);
     }
 
-    gantt_chart.drawTick(clock->getTotalTime());
-    system_monitor.drawTick(clock->getTotalTime());
+    gantt_chart.drawTick(clock.getTotalTime());
+    system_monitor.drawTick(clock.getTotalTime());
 }
 
 void System::handleInterruption(Interruption irq)
@@ -94,7 +98,7 @@ void System::changeState(TCBState state)
         }
 
         if (previous_task != current_task)
-            clock->resetQuantum();
+            clock.resetQuantum();
     }
 
     if (current_task != nullptr)
@@ -107,7 +111,7 @@ void System::checkNewTasks()
 
     while (i != new_list.end())
     {
-        if ((*i)->getStart() <= clock->getTotalTime())
+        if ((*i)->getStart() <= clock.getTotalTime())
         {
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
@@ -121,36 +125,12 @@ void System::checkNewTasks()
     }
 }
 
-void System::selectClock(char mode)
-{
-    int total_time = 0;
-
-    if (clock != nullptr)
-    {
-        total_time = clock->getTotalTime();
-        delete clock;
-    }
-
-    switch (mode)
-    {
-    case 'A':
-        clock = new AutoClock(this, total_time);
-        break;
-    case 'P':
-        clock = new ManualClock(this, total_time);
-        break;
-    default:
-        clock = new AutoClock(this, total_time);
-        break;
-    }
-}
-
 void System::terminateTask()
 {
     task_count--;
 
     if (task_count <= 0)
-        clock->stop();
+        clock.stop();
 
     changeState(TCBState::TERMINATED);
 }
@@ -163,7 +143,7 @@ void System::suspendTask()
 
 void System::preemptTask()
 {
-    clock->resetQuantum();
+    clock.resetQuantum();
 
     if (current_task != nullptr)
         ready_list.push_back(current_task);
@@ -173,19 +153,7 @@ void System::preemptTask()
 
 bool System::loadConfig(const string &filename)
 {
-    char mode = '\0';
-
-    screen->print(0, 0, "Selecione um modo de execução:");
-    screen->print(0, 1, "- Automático = digite 'A'");
-    screen->print(0, 2, "- Passo a passo = digite 'P'");
-    screen->print(0, 3, "Escolha: ");
-    screen->refresh();
-
-    while (mode != 'A' && mode != 'P')
-        mode = toupper(screen->getCh());
-
-    selectClock(mode);
-    screen->clear();
+    char mode = clock.initialSelection();
 
     if (!config_reader.openFile(filename))
     {
@@ -194,8 +162,8 @@ bool System::loadConfig(const string &filename)
     }
 
     config_reader.readPattern();
-    clock->setQuantum(config_reader.getQuantum());
     scheduler->setAlgorithm(config_reader.getAlgorithm());
+    clock.setQuantum(config_reader.getQuantum());
 
     new_list = config_reader.readTasks();
     task_count = new_list.size();
@@ -213,7 +181,8 @@ bool System::loadConfig(const string &filename)
     system_monitor.setTasks(&ord_tasks);
     system_monitor.drawTick(0);
     
-    clock->run();
+    clock.selectMode(mode);
+    clock.run();
 
     return true;
 }

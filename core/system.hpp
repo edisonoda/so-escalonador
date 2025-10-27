@@ -26,7 +26,7 @@ namespace Core
         static System* instance;
         
         Scheduler::Scheduler* scheduler;
-        Clock* clock;
+        Clock clock;
         ConfigReader config_reader;
         TCB* current_task;
         vector<TCB*> ord_tasks;
@@ -45,7 +45,6 @@ namespace Core
 
         void changeState(TCBState state);
         void checkNewTasks();
-        void selectClock(char mode);
         void terminateTask();
         void suspendTask();
         void preemptTask();

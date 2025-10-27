@@ -13,8 +13,9 @@ namespace Scheduler
 
     Scheduler::~Scheduler()
     {
-        instance = nullptr;
         delete algorithm;
+        algorithm = nullptr;
+        instance = nullptr;
     }
 
     Scheduler *Scheduler::getInstance()

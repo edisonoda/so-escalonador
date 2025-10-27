@@ -1,16 +1,27 @@
 #pragma once
 
-#include "clock.hpp"
+#include "clock_mode.hpp"
+#include <chrono>
+
+using namespace std::chrono;
 
 namespace Core
 {
-    class AutoClock : public Clock
+    class AutoClock : public ClockMode
     {
     private:
-        virtual bool getTick();
+        const int tick_interval;
+        int tick_counter;
+        bool ticked;
+
+        time_point<system_clock> start_time;
+        time_point<system_clock> end_time;
+        duration<double> elapsed;
 
     public:
-        AutoClock(System* sys, int total_t = 0);
+        AutoClock(Clock* clock, System* sys);
         ~AutoClock();
+
+        virtual bool getTick();
     };
 }

@@ -1,14 +1,23 @@
 #include "manual_clock.hpp"
+#include "clock.hpp"
 #include "../system.hpp"
 
 using namespace Core;
 
-ManualClock::ManualClock(System* sys, int total_t) : Clock(sys, total_t) { }
+ManualClock::ManualClock(Clock* c, System* sys) : ClockMode(c, sys) { }
 
 ManualClock::~ManualClock() { }
 
 bool ManualClock::getTick()
 {
-    system->handleInterruption(Interruption::FULL_STOP);
+    // checkModeChange();
+    int ch = screen->getCh();
+
+    if (ch == ' ')
+    {
+        clock->selectMode('A');
+        return false;
+    }
+
     return true;
 }

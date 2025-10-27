@@ -1,16 +1,15 @@
 #pragma once
 
-#include "clock.hpp"
+#include "clock_mode.hpp"
 
 namespace Core
 {
-    class ManualClock : public Clock
+    class ManualClock : public ClockMode
     {
-    private:
-        virtual bool getTick();
-
     public:
-        ManualClock(System* sys, int total_t = 0);
+        ManualClock(Clock* clock, System* sys);
         ~ManualClock();
+        
+        virtual bool getTick();
     };
 }

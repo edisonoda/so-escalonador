@@ -1,47 +1,87 @@
 #include "clock.hpp"
+#include "auto_clock.hpp"
+#include "manual_clock.hpp"
 
 #include "../system.hpp"
 #include "../../utils/constants.hpp"
 
 using namespace Core;
 
-Clock::Clock(System* sys, int total_t)
+Clock::Clock(System* sys)
     : system(sys)
-    , tick_interval(Constants::DEFAULT_TICK_INTERVAL)
+    , screen(UI::Screen::getInstance())
     , quantum_interval(Constants::DEFAULT_QUANTUM)
 {
-    tick_counter = 0;
-    total_time = total_t ? total_t : -1;
+    mode = nullptr;
+    total_time = -1;
     quantum = 0;
-    ticked = true;
     running = true;
-    start_time = system_clock::now();
 }
 
 Clock::~Clock() {
+    delete mode;
+    mode = nullptr;
     system = nullptr;
+    screen = nullptr;
 }
 
 void Clock::run()
 {
     while (running)
     {
-        if (getTick())
+        if (mode->getTick())
         {
             total_time++;
             quantum++;
 
             if (quantum >= quantum_interval)
                 system->handleInterruption(Interruption::QUANTUM);
-            
+
             system->tick();
         }
     }
-    
-    system->handleInterruption(Interruption::FULL_STOP);
 }
 
 void Clock::stop()
 {
     running = false;
+}
+
+void Clock::selectMode(char m)
+{
+    int total_time = 0;
+
+    if (mode != nullptr)
+        delete mode;
+
+    switch (m)
+    {
+    case 'A':
+        mode = new AutoClock(this, system);
+        break;
+    case 'P':
+        mode = new ManualClock(this, system);
+        break;
+    default:
+        mode = new AutoClock(this, system);
+        break;
+    }
+}
+
+char Clock::initialSelection()
+{
+    char mode = '\0';
+
+    screen->print(0, 0, "Selecione um modo de execução:");
+    screen->print(0, 1, "- Automático = digite 'A'");
+    screen->print(0, 2, "- Passo a passo = digite 'P'");
+    screen->print(0, 3, "Escolha: ");
+    screen->refresh();
+
+    while (mode != 'A' && mode != 'P')
+        mode = toupper(screen->getCh());
+
+    screen->clear();
+
+    return mode;
 }

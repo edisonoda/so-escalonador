@@ -18,6 +18,7 @@ int main()
         return 1;
     }
 
+    system->handleInterruption(Interruption::FULL_STOP);
     delete system;
 
     return 0;
