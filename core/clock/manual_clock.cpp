@@ -1,6 +1,7 @@
 #include "manual_clock.hpp"
 #include "clock.hpp"
 #include "../system.hpp"
+#include <ncurses.h>
 
 using namespace Core;
 
@@ -10,7 +11,7 @@ ManualClock::~ManualClock() { }
 
 bool ManualClock::getTick()
 {
-    // checkModeChange();
+    timeout(-1);
     int ch = screen->getCh();
 
     if (ch == ' ')

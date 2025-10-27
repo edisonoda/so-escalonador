@@ -46,7 +46,5 @@ bool AutoClock::getTick()
         ticked = false;
     }
     
-    flushinp();
-
     return ticked;
 }

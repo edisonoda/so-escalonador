@@ -1,4 +1,5 @@
 #include <locale.h>
+#include <ncurses.h>
 #include "core/system.hpp"
 // #include "ui/screen.hpp"
 
@@ -17,6 +18,8 @@ int main()
         delete system;
         return 1;
     }
+
+    flushinp();
 
     system->handleInterruption(Interruption::FULL_STOP);
     delete system;
