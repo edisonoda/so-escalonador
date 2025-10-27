@@ -19,8 +19,6 @@ TCB *FCFS::chooseTask(TCB *current_task)
 
     if (task_list->empty())
         return nullptr;
-
-    TCB *task = task_list->front();
-    task_list->pop_front();
-    return task;
+        
+    return task_list->front();
 }
