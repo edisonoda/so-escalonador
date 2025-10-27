@@ -2,7 +2,7 @@
 
 using namespace Scheduler;
 
-FCFS::FCFS(list<TCB *> *task_list) : SchedulingAlgorithm(task_list)
+FCFS::FCFS(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::FCFS, task_list)
 {
 }
 

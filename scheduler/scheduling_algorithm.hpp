@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string>
 #include <list>
 #include "../core/tcb.hpp"
 
@@ -19,14 +18,14 @@ namespace Scheduler
     class SchedulingAlgorithm
     {
     protected:
-        const static string name;
+        const AlgorithmID id;
         list<TCB *> *task_list;
 
     public:
-        SchedulingAlgorithm(list<TCB *> *task_list) : task_list(task_list) {};
+        SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list) : id(id), task_list(task_list) {};
         virtual ~SchedulingAlgorithm() {};
 
-        string getName() const { return name; }
+        AlgorithmID getID() const { return id; }
 
         virtual TCB *chooseTask(TCB *current_task = nullptr) = 0;
     };

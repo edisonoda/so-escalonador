@@ -2,7 +2,7 @@
 
 using namespace Scheduler;
 
-PRIOp::PRIOp(list<TCB *> *task_list) : SchedulingAlgorithm(task_list)
+PRIOp::PRIOp(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PRIOp, task_list)
 {
 }
 

@@ -2,7 +2,7 @@
 
 using namespace Scheduler;
 
-SRTF::SRTF(list<TCB *> *task_list) : SchedulingAlgorithm(task_list)
+SRTF::SRTF(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::SRTF, task_list)
 {
 }
 
