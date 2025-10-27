@@ -8,6 +8,7 @@ System *System::instance(nullptr);
 System::System()
     : scheduler(Scheduler::Scheduler::getInstance())
     , clock(this)
+    , gantt_chart(&chart_generator)
 {
     current_task = nullptr;
     task_count = 0;
@@ -127,12 +128,15 @@ void System::checkNewTasks()
 
 void System::terminateTask()
 {
+    changeState(TCBState::TERMINATED);
+    
     task_count--;
 
     if (task_count <= 0)
+    {
         clock.stop();
-
-    changeState(TCBState::TERMINATED);
+        chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+    }
 }
 
 void System::suspendTask()

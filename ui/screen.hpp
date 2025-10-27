@@ -28,8 +28,8 @@ namespace UI
         void refresh();
         void clear();
         void initColor(int color, int bg_color);
-        void setColor(DefaultColor color);
-        void setColor(int color_index);
+        int setColor(DefaultColor color);
+        int setColor(int color_index);
         void invertColor();
         void invertColor(bool inv);
         int getCh();

@@ -9,6 +9,7 @@
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
 #include "../ui/system_monitor.hpp"
+#include "../utils/chart_generator.hpp"
 
 using namespace std;
 
@@ -37,6 +38,8 @@ namespace Core
         UI::Screen* screen;
         UI::GanttChart gantt_chart;
         UI::SystemMonitor system_monitor;
+
+        Utils::ChartGenerator chart_generator;
 
         int task_count;
 

@@ -4,9 +4,15 @@ using namespace UI;
 
 #define PRINT_UNIT "   "
 
-GanttChart::GanttChart() : TaskVisual() { }
+GanttChart::GanttChart(Utils::ChartGenerator *chart_gen) : TaskVisual() 
+{
+    chart_generator = chart_gen;
+}
 
-GanttChart::~GanttChart() { }
+GanttChart::~GanttChart() 
+{
+    chart_generator = nullptr;
+}
 
 void GanttChart::drawTick(int tick)
 {
@@ -17,23 +23,25 @@ void GanttChart::drawTick(int tick)
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
         TCB* task = (*ord_tasks)[i];
+        int color;
 
         switch (task->getState())
         {
             case TCBState::READY:
-                screen->setColor(DefaultColor::GRAY); // cinza
+                color = screen->setColor(DefaultColor::GRAY); // cinza
                 break;
             case TCBState::RUNNING:
-                screen->setColor(i); // cor da tarefa no fundo
+                color = screen->setColor(i); // cor da tarefa no fundo
                 break;
             case TCBState::SUSPENDED:
-                screen->setColor(DefaultColor::GRAY); // cinza
+                color = screen->setColor(DefaultColor::GRAY); // cinza
                 break;
             default:
-                screen->setColor(DefaultColor::BLACK); // preto
+                color = screen->setColor(DefaultColor::BLACK); // preto
                 break;
         }
 
+        chart_generator->registerEntry(tick, i, color);
         print(x, i, PRINT_UNIT);
     }
 
