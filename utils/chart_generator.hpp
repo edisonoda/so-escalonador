@@ -5,6 +5,8 @@
 #include <vector>
 #include <ncurses.h>
 
+#include "../core/tcb.hpp"
+
 using namespace std;
 
 namespace Utils
@@ -22,9 +24,10 @@ namespace Utils
         const int TICK_WIDTH = 30;  // Largura de cada tick
         const int TASK_HEIGHT = 30; // Altura de cada tarefa
         vector<ChartEntry> chart_history;
+        vector<Core::TCB*> *tasks;
         
     public:
-        ChartGenerator();
+        ChartGenerator(vector<Core::TCB*> *task_list);
         ~ChartGenerator();
         void registerEntry(int tick, int task_index, int color);
         void generate(const string& filename, int total_time, int task_count);

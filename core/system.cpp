@@ -8,6 +8,7 @@ System *System::instance(nullptr);
 System::System()
     : scheduler(Scheduler::Scheduler::getInstance())
     , clock(this)
+    , chart_generator(&ord_tasks)
     , gantt_chart(&chart_generator)
 {
     current_task = nullptr;

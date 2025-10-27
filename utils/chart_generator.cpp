@@ -3,8 +3,9 @@
 
 using namespace Utils;
 
-ChartGenerator::ChartGenerator()
+ChartGenerator::ChartGenerator(vector<Core::TCB *> *task_list)
 {
+    tasks = task_list;
 }
 
 ChartGenerator::~ChartGenerator()
@@ -23,27 +24,42 @@ void ChartGenerator::registerEntry(int tick, int task_index, int color)
 void ChartGenerator::generate(const string &filename, int total_time, int task_count)
 {
     int img_width = (total_time + 1) * TICK_WIDTH;
-    int img_height = task_count * TASK_HEIGHT;
+    int img_height = (task_count + 1) * TASK_HEIGHT;
 
     ofstream file(filename);
     if (!file.is_open())
         return;
 
     file << "<svg width='" << img_width << "' height='" << img_height << "' xmlns='http://www.w3.org/2000/svg'>\n";
-    file << "  \n";
-    file << "  <rect x='0' y='0' width='" << img_width << "' height='" << img_height << "' fill='white' />\n";
+
+    for (int i = 0; i < tasks->size(); i++)
+    {
+        int y = i * TASK_HEIGHT;
+        file << "<text x='0' y='" << y + 5
+             << "' width='" << TICK_WIDTH << "' height='" << TASK_HEIGHT
+             << "' dominant-baseline='hanging'>" << (*tasks)[i]->getId() << "</text>";
+    }
 
     for (const auto &entry : chart_history)
     {
-        int x = entry.tick * TICK_WIDTH;
+        int x = (entry.tick + 1) * TICK_WIDTH;
         int y = entry.task_index * TASK_HEIGHT;
         string color = entry.color;
 
         file << "  <rect x='" << x << "' y='" << y
              << "' width='" << TICK_WIDTH << "' height='" << TASK_HEIGHT
-             << "' fill='" << color << "'/>\n";
+             << "' fill='" << color << "' stroke='black' stroke-width='0.5'/>\n";
     }
 
+    for (int i = 0; i < total_time + 1; i++)
+    {
+        int x = (i + 1) * TICK_WIDTH;
+        file << "<text x='" << x << "' y='" << img_height - TASK_HEIGHT + 5
+             << "' width='" << TICK_WIDTH << "' height='" << TASK_HEIGHT
+             << "' dominant-baseline='hanging'>" << i << "</text>";
+    }
+    
+    
     file << "</svg>\n";
     file.close();
 }
