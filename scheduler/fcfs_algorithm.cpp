@@ -21,6 +21,8 @@ TCB *FCFS::chooseTask(TCB *current_task)
         return nullptr;
 
     TCB *task = task_list->front();
-    task_list->pop_front();
+    // task_list->pop_front(); // Os outros algoritmos não estão operando as listas, só 
+    // encontrando a nova task, então não precisa desse pop front, pois la na system ela já 
+    // remove    
     return task;
 }

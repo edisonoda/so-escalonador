@@ -112,7 +112,9 @@ void System::checkNewTasks()
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
             new_list.erase(i++);
-            preemptTask();
+            // Dessa forma o FCFS não é chamado na preempção da entrada de novas tasks
+            if (current_alg_id != Scheduler::AlgorithmID::FCFS)
+                preemptTask();
         }
         else
         {
@@ -195,7 +197,8 @@ bool System::loadConfig(const string &filename)
 
     config_reader.readPattern();
     clock->setQuantum(config_reader.getQuantum());
-    scheduler->setAlgorithm(config_reader.getAlgorithm());
+    current_alg_id = config_reader.getAlgorithm();
+    scheduler->setAlgorithm(current_alg_id);
 
     new_list = config_reader.readTasks();
     task_count = new_list.size();

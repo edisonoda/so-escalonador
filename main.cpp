@@ -4,7 +4,7 @@
 
 using namespace Core;
 
-#define CONFIG_FILE "configs/priop_maziero.txt"
+#define CONFIG_FILE "configs/default_maziero.txt"
 
 int main()
 {

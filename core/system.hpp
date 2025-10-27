@@ -39,6 +39,8 @@ namespace Core
         UI::SystemMonitor system_monitor;
 
         int task_count;
+        // Corrigindo preempção desnecessária do FCFS
+        Scheduler::AlgorithmID current_alg_id;
 
         // Singleton
         System();
