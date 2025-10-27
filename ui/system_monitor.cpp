@@ -19,7 +19,10 @@ void SystemMonitor::drawTick(int tick)
         
         TCBState status = task->getState();
         string status_str;
-        string rem_str = " REMAINING: " + to_string(task->getRemaining()) + " ";
+        string start_str = " START: " + to_string(task->getStart()) + " ";
+        string duration_str = "| DURATION: " + to_string(task->getDuration()) + " ";
+        string rem_str = "| REMAINING: " + to_string(task->getRemaining()) + " ";
+        string prio_str = "| PRIORITY: " + to_string(task->getPriority()) + " ";
 
         switch (status)
         {
@@ -49,6 +52,9 @@ void SystemMonitor::drawTick(int tick)
         screen->setColor(DefaultColor::WHITE);
         screen->invertColor(false);
         
-        print(x + 10, i, rem_str);
+        print(x + 10, i, start_str);
+        print(x + 20, i, duration_str);
+        print(x + 35, i, rem_str);
+        print(x + 50, i, prio_str);
     }
 }

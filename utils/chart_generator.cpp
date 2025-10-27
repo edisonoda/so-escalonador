@@ -10,6 +10,7 @@ ChartGenerator::ChartGenerator(vector<Core::TCB *> *task_list)
 
 ChartGenerator::~ChartGenerator()
 {
+    tasks = nullptr;
 }
 
 void ChartGenerator::registerEntry(int tick, int task_index, int color)
