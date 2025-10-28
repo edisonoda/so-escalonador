@@ -15,7 +15,7 @@ Clock::Clock(System* sys)
     mode = nullptr;
     total_time = -1;
     quantum = 0;
-    running = true;
+    running = false;
 }
 
 Clock::~Clock() {
@@ -60,22 +60,4 @@ void Clock::selectMode(char m)
         case 'P': mode = new ManualClock(this, system); break;
         default: mode = new AutoClock(this, system); break;
     }
-}
-
-char Clock::initialSelection()
-{
-    char mode = '\0';
-
-    screen->print(0, 0, "Selecione um modo de execução:");
-    screen->print(0, 1, "- Automático = digite 'A'");
-    screen->print(0, 2, "- Passo a passo = digite 'P'");
-    screen->print(0, 3, "Escolha: ");
-    screen->refresh();
-
-    while (mode != 'A' && mode != 'P')
-        mode = toupper(screen->getCh());
-
-    screen->clear();
-
-    return mode;
 }

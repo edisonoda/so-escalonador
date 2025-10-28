@@ -30,8 +30,6 @@ namespace Core
         int getTotalTime() const { return total_time; }
 
         void selectMode(char mode);
-        char initialSelection();
-
         void run();
         void stop();
     };
