@@ -4,7 +4,7 @@
 #include <string>
 #include "tcb.hpp"
 #include "config_reader.hpp"
-#include "setup_ui.hpp"
+#include "../ui/setup_ui.hpp"
 #include "../scheduler/scheduling_algorithm.hpp"
 
 using namespace std;
@@ -25,8 +25,8 @@ private:
     SetupUI* ui;
 
     Scheduler::AlgorithmID setup_alg_id;
-    int setup_quantum;
     vector<TCB*> setup_tasks;
+    int setup_quantum;
 
     bool loadFromFile(const string& filename);
     void runEditor();

@@ -89,15 +89,9 @@ void System::changeState(TCBState state)
     {
         switch (current_task->getState())
         {
-        case TCBState::SUSPENDED:
-            suspended_list.remove(current_task);
-            break;
-
-        case TCBState::READY:
-            ready_list.remove(current_task);
-            break;
-        default:
-            break;
+            case TCBState::SUSPENDED: suspended_list.remove(current_task); break;
+            case TCBState::READY: ready_list.remove(current_task); break;
+            default: break;
         }
 
         if (previous_task != current_task)

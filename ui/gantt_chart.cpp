@@ -27,18 +27,10 @@ void GanttChart::drawTick(int tick)
 
         switch (task->getState())
         {
-            case TCBState::READY:
-                color = screen->setColor(DefaultColor::GRAY); // cinza
-                break;
-            case TCBState::RUNNING:
-                color = screen->setColor(i); // cor da tarefa no fundo
-                break;
-            case TCBState::SUSPENDED:
-                color = screen->setColor(DefaultColor::GRAY); // cinza
-                break;
-            default:
-                color = screen->setColor(DefaultColor::BLACK); // preto
-                break;
+            case TCBState::RUNNING: color = screen->setColor(i); break;
+            case TCBState::READY: color = screen->setColor(DefaultColor::GRAY); break;
+            case TCBState::SUSPENDED: color = screen->setColor(DefaultColor::GRAY); break;
+            default: color = screen->setColor(DefaultColor::BLACK); break;
         }
 
         chart_generator->registerEntry(tick, i, color);

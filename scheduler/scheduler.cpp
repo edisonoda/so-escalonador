@@ -30,21 +30,10 @@ namespace Scheduler
     {
         switch (id)
         {
-        case AlgorithmID::FCFS:
-            algorithm = new FCFS(task_list);
-            break;
-
-        case AlgorithmID::SRTF:
-            algorithm = new SRTF(task_list);
-            break;
-
-        case AlgorithmID::PRIOp:
-            algorithm = new PRIOp(task_list);
-            break;
-
-        default:
-            algorithm = new FCFS(task_list);
-            break;
+            case AlgorithmID::FCFS: algorithm = new FCFS(task_list); break;
+            case AlgorithmID::SRTF: algorithm = new SRTF(task_list); break;
+            case AlgorithmID::PRIOp: algorithm = new PRIOp(task_list); break;
+            default: algorithm = new FCFS(task_list); break;
         }
     }
 

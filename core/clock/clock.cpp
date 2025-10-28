@@ -56,15 +56,9 @@ void Clock::selectMode(char m)
 
     switch (m)
     {
-    case 'A':
-        mode = new AutoClock(this, system);
-        break;
-    case 'P':
-        mode = new ManualClock(this, system);
-        break;
-    default:
-        mode = new AutoClock(this, system);
-        break;
+        case 'A': mode = new AutoClock(this, system); break;
+        case 'P': mode = new ManualClock(this, system); break;
+        default: mode = new AutoClock(this, system); break;
     }
 }
 

@@ -3,7 +3,6 @@
 #include <list>
 #include <vector>
 #include "tcb.hpp"
-#include "config_reader.hpp"
 #include "clock/clock.hpp"
 #include "../scheduler/scheduler.hpp"
 #include "../ui/screen.hpp"
