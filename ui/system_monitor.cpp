@@ -14,7 +14,7 @@ void SystemMonitor::drawTick(int tick)
     {
         TCB *task = (*ord_tasks)[i];
 
-        screen->setColor(i); // Cor da tarefa
+        screen->setColor(task->getColor()); // Cor da tarefa
         screen->invertColor(true);
         
         TCBState status = task->getState();
@@ -26,25 +26,25 @@ void SystemMonitor::drawTick(int tick)
 
         switch (status)
         {
-        case TCBState::NEW:
-            status_str = "NEW       ";
-            break;
-        case TCBState::READY:
-            status_str = "READY     ";
-            break;
-        case TCBState::RUNNING:
-            screen->invertColor(false);
-            status_str = "RUNNING   ";
-            break;
-        case TCBState::SUSPENDED:
-            status_str = "SUSPENDED ";
-            break;
-        case TCBState::TERMINATED:
-            status_str = "TERMINATED";
-            break;
-        default:
-            status_str = "ERROR     ";
-            break;
+            case TCBState::NEW:
+                status_str = "NEW       ";
+                break;
+            case TCBState::READY:
+                status_str = "READY     ";
+                break;
+            case TCBState::RUNNING:
+                screen->invertColor(false);
+                status_str = "RUNNING   ";
+                break;
+            case TCBState::SUSPENDED:
+                status_str = "SUSPENDED ";
+                break;
+            case TCBState::TERMINATED:
+                status_str = "TERMINATED";
+                break;
+            default:
+                status_str = "ERROR     ";
+                break;
         }
 
         print(x, i, status_str);

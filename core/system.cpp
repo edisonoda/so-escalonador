@@ -66,14 +66,14 @@ void System::handleInterruption(Interruption irq)
 {
     switch (irq)
     {
-    case Interruption::QUANTUM:
-        preemptTask();
-        break;
-    case Interruption::FULL_STOP:
-        screen->getCh();
-        break;
-    default:
-        break;
+        case Interruption::QUANTUM:
+            preemptTask();
+            break;
+        case Interruption::FULL_STOP:
+            screen->getCh();
+            break;
+        default:
+            break;
     }
 }
 
