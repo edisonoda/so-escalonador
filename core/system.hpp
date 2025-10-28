@@ -4,6 +4,7 @@
 #include <vector>
 #include "tcb.hpp"
 #include "config_reader.hpp"
+#include "clock/tick_observer.hpp"
 #include "clock/clock.hpp"
 #include "../scheduler/scheduler.hpp"
 #include "../ui/screen.hpp"
@@ -21,7 +22,7 @@ namespace Core
         FULL_STOP
     };
 
-    class System
+    class System : public TickObserver
     {
     private:
         static System* instance;
@@ -58,6 +59,7 @@ namespace Core
 
         bool loadConfig(const string &filename);
         void handleInterruption(Interruption irq);
-        void tick();
+        
+        virtual void tick();
     };
 } // namespace Core

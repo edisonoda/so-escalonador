@@ -1,5 +1,6 @@
 #pragma once
 
+#include "tick_subject.hpp"
 #include "clock_mode.hpp"
 #include "../../ui/screen.hpp"
 
@@ -8,7 +9,7 @@ namespace Core { class System; }
 
 namespace Core
 {
-    class Clock
+    class Clock : public TickSubject
     {
     private:
         System* system;

@@ -5,14 +5,16 @@ using namespace Core;
 
 System *System::instance(nullptr);
 
-System::System()
-    : scheduler(Scheduler::Scheduler::getInstance())
+System::System() : TickObserver()
+    , scheduler(Scheduler::Scheduler::getInstance())
     , clock(this)
     , chart_generator(&ord_tasks)
     , gantt_chart(&chart_generator)
 {
     current_task = nullptr;
     task_count = 0;
+
+    clock.attach(this);
 
     scheduler->setTaskList(&ready_list);
     screen = UI::Screen::getInstance();
@@ -24,10 +26,19 @@ System::~System()
     delete scheduler;
     
     instance = nullptr;
+    current_task = nullptr;
     screen = nullptr;
     scheduler = nullptr;
 
-    // TODO: delete all tasks
+    for (TCB* task : ord_tasks)
+        delete task;
+
+    ord_tasks.clear();
+    new_list.clear();
+    ready_list.clear();
+    suspended_list.clear();
+
+    clock.detach(this);
 }
 
 System *System::getInstance()
@@ -66,6 +77,7 @@ void System::handleInterruption(Interruption irq)
     switch (irq)
     {
     case Interruption::QUANTUM:
+        clock.resetQuantum();
         preemptTask();
         break;
     case Interruption::FULL_STOP:
@@ -98,13 +110,12 @@ void System::changeState(TCBState state)
         default:
             break;
         }
+        
+        current_task->setState(TCBState::RUNNING);
 
         if (previous_task != current_task)
             clock.resetQuantum();
     }
-
-    if (current_task != nullptr)
-        current_task->setState(TCBState::RUNNING);
 }
 
 void System::checkNewTasks()
@@ -148,8 +159,6 @@ void System::suspendTask()
 
 void System::preemptTask()
 {
-    clock.resetQuantum();
-
     if (current_task != nullptr)
         ready_list.push_back(current_task);
 

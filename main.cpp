@@ -19,6 +19,7 @@ int main()
         return 1;
     }
 
+    timeout(-1);
     flushinp();
 
     system->handleInterruption(Interruption::FULL_STOP);

@@ -37,7 +37,7 @@ void Clock::run()
             if (quantum >= quantum_interval)
                 system->handleInterruption(Interruption::QUANTUM);
 
-            system->tick();
+            notify();
         }
     }
 }
