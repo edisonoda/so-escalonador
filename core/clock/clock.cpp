@@ -27,6 +27,8 @@ Clock::~Clock() {
 
 void Clock::run()
 {
+    running = true;
+
     while (running)
     {
         if (mode->getTick())
