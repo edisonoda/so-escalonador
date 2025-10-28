@@ -1,4 +1,5 @@
 #include "tcb.hpp"
+#include <iostream>
 using namespace Core;
 
 const map<string, EventType> TCB::events_map({
@@ -21,7 +22,13 @@ TCB::TCB(string id, int color, int start, int duration, int priority, list<strin
         createEvent(event);
 }
 
-TCB::~TCB() {}
+TCB::~TCB()
+{
+    for (Event* ev : events)
+        delete ev;
+
+    events.clear();
+}
 
 void TCB::createEvent(string ev)
 {
@@ -51,7 +58,7 @@ void TCB::createEvent(string ev)
             break;
     }
 
-    this->events.push_back(event);
+    this->events.push_back(&event);
 }
 
 string TCB::getId() const { return id; }
@@ -67,6 +74,8 @@ int TCB::getPriority() const { return priority; }
 int TCB::getRemaining() const { return remaining; }
 
 TCBState TCB::getState() const { return state; }
+
+list<Event*>* TCB::getEvents() { return &events; }
 
 void TCB::setState(TCBState state) { this->state = state; }
 

@@ -33,10 +33,14 @@ System::~System()
     for (TCB* task : ord_tasks)
         delete task;
 
+    for (IOEvent* ev : event_list)
+        delete ev;
+
     ord_tasks.clear();
     new_list.clear();
     ready_list.clear();
     suspended_list.clear();
+    event_list.clear();
 
     clock.detach(this);
 }
@@ -64,6 +68,8 @@ void System::tick()
         if (current_task->getRemaining() <= 0)
             terminateTask();
 
+        checkEvents();
+
         if (current_task != nullptr)
             current_task->decrementRemaining(1);
     }
@@ -72,13 +78,17 @@ void System::tick()
     system_monitor.drawTick(clock.getTotalTime());
 }
 
-void System::handleInterruption(Interruption irq)
+void System::handleInterruption(Interruption irq, TCB* task)
 {
     switch (irq)
     {
     case Interruption::QUANTUM:
         clock.resetQuantum();
         preemptTask();
+        break;
+    case Interruption::FINISH_IO:
+        if (task != nullptr)
+            readyTask(task);
         break;
     case Interruption::FULL_STOP:
         screen->getCh();
@@ -138,6 +148,33 @@ void System::checkNewTasks()
     }
 }
 
+void System::checkEvents()
+{
+    list<Event*>* events = current_task->getEvents();
+
+    if (!events || events->empty())
+        return;
+
+    list<Event*>::iterator i = (*events).begin();
+    int elapsed = current_task->getDuration() - current_task->getRemaining();
+
+    while (i != (*events).end())
+    {
+        if ((*i)->start <= elapsed)
+        {
+            event_list.push_back(new IOEvent(current_task, this, &clock, (*i)->duration));
+            events->erase(i++);
+            delete (*i);
+            suspendTask();
+            return;
+        }
+        else
+        {
+            i++;
+        }
+    }
+}
+
 void System::terminateTask()
 {
     changeState(TCBState::TERMINATED);
@@ -163,6 +200,14 @@ void System::preemptTask()
         ready_list.push_back(current_task);
 
     changeState(TCBState::READY);
+}
+
+void System::readyTask(TCB* task)
+{
+    suspended_list.remove(task);
+    ready_list.push_back(task);
+    task->setState(TCBState::READY);
+    preemptTask();
 }
 
 bool System::loadConfig(const string &filename)

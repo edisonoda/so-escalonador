@@ -42,7 +42,7 @@ namespace Core
         const int priority;
         int remaining;
         TCBState state;
-        list<Event> events;
+        list<Event*> events;
 
         void createEvent(string ev);
 
@@ -57,6 +57,7 @@ namespace Core
         int getPriority() const;
         int getRemaining() const;
         TCBState getState() const;
+        list<Event*>* getEvents();
 
         void setState(TCBState state);
         void decrementRemaining(int amount = 1);

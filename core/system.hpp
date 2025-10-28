@@ -3,6 +3,7 @@
 #include <list>
 #include <vector>
 #include "tcb.hpp"
+#include "io_event.hpp"
 #include "config_reader.hpp"
 #include "clock/tick_observer.hpp"
 #include "clock/clock.hpp"
@@ -19,6 +20,7 @@ namespace Core
     enum class Interruption
     {
         QUANTUM,
+        FINISH_IO,
         FULL_STOP
     };
 
@@ -35,6 +37,7 @@ namespace Core
         list<TCB*> new_list;
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
+        list<IOEvent*> event_list;
 
         UI::Screen* screen;
         UI::GanttChart gantt_chart;
@@ -49,16 +52,18 @@ namespace Core
 
         void changeState(TCBState state);
         void checkNewTasks();
+        void checkEvents();
         void terminateTask();
         void suspendTask();
         void preemptTask();
+        void readyTask(TCB* task);
     
     public:
         ~System();
         static System* getInstance();
 
         bool loadConfig(const string &filename);
-        void handleInterruption(Interruption irq);
+        void handleInterruption(Interruption irq, TCB* task = nullptr);
         
         virtual void tick();
     };
