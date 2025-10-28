@@ -10,6 +10,7 @@
 #include "../ui/gantt_chart.hpp"
 #include "../ui/system_monitor.hpp"
 #include "../utils/chart_generator.hpp"
+#include "setup_manager.hpp"
 
 using namespace std;
 
@@ -28,7 +29,7 @@ namespace Core
         
         Scheduler::Scheduler* scheduler;
         Clock clock;
-        ConfigReader config_reader;
+        // ConfigReader config_reader;
         TCB* current_task;
         vector<TCB*> ord_tasks;
         list<TCB*> new_list;
@@ -42,6 +43,8 @@ namespace Core
         Utils::ChartGenerator chart_generator;
 
         int task_count;
+
+        SetupManager setup;
 
         // Singleton
         System();

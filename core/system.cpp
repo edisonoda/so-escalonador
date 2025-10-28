@@ -10,12 +10,13 @@ System::System()
     , clock(this)
     , chart_generator(&ord_tasks)
     , gantt_chart(&chart_generator)
+    , screen(UI::Screen::getInstance())
+    , setup(screen)
 {
     current_task = nullptr;
     task_count = 0;
 
     scheduler->setTaskList(&ready_list);
-    screen = UI::Screen::getInstance();
 }
 
 System::~System()
@@ -160,23 +161,25 @@ bool System::loadConfig(const string &filename)
 {
     char mode = clock.initialSelection();
 
-    if (!config_reader.openFile(filename))
-    {
-        printf("Failed to open config file.\n");
-        return false;
-    }
+    // if (!config_reader.openFile(filename))
+    // {
+    //     printf("Failed to open config file.\n");
+    //     return false;
+    // }
 
-    config_reader.readPattern();
-    scheduler->setAlgorithm(config_reader.getAlgorithm());
-    clock.setQuantum(config_reader.getQuantum());
+    // config_reader.readPattern();
+    SimulationConfig configs = setup.run();
+    scheduler->setAlgorithm(configs.alg_id);
+    clock.setQuantum(configs.quantum);
 
-    new_list = config_reader.readTasks();
+    ord_tasks = configs.tasks;
+    new_list = list<TCB *>(begin(ord_tasks), end(ord_tasks));
+    
     task_count = new_list.size();
 
     for (TCB *task : new_list)
         screen->initColor(0, task->getColor());
 
-    ord_tasks = vector<TCB *>(begin(new_list), end(new_list));
 
     gantt_chart.setScreen(screen);
     gantt_chart.setTasks(&ord_tasks);
