@@ -1,15 +1,84 @@
 #include "setup_ui.hpp"
-#include <ncurses.h> // Para toupper()
-#include <stdio.h>   // Para sprintf
+#include "../core/setup_manager.hpp"
 
-SetupUI::SetupUI(UI::Screen* scr) : screen(scr) 
+#define INFO_X_OFFSET 60
+
+using namespace UI;
+
+SetupUI::SetupUI(SimulationConfig* config)
+    : screen(UI::Screen::getInstance())
+    , config(config)
 {
-    // Construtor
 }
 
 SetupUI::~SetupUI()
 {
-    // Destrutor (screen é gerenciado pelo System)
+    screen = nullptr;
+    config = nullptr;
+}
+
+void SetupUI::updateInfo()
+{
+    int y = 0;
+
+    screen->print(INFO_X_OFFSET, y++, "--- Configuração Atual ---");
+    string alg_str;
+    switch(config->alg_id)
+    {
+        case Scheduler::AlgorithmID::FCFS: alg_str = "FCFS"; break;
+        case Scheduler::AlgorithmID::PRIOp: alg_str = "PRIOp"; break;
+        case Scheduler::AlgorithmID::SRTF: alg_str = "SRTF"; break;
+    }
+    screen->print(INFO_X_OFFSET, y++, "Algoritmo: " + alg_str);
+    screen->print(INFO_X_OFFSET, y++, "Quantum:   " + to_string(config->quantum));
+    screen->print(INFO_X_OFFSET, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
+
+    if (!config->tasks.empty())
+        for (TCB* task : config->tasks)
+        {
+            screen->setColor(task->getColor() ? task->getColor() : 0); // Cor da tarefa
+            screen->invertColor(true);
+            screen->print(INFO_X_OFFSET, y, task->getId());
+            
+            screen->setColor(DefaultColor::WHITE);
+            screen->invertColor(false);
+            
+            string start_str = " START: " + to_string(task->getStart()) + " ";
+            string duration_str = "| DURATION: " + to_string(task->getDuration()) + " ";
+            string prio_str = "| PRIORITY: " + to_string(task->getPriority()) + " ";
+            
+            screen->print(INFO_X_OFFSET + 5, y, start_str);
+            screen->print(INFO_X_OFFSET + 15, y, duration_str);
+            screen->print(INFO_X_OFFSET + 30, y, prio_str);
+            
+            y++;
+        }
+
+    screen->refresh();
+}
+
+int SetupUI::showMainMenu()
+{
+    screen->clear();
+    screen->print(0, 0, "--- SETUP DA SIMULAÇÃO ---");
+    screen->print(2, 1, "[1] Iniciar (Modo: " + string(1, config->mode) + ")");
+    screen->print(2, 2, "[2] Carregar");
+    screen->print(2, 3, "[3] Editar");
+    screen->print(2, 4, "[4] Restaurar PADRÃO");
+    screen->print(2, 5, "[Q] Sair do programa");
+    screen->print(2, 7, "*Pressione -Espaço- para alterar o modo de execução");
+    screen->refresh();
+
+    updateInfo();
+    return screen->getCh();
+}
+
+void SetupUI::showEditor()
+{
+}
+
+void SetupUI::showTaskEditor()
+{
 }
 
 void SetupUI::showError(const string& message)
@@ -25,32 +94,6 @@ void SetupUI::showMessage(const string& message)
     screen->refresh();
 }
 
-int SetupUI::showMainMenu(Scheduler::AlgorithmID alg, int quantum, int task_count)
-{
-    screen->clear();
-    screen->print(0, 0, "--- SETUP DA SIMULAÇÃO ---");
-    screen->print(2, 2, "[1] Carregar configuração PADRÃO (configs/default.txt)");
-    screen->print(2, 3, "[2] Carregar configuração de ARQUIVO");
-    screen->print(2, 4, "[3] Editar configuração PADRÃO");
-    screen->print(2, 6, "[4] INICIAR Simulação com a configuração atual");
-    screen->print(2, 8, "[Q] Sair do programa");
-    
-    screen->print(0, 10, "--- Configuração Atual ---");
-    string alg_str;
-    switch(alg)
-    {
-        case Scheduler::AlgorithmID::FCFS: alg_str = "FCFS"; break;
-        case Scheduler::AlgorithmID::PRIOp: alg_str = "PRIOp"; break;
-        case Scheduler::AlgorithmID::SRTF: alg_str = "SRTF"; break;
-    }
-    screen->print(2, 11, "Algoritmo: " + alg_str);
-    screen->print(2, 12, "Quantum:   " + to_string(quantum));
-    screen->print(2, 13, "Nº de Tasks: " + to_string(task_count));
-    screen->refresh();
-
-    return screen->getCh();
-}
-
 string SetupUI::promptForFilename()
 {
     screen->clear();
@@ -58,15 +101,9 @@ string SetupUI::promptForFilename()
     screen->print(0, 2, "Digite o caminho do arquivo (ex: configs/meu_arquivo.txt):");
     screen->print(0, 4, "> ");
     screen->refresh();
+
+    updateInfo();
     return readString();
-}
-
-void SetupUI::showEditor(Scheduler::AlgorithmID alg, int quantum, const vector<TCB*>& tasks)
-{
-}
-
-void SetupUI::showTaskEditor()
-{
 }
 
 string SetupUI::readString()

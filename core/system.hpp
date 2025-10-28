@@ -40,10 +40,9 @@ namespace Core
         UI::SystemMonitor system_monitor;
 
         Utils::ChartGenerator chart_generator;
+        SetupManager setup;
 
         int task_count;
-
-        SetupManager setup;
 
         // Singleton
         System();
@@ -58,7 +57,7 @@ namespace Core
         ~System();
         static System* getInstance();
 
-        bool loadConfig(const string &filename);
+        bool loadConfig();
         void handleInterruption(Interruption irq);
         void tick();
     };

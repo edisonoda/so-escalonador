@@ -11,7 +11,6 @@ System::System()
     , chart_generator(&ord_tasks)
     , gantt_chart(&chart_generator)
     , screen(UI::Screen::getInstance())
-    , setup(screen)
 {
     current_task = nullptr;
     task_count = 0;
@@ -151,18 +150,10 @@ void System::preemptTask()
     changeState(TCBState::READY);
 }
 
-bool System::loadConfig(const string &filename)
+bool System::loadConfig()
 {
-    char mode = clock.initialSelection();
-
-    // if (!config_reader.openFile(filename))
-    // {
-    //     printf("Failed to open config file.\n");
-    //     return false;
-    // }
-
-    // config_reader.readPattern();
     SimulationConfig configs = setup.run();
+
     scheduler->setAlgorithm(configs.alg_id);
     clock.setQuantum(configs.quantum);
 
@@ -183,7 +174,7 @@ bool System::loadConfig(const string &filename)
     system_monitor.setTasks(&ord_tasks);
     system_monitor.drawTick(0);
     
-    clock.selectMode(mode);
+    clock.selectMode(configs.mode);
     clock.run();
 
     return true;

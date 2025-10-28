@@ -5,20 +5,19 @@
 
 using namespace Core;
 
-#define CONFIG_FILE "configs/priop_maziero.txt"
-
 int main()
 {
     setlocale(LC_ALL, "pt_BR.UTF-8");
 
     System *system = System::getInstance();
 
-    if (!system->loadConfig(CONFIG_FILE))
+    if (!system->loadConfig())
     {
         delete system;
         return 1;
     }
 
+    timeout(-1);
     flushinp();
 
     system->handleInterruption(Interruption::FULL_STOP);

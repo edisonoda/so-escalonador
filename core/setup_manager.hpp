@@ -8,36 +8,39 @@
 #include "../scheduler/scheduling_algorithm.hpp"
 
 using namespace std;
-using namespace Core;
+using namespace UI;
 
-struct SimulationConfig
+namespace Core
 {
-    Scheduler::AlgorithmID alg_id = Scheduler::AlgorithmID::FCFS;
-    int quantum = 0;
-    vector<TCB*> tasks;
-    bool simulation_should_run = false;
-};
+    struct SimulationConfig
+    {
+        Scheduler::AlgorithmID alg_id = Scheduler::AlgorithmID::FCFS;
+        vector<TCB*> tasks;
 
-class SetupManager
-{
-private:
-    ConfigReader config_reader;
-    SetupUI* ui;
+        int quantum = 2;
+        char mode = 'A';
+        bool simulation_should_run = false;
+    };
 
-    Scheduler::AlgorithmID setup_alg_id;
-    vector<TCB*> setup_tasks;
-    int setup_quantum;
+    class SetupManager
+    {
+    private:
+        ConfigReader config_reader;
+        SetupUI ui;
 
-    bool loadFromFile(const string& filename);
-    void runEditor();
-    
-    void addNewTask();
-    void deleteTask();
-    bool isNumber(const string &s);
+        SimulationConfig config;
 
-public:
-    SetupManager(UI::Screen* screen);
-    ~SetupManager();
+        bool loadFromFile(const string& filename);
+        void runEditor();
+        
+        void addNewTask();
+        void deleteTask();
+        bool isNumber(const string &s);
 
-    SimulationConfig run();
-};
+    public:
+        SetupManager();
+        ~SetupManager();
+
+        SimulationConfig run();
+    };
+} // namespace Core

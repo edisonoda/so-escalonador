@@ -1,32 +1,38 @@
 #pragma once
 
 #include <string>
-#include <vector>
 #include "screen.hpp"
-#include "../core/tcb.hpp"
-#include "../scheduler/scheduling_algorithm.hpp"
 
 using namespace std;
+
+// Forward declaration
+namespace Core { class SimulationConfig; }
 using namespace Core;
 
-class SetupUI
+namespace UI
 {
-private:
-    UI::Screen* screen;
+    class SetupUI
+    {
+    private:
+        UI::Screen* screen;
+        SimulationConfig* config;
 
-public:
-    SetupUI(UI::Screen* scr);
-    ~SetupUI();
-
-    // --- Funções de Desenho de Tela ---
-    int showMainMenu(Scheduler::AlgorithmID alg, int quantum, int task_count);
-    void showEditor(Scheduler::AlgorithmID alg, int quantum, const vector<TCB*>& tasks);
-    void showTaskEditor();
+    public:
+        SetupUI(SimulationConfig* config);
+        ~SetupUI();
     
-    // --- Funções de UI Utility ---
-    string promptForFilename();
-    string readString();
+        // --- Funções de Desenho de Tela ---
+        void updateInfo();
     
-    void showError(const string& message);
-    void showMessage(const string& message);
-};
+        int showMainMenu();
+        void showEditor();
+        void showTaskEditor();
+        
+        void showError(const string& message);
+        void showMessage(const string& message);
+        
+        // --- Funções de UI Utility ---
+        string promptForFilename();
+        string readString();
+    };
+} // namespace UI
