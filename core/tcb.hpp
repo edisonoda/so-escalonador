@@ -2,6 +2,7 @@
 
 #include <string>
 #include <list>
+#include <map>
 using namespace std;
 
 namespace Core
@@ -15,9 +16,25 @@ namespace Core
         TERMINATED
     };
 
+    enum class EventType
+    {
+        IO,
+        ML,
+        MU
+    };
+
+    struct Event
+    {
+        EventType type;
+        int start;
+        int duration;
+    };
+
     class TCB
     {
     private:
+        const static map<string, EventType> events_map;
+
         const string id;
         const int color;
         const int start;
@@ -25,7 +42,9 @@ namespace Core
         const int priority;
         int remaining;
         TCBState state;
-        list<string> events;
+        list<Event> events;
+
+        void createEvent(string ev);
 
     public:
         TCB(string id, int color, int start, int duration, int priority, list<string> events = {});

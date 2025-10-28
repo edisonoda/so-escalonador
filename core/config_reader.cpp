@@ -1,4 +1,5 @@
 #include "config_reader.hpp"
+#include <list>
 #include <vector>
 
 using namespace Core;
@@ -79,11 +80,13 @@ list<TCB *> ConfigReader::readTasks()
             stoi(configs[1]),
             stoi(configs[2]),
             stoi(configs[3]),
-            stoi(configs[4])
+            stoi(configs[4]),
+            list<string>(configs.begin() + 5, configs.end())
         );
 
         tasks.push_back(tcb);
         configs.clear();
     }
+    
     return tasks;
 }
