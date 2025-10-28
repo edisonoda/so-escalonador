@@ -153,6 +153,8 @@ void System::preemptTask()
 bool System::loadConfig()
 {
     SimulationConfig configs = setup.run();
+    
+    screen->clear();
 
     scheduler->setAlgorithm(configs.alg_id);
     clock.setQuantum(configs.quantum);
@@ -164,7 +166,6 @@ bool System::loadConfig()
 
     for (TCB *task : new_list)
         screen->initColor(0, task->getColor());
-
 
     gantt_chart.setScreen(screen);
     gantt_chart.setTasks(&ord_tasks);

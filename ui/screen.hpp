@@ -32,6 +32,6 @@ namespace UI
         int setColor(int color_index);
         void invertColor();
         void invertColor(bool inv);
-        int getCh();
+        char getCh();
     };
 } // namespace UI

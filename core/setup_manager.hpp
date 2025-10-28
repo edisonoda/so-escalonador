@@ -5,6 +5,7 @@
 #include "tcb.hpp"
 #include "config_reader.hpp"
 #include "../ui/setup_ui.hpp"
+#include "../ui/screen.hpp"
 #include "../scheduler/scheduling_algorithm.hpp"
 
 using namespace std;
@@ -26,6 +27,7 @@ namespace Core
     {
     private:
         ConfigReader config_reader;
+        Screen* screen;
         SetupUI ui;
 
         SimulationConfig config;

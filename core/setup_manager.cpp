@@ -6,12 +6,14 @@
 
 SetupManager::SetupManager()
     : ui(&config)
+    , screen(Screen::getInstance())
 {
     loadFromFile(CONFIG_FILE);
 }
 
 SetupManager::~SetupManager()
 {
+    screen = nullptr;
 }
 
 SimulationConfig SetupManager::run()
@@ -19,14 +21,18 @@ SimulationConfig SetupManager::run()
     timeout(-1);
 
     bool in_setup = true;
-    int ch = '1';
+    char ch = '1';
 
-    vector<int> valid_entries = {'1', '2', '3', '4', 'Q', ' '};
+    vector<char> valid_entries = {'1', '2', '3', '4', 'Q', ' '};
 
     while (in_setup)
     {
-        while (find(valid_entries.begin(), valid_entries.end(), ch) != valid_entries.end())
-            ch = ui.showMainMenu();
+        ch = ui.showMainMenu();
+        while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
+        {
+            ui.showError("digite uma opção válida!");
+            ch = screen->getCh();
+        }
 
         switch (ch)
         {

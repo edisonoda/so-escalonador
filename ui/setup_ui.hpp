@@ -24,7 +24,7 @@ namespace UI
         // --- Funções de Desenho de Tela ---
         void updateInfo();
     
-        int showMainMenu();
+        char showMainMenu();
         void showEditor();
         void showTaskEditor();
         

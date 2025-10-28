@@ -86,7 +86,7 @@ void Screen::invertColor(bool inv)
     invertColor();
 }
 
-int Screen::getCh()
+char Screen::getCh()
 {
     return ::getch();
 }

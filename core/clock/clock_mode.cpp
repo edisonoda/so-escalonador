@@ -21,7 +21,7 @@ ClockMode::~ClockMode()
 
 void ClockMode::checkModeChange()
 {
-    int ch = screen->getCh();
+    char ch = screen->getCh();
 
     if (ch == ' ')
         clock->selectMode('P');

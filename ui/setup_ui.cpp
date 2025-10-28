@@ -57,7 +57,7 @@ void SetupUI::updateInfo()
     screen->refresh();
 }
 
-int SetupUI::showMainMenu()
+char SetupUI::showMainMenu()
 {
     screen->clear();
     screen->print(0, 0, "--- SETUP DA SIMULAÇÃO ---");
@@ -108,7 +108,7 @@ string SetupUI::promptForFilename()
 
 string SetupUI::readString()
 {
-    int ch = screen->getCh();
+    char ch = screen->getCh();
     string str = "";
 
     while (ch != '\n')
