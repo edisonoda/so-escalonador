@@ -17,14 +17,23 @@ namespace UI
         UI::Screen* screen;
         SimulationConfig* config;
 
+        int selected;
+
+        void navigate(char dir, int max_options);
+        void printOption(int index, string text);
+        
+        void showMainMenu();
+
     public:
         SetupUI(SimulationConfig* config);
         ~SetupUI();
+
+        int getSelected() const { return selected; }
     
         // --- Funções de Desenho de Tela ---
         void updateInfo();
     
-        char showMainMenu();
+        char navigateMainMenu();
         void showEditor();
         void showTaskEditor();
         

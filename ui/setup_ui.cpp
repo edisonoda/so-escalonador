@@ -1,5 +1,7 @@
 #include "setup_ui.hpp"
 #include "../core/setup_manager.hpp"
+#include "screen.hpp"
+#include <ncurses.h>
 #include <string>
 
 #define MSG_Y_OFFSET 15
@@ -11,6 +13,7 @@ SetupUI::SetupUI(SimulationConfig* config)
     : screen(UI::Screen::getInstance())
     , config(config)
 {
+    selected = 0;
 }
 
 SetupUI::~SetupUI()
@@ -61,20 +64,41 @@ void SetupUI::updateInfo()
     screen->refresh();
 }
 
-char SetupUI::showMainMenu()
+char SetupUI::navigateMainMenu()
 {
+    showMainMenu();
+
+    char ch = getch();
+
+    // Flechas (3 ch): \033 + [ + (A, B, C ou D)
+    while (ch == '\033')
+    {
+        getch();
+        navigate(getch(), 5);
+        showMainMenu();
+        ch = getch();
+    }
+
+    return ch;
+}
+
+void SetupUI::showMainMenu()
+{
+    int i = 0;
+
     screen->clear();
     screen->print(0, 0, "--- SETUP DA SIMULAÇÃO ---");
-    screen->print(0, 1, "[1] Iniciar (Modo: " + string(1, config->mode) + ")");
-    screen->print(0, 2, "[2] Carregar");
-    screen->print(0, 3, "[3] Editar");
-    screen->print(0, 4, "[4] Restaurar PADRÃO");
-    screen->print(0, 5, "[Q] Sair do programa");
-    screen->print(0, 7, "*Pressione -Espaço- para alterar o modo de execução");
-    screen->refresh();
 
+    printOption(i++, "Iniciar (Modo: " + string(1, config->mode) + ")");
+    printOption(i++, "Carregar");
+    printOption(i++, "Editar");
+    printOption(i++, "Restaurar PADRÃO");
+    printOption(i++, "Sair do programa");
+
+    screen->print(0, i + 2, "*Pressione -Espaço- para alterar o modo de execução");
+
+    screen->refresh();
     updateInfo();
-    return screen->getCh();
 }
 
 void SetupUI::showEditor()
@@ -85,9 +109,35 @@ void SetupUI::showTaskEditor()
 {
 }
 
+void SetupUI::navigate(char dir, int max_options)
+{
+    // Move para cima ou para baixo, dependendo do código da seta
+    switch (dir)
+    {
+        case 'A': selected--; break;
+        case 'B': selected++; break;
+    }
+
+    // Mantém a seleção dentre as opções
+    selected = (selected + max_options) % max_options;
+}
+
+void SetupUI::printOption(int index, string text)
+{
+    // Se a opção for a selecionada, formata ela
+    if (index == selected)
+    {
+        screen->setColor(DefaultColor::GREEN);
+        text = "> " + text;
+    }
+
+    index++;
+    screen->print(0, index, "[" + to_string(index) + "] " + text);
+    screen->setColor(DefaultColor::WHITE);
+}
+
 void SetupUI::showError(const string& message)
 {
-    // Mostra uma mensagem e espera o usuário
     screen->print(0, MSG_Y_OFFSET, "ERRO: " + message);
     screen->refresh();
 }

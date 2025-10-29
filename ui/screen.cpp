@@ -1,8 +1,9 @@
 #include "screen.hpp"
+#include <ncurses.h>
+
+#define INITIAL_COLORS 4
 
 using namespace UI;
-
-#include <ncurses.h>
 
 Screen* Screen::instance(nullptr);
 
@@ -12,10 +13,12 @@ Screen::Screen()
     inverted = false;
     initscr();
     start_color();
-    init_color(8, 400,400,400);
+    init_color(100, 250, 250, 250);
+
     initColor(7, 0); // branco no preto
     initColor(0, 0); // preto no preto
-    initColor(0, 8); // cinza no preto
+    initColor(0, 100); // preto no cinza
+    initColor(COLOR_GREEN, 0); // verde no preto
 
     bkgd(COLOR_PAIR(1));
 }
@@ -68,8 +71,8 @@ int Screen::setColor(DefaultColor color)
 
 int Screen::setColor(int color_index)
 {
-    attron(COLOR_PAIR(color_index + 4));
-    return color_index + 4;
+    attron(COLOR_PAIR(color_index + INITIAL_COLORS + 1));
+    return color_index + INITIAL_COLORS + 1;
 }
 
 void Screen::invertColor()

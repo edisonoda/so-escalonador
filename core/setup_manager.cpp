@@ -26,16 +26,19 @@ SimulationConfig SetupManager::run()
     bool in_setup = true;
     char ch = '1';
 
-    vector<char> valid_entries = {'1', '2', '3', '4', 'Q', ' '};
+    vector<char> valid_entries = {'1', '2', '3', '4', '5', ' ', '\n'};
 
     while (in_setup)
     {
-        ch = ui.showMainMenu();
+        ch = ui.navigateMainMenu();
         while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
         {
             ui.showError("digite uma opção válida!");
             ch = screen->getCh();
         }
+
+        if (ch == '\n')
+            ch = '0' + ui.getSelected() + 1;
 
         switch (ch)
         {
@@ -59,7 +62,7 @@ SimulationConfig SetupManager::run()
                 loadFromFile("configs/default.txt");
                 break;
 
-            case 'Q':
+            case '5':
                 config.simulation_should_run = false;
                 return config;
 

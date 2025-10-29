@@ -8,7 +8,8 @@ namespace UI
     {
         WHITE = 1,
         BLACK = 2,
-        GRAY = 3
+        GRAY = 3,
+        GREEN = 4
     };
 
     class Screen
