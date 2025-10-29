@@ -2,7 +2,6 @@
 #include "clock.hpp"
 #include "../system.hpp"
 #include "../../utils/constants.hpp"
-#include <ncurses.h>
 
 using namespace Core;
 

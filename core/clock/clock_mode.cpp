@@ -2,7 +2,7 @@
 #include "clock.hpp"
 #include "../system.hpp"
 
-#include <ncurses.h>
+#include "../../utils/std_libraries.hpp"
 
 using namespace Core;
 

@@ -1,13 +1,8 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
+#include "../utils/std_libraries.hpp"
 #include "tcb.hpp"
 #include "../scheduler/scheduling_algorithm.hpp"
-
-using namespace std;
 
 namespace Core
 {

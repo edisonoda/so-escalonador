@@ -1,5 +1,4 @@
 #include "chart_generator.hpp"
-#include <iomanip>
 
 using namespace Utils;
 

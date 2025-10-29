@@ -1,8 +1,6 @@
 #include "setup_ui.hpp"
 #include "../core/setup_manager.hpp"
 #include "screen.hpp"
-#include <ncurses.h>
-#include <string>
 
 #define MSG_Y_OFFSET 15
 #define INFO_X_OFFSET 60

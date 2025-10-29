@@ -1,5 +1,4 @@
 #include "config_reader.hpp"
-#include <vector>
 
 using namespace Core;
 

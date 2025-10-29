@@ -1,0 +1,20 @@
+#pragma once
+
+// bibliotecas de estruturas
+#include <string>
+#include <list>
+#include <vector>
+#include <map>
+
+// bibliotecas de utilidade
+#include <fstream>
+#include <iomanip>
+#include <algorithm>
+#include <iostream>
+#include <chrono>
+
+// headers do C
+#include <ncurses.h>
+#include <locale.h>
+
+using namespace std;

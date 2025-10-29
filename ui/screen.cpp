@@ -1,5 +1,4 @@
 #include "screen.hpp"
-#include <ncurses.h>
 
 #define INITIAL_COLORS 4
 
