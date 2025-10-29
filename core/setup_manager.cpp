@@ -28,8 +28,6 @@ SimulationConfig SetupManager::run()
 
     while (in_setup)
     {
-        noecho();
-
         ch = ui.navigateMainMenu();
         while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
         {

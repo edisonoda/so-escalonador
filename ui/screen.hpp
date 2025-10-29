@@ -24,10 +24,18 @@ namespace UI
     public:
         ~Screen();
         static Screen* getInstance();
-        void print(int x, int y, char ch = '*');
+        void getPos(int* x, int* y);
+        int getPosX();
+        int getPosY();
+
+        void move(int x, int y);
+        void print(char ch);
+        void print(int x, int y, char ch);
         void print(int x, int y, string str);
+        void del(int x, int y);
         void refresh();
         void clear();
+
         void initColor(int color, int bg_color);
         int setColor(DefaultColor color);
         int setColor(int color_index);

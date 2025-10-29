@@ -1,4 +1,5 @@
 #include "screen.hpp"
+#include <ncurses.h>
 
 #define INITIAL_COLORS 4
 
@@ -37,6 +38,31 @@ Screen* Screen::getInstance()
     return instance;
 }
 
+void Screen::getPos(int* x, int* y)
+{
+    getyx(stdscr, *y, *x);
+}
+
+int Screen::getPosX()
+{
+    return getcurx(stdscr);
+}
+
+int Screen::getPosY()
+{
+    return getcury(stdscr);
+}
+
+void Screen::move(int x, int y)
+{
+    ::move(y, x);
+}
+
+void Screen::print(char ch)
+{
+    printw("%c", ch);
+}
+
 void Screen::print(int x, int y, char ch)
 {
     mvprintw(y, x, "%c", ch);
@@ -45,6 +71,12 @@ void Screen::print(int x, int y, char ch)
 void Screen::print(int x, int y, string str)
 {
     mvprintw(y, x, "%s", str.c_str());
+}
+
+void Screen::del(int x, int y)
+{
+    move(x, y);
+    delch();
 }
 
 void Screen::refresh()

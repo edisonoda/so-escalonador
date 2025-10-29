@@ -2,6 +2,8 @@
 #include "setup_ui.hpp"
 
 #include "../core/setup_manager.hpp"
+#include <ncurses.h>
+#include <string>
 
 #define MSG_Y_OFFSET 15
 #define INFO_X_OFFSET 60
@@ -150,25 +152,41 @@ void SetupUI::showMessage(const string& message)
 string SetupUI::promptForFilename()
 {
     screen->clear();
+    updateInfo();
+
     screen->print(0, 0, "--- Carregar Arquivo de Configuração ---");
-    screen->print(0, 2, "Digite o caminho do arquivo (ex: configs/meu_arquivo.txt):");
-    screen->print(0, 4, "> ");
+    screen->print(0, 1, "Digite o nome do arquivo (ex: meu_arquivo.txt):");
+    screen->print(0, 2, "> ");
     screen->refresh();
 
-    updateInfo();
     return readString();
 }
 
 string SetupUI::readString()
 {
-    echo();
-
     char ch = getch();
     string str = "";
 
     while (ch != '\n')
     {
-        str += ch;
+        // screen->print(screen->getPosX(), screen->getPosY(), to_string(ch));
+
+        if (ch == '\b' || ch == 127)
+        {
+            if (!str.empty())
+            {
+                screen->move(screen->getPosX() - 1, screen->getPosY());
+                str.pop_back();
+                screen->print(' ');
+                screen->move(screen->getPosX() - 1, screen->getPosY());
+            }
+        }
+        else
+        {
+            screen->print(ch);
+            str += ch;
+        }
+        
         ch = getch();
     }
 
