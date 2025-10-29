@@ -14,7 +14,7 @@ void SystemMonitor::drawTick(int tick)
     {
         TCB *task = (*ord_tasks)[i];
 
-        screen->setColor(task->getColor()); // Cor da tarefa
+        screen->setColor(i); // Cor da tarefa
         screen->invertColor(true);
         
         TCBState status = task->getState();

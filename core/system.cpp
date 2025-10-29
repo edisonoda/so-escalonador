@@ -161,11 +161,7 @@ bool System::loadConfig()
 
     ord_tasks = configs.tasks;
     new_list = list<TCB *>(begin(ord_tasks), end(ord_tasks));
-    
     task_count = new_list.size();
-
-    for (TCB *task : new_list)
-        screen->initColor(0, task->getColor());
 
     gantt_chart.setScreen(screen);
     gantt_chart.setTasks(&ord_tasks);

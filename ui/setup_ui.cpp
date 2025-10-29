@@ -1,6 +1,8 @@
 #include "setup_ui.hpp"
 #include "../core/setup_manager.hpp"
+#include <string>
 
+#define MSG_Y_OFFSET 15
 #define INFO_X_OFFSET 60
 
 using namespace UI;
@@ -34,22 +36,24 @@ void SetupUI::updateInfo()
     screen->print(INFO_X_OFFSET, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
     if (!config->tasks.empty())
-        for (TCB* task : config->tasks)
+        for (size_t i = 0; i < config->tasks.size(); i++)
         {
-            screen->setColor(task->getColor() ? task->getColor() : 0); // Cor da tarefa
+            TCB *task = config->tasks[i];
+            screen->setColor(i); // Cor da tarefa
             screen->invertColor(true);
             screen->print(INFO_X_OFFSET, y, task->getId());
+            screen->print(INFO_X_OFFSET + 4, y, "COLOR: " + to_string(task->getColor()) + " ");
             
             screen->setColor(DefaultColor::WHITE);
             screen->invertColor(false);
             
-            string start_str = " START: " + to_string(task->getStart()) + " ";
+            string start_str = "| START: " + to_string(task->getStart()) + " ";
             string duration_str = "| DURATION: " + to_string(task->getDuration()) + " ";
             string prio_str = "| PRIORITY: " + to_string(task->getPriority()) + " ";
             
-            screen->print(INFO_X_OFFSET + 5, y, start_str);
-            screen->print(INFO_X_OFFSET + 15, y, duration_str);
-            screen->print(INFO_X_OFFSET + 30, y, prio_str);
+            screen->print(INFO_X_OFFSET + 14, y, start_str);
+            screen->print(INFO_X_OFFSET + 26, y, duration_str);
+            screen->print(INFO_X_OFFSET + 41, y, prio_str);
             
             y++;
         }
@@ -61,12 +65,12 @@ char SetupUI::showMainMenu()
 {
     screen->clear();
     screen->print(0, 0, "--- SETUP DA SIMULAÇÃO ---");
-    screen->print(2, 1, "[1] Iniciar (Modo: " + string(1, config->mode) + ")");
-    screen->print(2, 2, "[2] Carregar");
-    screen->print(2, 3, "[3] Editar");
-    screen->print(2, 4, "[4] Restaurar PADRÃO");
-    screen->print(2, 5, "[Q] Sair do programa");
-    screen->print(2, 7, "*Pressione -Espaço- para alterar o modo de execução");
+    screen->print(0, 1, "[1] Iniciar (Modo: " + string(1, config->mode) + ")");
+    screen->print(0, 2, "[2] Carregar");
+    screen->print(0, 3, "[3] Editar");
+    screen->print(0, 4, "[4] Restaurar PADRÃO");
+    screen->print(0, 5, "[Q] Sair do programa");
+    screen->print(0, 7, "*Pressione -Espaço- para alterar o modo de execução");
     screen->refresh();
 
     updateInfo();
@@ -84,13 +88,13 @@ void SetupUI::showTaskEditor()
 void SetupUI::showError(const string& message)
 {
     // Mostra uma mensagem e espera o usuário
-    screen->print(0, 20, "ERRO: " + message);
+    screen->print(0, MSG_Y_OFFSET, "ERRO: " + message);
     screen->refresh();
 }
 
 void SetupUI::showMessage(const string& message)
 {
-    screen->print(0, 20, message);
+    screen->print(0, MSG_Y_OFFSET, message);
     screen->refresh();
 }
 

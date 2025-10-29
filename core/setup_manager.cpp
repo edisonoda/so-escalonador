@@ -9,6 +9,9 @@ SetupManager::SetupManager()
     , screen(Screen::getInstance())
 {
     loadFromFile(CONFIG_FILE);
+
+    for (TCB *task : config.tasks)
+        screen->initColor(0, task->getColor());
 }
 
 SetupManager::~SetupManager()
@@ -119,6 +122,8 @@ void SetupManager::addNewTask()
         stoi(duration),
         stoi(priority)
     ));
+
+    screen->initColor(0, stoi(color));
 }
 
 void SetupManager::deleteTask()

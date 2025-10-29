@@ -16,6 +16,8 @@ Screen::Screen()
     initColor(7, 0); // branco no preto
     initColor(0, 0); // preto no preto
     initColor(0, 8); // cinza no preto
+
+    bkgd(COLOR_PAIR(1));
 }
 
 Screen::~Screen()
