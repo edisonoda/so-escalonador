@@ -2,8 +2,6 @@
 
 #include "std_libraries.hpp"
 
-using namespace std;
-
 namespace Constants
 {
     constexpr int DEFAULT_TICK_INTERVAL = 250; // Milliseconds

@@ -4,7 +4,7 @@
 
 #include "clock_mode.hpp"
 
-using namespace std::chrono;
+using namespace chrono;
 
 namespace Core
 {

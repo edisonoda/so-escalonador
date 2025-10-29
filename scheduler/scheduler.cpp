@@ -4,8 +4,6 @@
 #include "srtf_algorithm.hpp"
 #include "priop_algorithm.hpp"
 
-using namespace std;
-
 namespace Scheduler
 {
     Scheduler *Scheduler::instance(nullptr);
