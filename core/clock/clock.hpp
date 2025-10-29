@@ -1,6 +1,7 @@
 #pragma once
 
 #include "clock_mode.hpp"
+
 #include "../../ui/screen.hpp"
 
 // Forward declaration

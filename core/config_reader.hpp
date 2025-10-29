@@ -1,7 +1,9 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
+
 #include "tcb.hpp"
+
 #include "../scheduler/scheduling_algorithm.hpp"
 
 namespace Core

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "task_visual.hpp"
+
 #include "../utils/chart_generator.hpp"
 
 namespace UI

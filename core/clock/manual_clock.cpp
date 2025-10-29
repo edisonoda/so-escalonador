@@ -1,5 +1,7 @@
 #include "manual_clock.hpp"
+
 #include "clock.hpp"
+
 #include "../system.hpp"
 
 using namespace Core;

@@ -1,6 +1,7 @@
-#include "setup_ui.hpp"
-#include "../core/setup_manager.hpp"
 #include "screen.hpp"
+#include "setup_ui.hpp"
+
+#include "../core/setup_manager.hpp"
 
 #define MSG_Y_OFFSET 15
 #define INFO_X_OFFSET 60
