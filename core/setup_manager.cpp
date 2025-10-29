@@ -9,6 +9,8 @@ SetupManager::SetupManager()
     , screen(Screen::getInstance())
 {
     loadFromFile(CONFIG_FILE);
+    timeout(-1);
+    noecho();
 
     for (TCB *task : config.tasks)
         screen->initColor(0, task->getColor());
@@ -21,8 +23,6 @@ SetupManager::~SetupManager()
 
 SimulationConfig SetupManager::run()
 {
-    timeout(-1);
-
     bool in_setup = true;
     char ch = '1';
 
@@ -30,11 +30,13 @@ SimulationConfig SetupManager::run()
 
     while (in_setup)
     {
+        noecho();
+
         ch = ui.navigateMainMenu();
         while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
         {
             ui.showError("digite uma opção válida!");
-            ch = screen->getCh();
+            ch = getch();
         }
 
         if (ch == '\n')

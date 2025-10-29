@@ -38,7 +38,7 @@ bool AutoClock::getTick()
     }
 
     timeout(0);
-    int ch = screen->getCh();
+    char ch = getch();
 
     if (ch == ' ')
     {

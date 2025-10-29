@@ -1,7 +1,6 @@
 #pragma once
 
 #include "clock_mode.hpp"
-#include "../../ui/screen.hpp"
 
 // Forward declaration
 namespace Core { class System; }
@@ -13,7 +12,6 @@ namespace Core
     private:
         System* system;
         ClockMode* mode;
-        UI::Screen* screen;
         
         int total_time;
         int quantum_interval;

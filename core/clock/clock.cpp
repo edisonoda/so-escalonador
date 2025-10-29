@@ -9,7 +9,6 @@ using namespace Core;
 
 Clock::Clock(System* sys)
     : system(sys)
-    , screen(UI::Screen::getInstance())
     , quantum_interval(Constants::DEFAULT_QUANTUM)
 {
     mode = nullptr;
@@ -22,7 +21,6 @@ Clock::~Clock() {
     delete mode;
     mode = nullptr;
     system = nullptr;
-    screen = nullptr;
 }
 
 void Clock::run()

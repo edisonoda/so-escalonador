@@ -12,7 +12,7 @@ ManualClock::~ManualClock() { }
 bool ManualClock::getTick()
 {
     timeout(-1);
-    char ch = screen->getCh();
+    char ch = getch();
 
     if (ch == ' ')
     {

@@ -90,8 +90,3 @@ void Screen::invertColor(bool inv)
     inverted = !inv;
     invertColor();
 }
-
-char Screen::getCh()
-{
-    return ::getch();
-}

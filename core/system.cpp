@@ -69,7 +69,7 @@ void System::handleInterruption(Interruption irq)
             preemptTask();
             break;
         case Interruption::FULL_STOP:
-            screen->getCh();
+            getch();
             break;
         default:
             break;

@@ -162,13 +162,15 @@ string SetupUI::promptForFilename()
 
 string SetupUI::readString()
 {
-    char ch = screen->getCh();
+    echo();
+
+    char ch = getch();
     string str = "";
 
     while (ch != '\n')
     {
         str += ch;
-        ch = screen->getCh();
+        ch = getch();
     }
 
     return str;
