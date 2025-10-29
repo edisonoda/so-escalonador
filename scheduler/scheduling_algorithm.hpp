@@ -1,10 +1,9 @@
 #pragma once
 
-#include <string>
-#include <list>
+#include "../utils/std_libraries.hpp"
+
 #include "../core/tcb.hpp"
 
-using namespace std;
 using namespace Core;
 
 namespace Scheduler

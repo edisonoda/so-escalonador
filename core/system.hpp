@@ -1,17 +1,18 @@
 #pragma once
 
-#include <list>
-#include <vector>
+#include "../utils/std_libraries.hpp"
+
 #include "tcb.hpp"
 #include "clock/clock.hpp"
+#include "setup_manager.hpp"
+
 #include "../scheduler/scheduler.hpp"
+
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
 #include "../ui/system_monitor.hpp"
-#include "../utils/chart_generator.hpp"
-#include "setup_manager.hpp"
 
-using namespace std;
+#include "../utils/chart_generator.hpp"
 
 namespace Core
 {

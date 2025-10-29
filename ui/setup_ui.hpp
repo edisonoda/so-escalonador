@@ -1,9 +1,8 @@
 #pragma once
 
-#include <string>
-#include "screen.hpp"
+#include "../utils/std_libraries.hpp"
 
-using namespace std;
+#include "screen.hpp"
 
 // Forward declaration
 namespace Core { class SimulationConfig; }

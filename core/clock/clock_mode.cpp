@@ -1,8 +1,8 @@
 #include "clock_mode.hpp"
-#include "clock.hpp"
-#include "../system.hpp"
 
-#include <ncurses.h>
+#include "clock.hpp"
+
+#include "../system.hpp"
 
 using namespace Core;
 

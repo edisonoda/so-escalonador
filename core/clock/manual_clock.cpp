@@ -1,7 +1,8 @@
 #include "manual_clock.hpp"
+
 #include "clock.hpp"
+
 #include "../system.hpp"
-#include <ncurses.h>
 
 using namespace Core;
 

@@ -1,10 +1,9 @@
 #pragma once
 
-#include <vector>
-#include "../core/tcb.hpp"
+#include "../utils/std_libraries.hpp"
 #include "screen.hpp"
+#include "../core/tcb.hpp"
 
-using namespace std;
 using namespace Core;
 
 namespace UI

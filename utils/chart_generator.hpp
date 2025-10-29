@@ -1,13 +1,8 @@
 #pragma once
 
-#include <fstream>
-#include <string>
-#include <vector>
-#include <ncurses.h>
+#include "std_libraries.hpp"
 
 #include "../core/tcb.hpp"
-
-using namespace std;
 
 namespace Utils
 {

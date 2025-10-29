@@ -1,14 +1,15 @@
 #pragma once
 
-#include <vector>
-#include <string>
+#include "../utils/std_libraries.hpp"
+
 #include "tcb.hpp"
 #include "config_reader.hpp"
-#include "../ui/setup_ui.hpp"
-#include "../ui/screen.hpp"
+
 #include "../scheduler/scheduling_algorithm.hpp"
 
-using namespace std;
+#include "../ui/setup_ui.hpp"
+#include "../ui/screen.hpp"
+
 using namespace UI;
 
 namespace Core

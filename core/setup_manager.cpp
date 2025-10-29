@@ -1,6 +1,4 @@
 #include "setup_manager.hpp"
-#include <algorithm>
-#include <ncurses.h>
 
 #define CONFIG_FILE "configs/default.txt"
 
