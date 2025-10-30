@@ -54,11 +54,13 @@ namespace Core
         void suspendTask();
         void preemptTask();
     
+        void endProgram();
+        
     public:
         ~System();
         static System* getInstance();
 
-        bool loadConfig();
+        void loadConfig();
         void handleInterruption(Interruption irq);
         void tick();
     };

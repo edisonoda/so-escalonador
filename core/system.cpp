@@ -7,11 +7,7 @@ using namespace Core;
 System *System::instance(nullptr);
 
 System::System()
-    : scheduler(Scheduler::Scheduler::getInstance())
-    , clock(this)
-    , chart_generator(&ord_tasks)
-    , gantt_chart(&chart_generator)
-    , screen(Screen::getInstance())
+    : scheduler(Scheduler::Scheduler::getInstance()), clock(this), chart_generator(&ord_tasks), gantt_chart(&chart_generator), screen(Screen::getInstance())
 {
     current_task = nullptr;
     task_count = 0;
@@ -23,13 +19,13 @@ System::~System()
 {
     delete screen;
     delete scheduler;
-    
+
     instance = nullptr;
     screen = nullptr;
     scheduler = nullptr;
     current_task = nullptr;
-    
-    for (TCB* task : ord_tasks)
+
+    for (TCB *task : ord_tasks)
         delete task;
 
     ord_tasks.clear();
@@ -73,14 +69,14 @@ void System::handleInterruption(Interruption irq)
 {
     switch (irq)
     {
-        case Interruption::QUANTUM:
-            preemptTask();
-            break;
-        case Interruption::FULL_STOP:
-            getch();
-            break;
-        default:
-            break;
+    case Interruption::QUANTUM:
+        preemptTask();
+        break;
+    case Interruption::FULL_STOP:
+        getch();
+        break;
+    default:
+        break;
     }
 }
 
@@ -96,9 +92,14 @@ void System::changeState(TCBState state)
     {
         switch (current_task->getState())
         {
-            case TCBState::SUSPENDED: suspended_list.remove(current_task); break;
-            case TCBState::READY: ready_list.remove(current_task); break;
-            default: break;
+        case TCBState::SUSPENDED:
+            suspended_list.remove(current_task);
+            break;
+        case TCBState::READY:
+            ready_list.remove(current_task);
+            break;
+        default:
+            break;
         }
 
         if (previous_task != current_task)
@@ -132,13 +133,12 @@ void System::checkNewTasks()
 void System::terminateTask()
 {
     changeState(TCBState::TERMINATED);
-    
+
     task_count--;
 
     if (task_count <= 0)
     {
-        clock.stop();
-        chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+        endProgram();
     }
 }
 
@@ -158,10 +158,13 @@ void System::preemptTask()
     changeState(TCBState::READY);
 }
 
-bool System::loadConfig()
+void System::loadConfig()
 {
     SimulationConfig configs = setup.run();
-    
+
+    if (!configs.simulation_should_run)
+        return;
+
     screen->erase();
 
     scheduler->setAlgorithm(configs.alg_id);
@@ -173,7 +176,7 @@ bool System::loadConfig()
 
     int total_time = 0;
     int latest_start = 0;
-    for (TCB* task : ord_tasks)
+    for (TCB *task : ord_tasks)
     {
         total_time += task->getDuration();
         latest_start = task->getStart() > latest_start ? task->getStart() : latest_start;
@@ -184,22 +187,27 @@ bool System::loadConfig()
         task_count + 2,
         (total_time + 2) * UNIT_WIDTH,
         0,
-        0
-    );
+        0);
 
     system_monitor.setWindowDimensions(
         task_count + 2,
         MONITOR_WIDTH,
         0,
-        task_count + 2
-    );
+        task_count + 2);
 
     gantt_chart.setTasks(&ord_tasks);
     system_monitor.setTasks(&ord_tasks);
-    
+
     system_monitor.drawTick(0);
     clock.selectMode(configs.mode);
     clock.run();
+}
 
-    return true;
+void System::endProgram()
+{
+    clock.stop();
+    chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+    timeout(-1);
+    flushinp();
+    handleInterruption(Interruption::FULL_STOP);
 }

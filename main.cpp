@@ -9,16 +9,8 @@ int main()
 
     System *system = System::getInstance();
 
-    if (!system->loadConfig())
-    {
-        delete system;
-        return 1;
-    }
+    system->loadConfig();
 
-    timeout(-1);
-    flushinp();
-
-    system->handleInterruption(Interruption::FULL_STOP);
     delete system;
 
     return 0;
