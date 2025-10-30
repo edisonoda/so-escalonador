@@ -22,9 +22,10 @@ void Menu::setupMenu(string title, vector<string> options)
     this->title = title;
     this->options = options;
     height = options.size() + 4;
-    clear();
+    screen->erase();
     wresize(window, height, width);
     screen->refresh();
+    ui->updateInfo();
 
     valid_entries.clear();
     valid_entries.push_back(KEY_ENTER);

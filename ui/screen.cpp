@@ -52,9 +52,9 @@ void Screen::refresh()
     ::refresh();
 }
 
-void Screen::clear()
+void Screen::erase()
 {
-    ::clear();
+    ::erase();
 }
 
 void Screen::initColor(int color, int bg_color)

@@ -66,10 +66,8 @@ SimulationConfig SetupManager::run()
                 config.simulation_should_run = false;
                 return config;
         }
-
-        ui.updateInfo();
     }
-
+    
     config.simulation_should_run = true;
     return config;
 }

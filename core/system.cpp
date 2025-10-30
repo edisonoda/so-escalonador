@@ -162,7 +162,7 @@ bool System::loadConfig()
 {
     SimulationConfig configs = setup.run();
     
-    screen->clear();
+    screen->erase();
 
     scheduler->setAlgorithm(configs.alg_id);
     clock.setQuantum(configs.quantum);

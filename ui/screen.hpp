@@ -27,7 +27,7 @@ namespace UI
         static Screen* getInstance();
         
         void refresh();
-        void clear();
+        void erase();
         
         void initColor(int color, int bg_color);
     };
