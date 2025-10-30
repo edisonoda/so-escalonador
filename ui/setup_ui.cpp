@@ -4,7 +4,7 @@
 #include <ncurses.h>
 #include <string>
 
-#define INFO_X_OFFSET 60
+#define INFO_X_OFFSET 50
 
 using namespace UI;
 
@@ -14,9 +14,8 @@ SetupUI::SetupUI(SimulationConfig* config)
     , menu(this)
 {
     menu.setWindowDimensions(0, INFO_X_OFFSET, 0, 0);
-
-    task_info.setWindowDimensions(30, 75, INFO_X_OFFSET, 0);
-    mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, menu.getHeight());
+    task_info.setWindowDimensions(20, 60, INFO_X_OFFSET, 0);
+    mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, 0);
     input.setWindowDimensions(5, INFO_X_OFFSET, 0, 0);
 }
 
