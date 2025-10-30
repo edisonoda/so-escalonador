@@ -1,7 +1,6 @@
 #include "system.hpp"
 
 #include "clock/clock.hpp"
-#include <algorithm>
 
 using namespace Core;
 
@@ -28,8 +27,15 @@ System::~System()
     instance = nullptr;
     screen = nullptr;
     scheduler = nullptr;
+    current_task = nullptr;
+    
+    for (TCB* task : ord_tasks)
+        delete task;
 
-    // TODO: delete all tasks
+    ord_tasks.clear();
+    new_list.clear();
+    ready_list.clear();
+    suspended_list.clear();
 }
 
 System *System::getInstance()
