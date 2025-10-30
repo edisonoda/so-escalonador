@@ -16,11 +16,11 @@ namespace Core
     class TCB
     {
     private:
-        const string id;
-        const int color;
-        const int start;
-        const int duration;
-        const int priority;
+        string id;
+        int color;
+        int start;
+        int duration;
+        int priority;
         int remaining;
         TCBState state;
         list<string> events;
@@ -34,6 +34,13 @@ namespace Core
         int getStart() const;
         int getDuration() const;
         int getPriority() const;
+
+        void setId(const string _id);
+        void setColor(const int _color);
+        void setStart(const int _start);
+        void setDuration(const int _duration);
+        void setPriority(const int _priority);
+
         int getRemaining() const;
         TCBState getState() const;
 

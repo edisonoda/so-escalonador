@@ -150,7 +150,7 @@ int SetupUI::showTaskEditor(string id)
         "Início",
         "Duração",
         "Prioridade",
-        "Salvar e Sair"
+        "Sair"
     });
 
     return menu.showMenu();
@@ -181,7 +181,7 @@ string SetupUI::promptForField(string field)
     screen->erase();
     screen->refresh();
 
-    input.print(0, 0, "--- Editar " + field + " ---");
+    input.print(0, 0, "--- Inserir " + field + " ---");
     input.print(0, 1, "> ");
     input.refresh();
 

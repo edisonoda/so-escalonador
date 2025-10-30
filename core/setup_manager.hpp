@@ -43,6 +43,8 @@ namespace Core
         void editTask(int index);
         bool isNumber(const string &s);
 
+        bool validateEntry(string str);
+
     public:
         SetupManager();
         ~SetupManager();

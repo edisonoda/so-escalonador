@@ -8,8 +8,7 @@
 using namespace Scheduler;
 
 SetupManager::SetupManager()
-    : ui(&config)
-    , screen(Screen::getInstance())
+    : ui(&config), screen(Screen::getInstance())
 {
     loadFromFile(CONFIG_FILE);
     timeout(-1);
@@ -27,49 +26,50 @@ SetupManager::~SetupManager()
 
 SimulationConfig SetupManager::run()
 {
-    bool in_setup = true;
+    bool in_editor = true;
     int ch = '1';
 
-    while (in_setup)
+    do
     {
         ch = ui.showMainMenu();
 
         switch (ch)
         {
-            case '1': // LÓGICA: Iniciar Simulação
-                in_setup = false;
-                break;
-
-            case '2':
-            {
-                string filename = ui.promptForFilename();
-                if (!filename.empty())
-                    loadFromFile("configs/" + filename);
-            }
+        case '1': // LÓGICA: Iniciar Simulação
+            in_editor = false;
             break;
 
-            case '3':
-                runEditor();
-                break;
-            
-            case '4':
-                loadFromFile("configs/default.txt");
-                break;
+        case '2':
+        {
+            string filename = ui.promptForFilename();
+            if (!filename.empty())
+                loadFromFile("configs/" + filename);
+        }
+        break;
 
-            case '5':
-                if (config.mode == 'A')
-                    config.mode = 'P';
-                else
-                    config.mode = 'A';
-                break;
+        case '3':
+            runEditor();
+            break;
 
-            case '6':
-                config.simulation_should_run = false;
-                return config;
+        case '4':
+            loadFromFile("configs/default.txt");
+            break;
+
+        case '5':
+            if (config.mode == 'A')
+                config.mode = 'P';
+            else
+                config.mode = 'A';
+            break;
+
+        case '6':
+            config.simulation_should_run = false;
+            return config;
         }
 
         ui.update();
-    }
+
+    } while (in_editor);
 
     config.simulation_should_run = true;
     return config;
@@ -102,17 +102,18 @@ bool SetupManager::loadFromFile(const string &filename)
 void SetupManager::runEditor()
 {
     int ch;
+    bool in_editor;
 
     do
     {
         ch = ui.showEditor();
-        
+
         switch (ch)
         {
         case '1':
             runAlgorithmEditor();
             break;
-        
+
         case '2':
             config.quantum = stoi(ui.promptForField("Quantum"));
             break;
@@ -120,8 +121,12 @@ void SetupManager::runEditor()
         case '3':
             runTaskListEditor();
             break;
+
+        default:
+            in_editor = false;
+            break;
         }
-    } while (ch != '0' + config.tasks.size() - 1);
+    } while (in_editor);
 
     ui.update();
 }
@@ -129,27 +134,31 @@ void SetupManager::runEditor()
 void SetupManager::runTaskListEditor()
 {
     int ch;
+    bool in_editor = true;
 
     do
     {
         ch = ui.showTaskList();
-        
+
         switch (ch)
         {
         case '1':
             addNewTask();
             break;
-        
+
         case '2':
             deleteTask();
             break;
-        
+
         default:
-            // edit task
+            if (ch < '0' + config.tasks.size() + 1)
+                editTask((ch - 3) - '0');
+            else
+                in_editor = false;
             break;
         }
 
-    } while (ch != '0' + config.tasks.size() - 1);
+    } while (in_editor);
 
     ui.update();
 }
@@ -157,46 +166,64 @@ void SetupManager::runTaskListEditor()
 void SetupManager::runAlgorithmEditor()
 {
     int ch;
+    bool in_editor = true;
 
     do
     {
         ch = ui.showAlgorithm();
-        
+
         switch (ch)
         {
         case '1':
             config.alg_id = AlgorithmID::FCFS;
             break;
-        
+
         case '2':
             config.alg_id = AlgorithmID::PRIOp;
             break;
-        
+
         case '3':
             config.alg_id = AlgorithmID::SRTF;
             break;
+
+        default:
+            in_editor = false;
+            break;
         }
 
-    } while (ch != '0' + config.tasks.size() - 1);
+    } while (in_editor);
 
     ui.update();
 }
 
 void SetupManager::addNewTask()
 {
-    ui.showTaskEditor();
-    string id = ui.readString();
-    string color = ui.readString();
-    string start = ui.readString();
-    string duration = ui.readString();
-    string priority = ui.readString();
-    config.tasks.push_back(new TCB(
+    string id = ui.promptForField("Id");
+
+    string color = ui.promptForField("Cor");
+    if (!validateEntry(color))
+        return;
+
+    string start = ui.promptForField("Início");
+    if (!validateEntry(start))
+        return;
+
+    string duration = ui.promptForField("Duração");
+    if (!validateEntry(duration))
+        return;
+
+    string priority = ui.promptForField("Prioridade");
+    if (!validateEntry(priority))
+        return;
+
+    TCB *task = new TCB(
         id,
         stoi(color),
         stoi(start),
         stoi(duration),
-        stoi(priority)
-    ));
+        stoi(priority));
+
+    config.tasks.push_back(task);
 
     screen->initColor(0, stoi(color));
 
@@ -221,7 +248,55 @@ void SetupManager::deleteTask()
 
 void SetupManager::editTask(int index)
 {
-    
+    int ch;
+    TCB *task;
+    string entry;
+    bool in_editor = true;
+
+    task = config.tasks.at(index);
+
+    do
+    {
+        ch = ui.showTaskEditor();
+
+        switch (ch)
+        {
+        case '1':
+            task->setId(ui.promptForField("Id"));
+            break;
+
+        case '2':
+            entry = ui.promptForField("Cor");
+            if (validateEntry(entry))
+                task->setColor(stoi(entry));
+            break;
+
+        case '3':
+            entry = ui.promptForField("Início");
+            if (validateEntry(entry))
+                task->setStart(stoi(entry));
+            break;
+
+        case '4':
+            entry = ui.promptForField("Duração");
+            if (validateEntry(entry))
+                task->setDuration(stoi(entry));
+            break;
+
+        case '5':
+            entry = ui.promptForField("Prioridade");
+            if (validateEntry(entry))
+                task->setPriority(stoi(entry));
+            break;
+
+        default:
+            in_editor = false;
+            break;
+        }
+
+    } while (in_editor);
+
+    ui.update();
 }
 
 bool SetupManager::isNumber(const string &s)
@@ -230,4 +305,15 @@ bool SetupManager::isNumber(const string &s)
     while (it != s.end() && isdigit(*it))
         ++it;
     return !s.empty() && it == s.end();
+}
+
+bool SetupManager::validateEntry(string str)
+{
+    if (!isNumber(str))
+    {
+        ui.showError("Digite um valor válido!");
+        return false;
+    }
+
+    return true;
 }
