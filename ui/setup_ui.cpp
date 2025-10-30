@@ -4,8 +4,9 @@
 #include <ncurses.h>
 #include <string>
 
-#define INFO_X_OFFSET 50
-#define INFO_HEIGHT 20
+#define MAIN_WIDTH 50
+#define INFO_X_OFFSET MAIN_WIDTH + 4
+#define INFO_HEIGHT 5
 #define INFO_WIDTH 60
 
 using namespace UI;
@@ -15,10 +16,10 @@ SetupUI::SetupUI(SimulationConfig* config)
     , config(config)
     , menu(this)
 {
-    menu.setWindowDimensions(0, INFO_X_OFFSET, 0, 0);
-    task_info.setWindowDimensions(INFO_HEIGHT, INFO_WIDTH, INFO_X_OFFSET, 0);
-    mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, 0);
-    input.setWindowDimensions(5, INFO_X_OFFSET, 0, 0);
+    menu.setWindowDimensions(0, MAIN_WIDTH, 0, 0);
+    task_info.setWindowDimensions(0, INFO_WIDTH, INFO_X_OFFSET, 0);
+    mensagem.setWindowDimensions(2, MAIN_WIDTH, 0, 0);
+    input.setWindowDimensions(5, MAIN_WIDTH, 0, 0);
 }
 
 SetupUI::~SetupUI()
@@ -34,6 +35,7 @@ void SetupUI::updateInfo()
     task_info.clear();
 
     task_info.print(0, y++, "--- Configuração Atual ---");
+
     string alg_str;
     switch(config->alg_id)
     {
@@ -48,6 +50,7 @@ void SetupUI::updateInfo()
     task_info.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
     if (!config->tasks.empty())
+    {
         for (size_t i = 0; i < config->tasks.size(); i++)
         {
             TCB *task = config->tasks[i];
@@ -69,7 +72,15 @@ void SetupUI::updateInfo()
             
             y++;
         }
+    }
 
+    task_info.setWindowDimensions(
+        INFO_HEIGHT + config->tasks.size(),
+        INFO_WIDTH,
+        INFO_X_OFFSET,
+        0
+    );
+    
     task_info.refresh();
 }
 

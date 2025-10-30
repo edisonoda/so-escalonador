@@ -1,5 +1,6 @@
 #include "menu.hpp"
 #include "setup_ui.hpp"
+#include <ncurses.h>
 #include <string>
 
 using namespace UI;
@@ -18,11 +19,10 @@ Menu::~Menu()
 
 void Menu::setupMenu(string title, vector<string> options)
 {
-    clear();
-    refresh();
     this->title = title;
     this->options = options;
-    height = options.size() + 2;
+    height = options.size() + 4;
+    clear();
     wresize(window, height, width);
     screen->refresh();
 
@@ -67,7 +67,7 @@ void Menu::printMenu()
 {
     int i = 0;
 
-    erase();
+    clear();
     print(0, 0, title);
 
     for (int it = 0; it < options.size(); it++)

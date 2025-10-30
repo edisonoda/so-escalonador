@@ -22,12 +22,12 @@ Window::~Window()
     window = nullptr;
 }
 
-void Window::setWindowDimensions(int height, int width, int x, int y)
+void Window::setWindowDimensions(int h, int w, int _x, int _y)
 {
-    this->height = height;
-    this->width = width;
-    this->x = x;
-    this->y = y;
+    height = h + 2;
+    width = w + 2;
+    x = _x;
+    y = _y;
 
     wresize(window, height, width);
     mvwin(window, y, x);
@@ -73,12 +73,12 @@ void Window::print(string str)
 
 void Window::print(int x, int y, int ch)
 {
-    mvwprintw(window, y, x, "%c", ch);
+    mvwprintw(window, y + 1, x + 1, "%c", ch);
 }
 
 void Window::print(int x, int y, string str)
 {
-    mvwprintw(window, y, x, "%s", str.c_str());
+    mvwprintw(window, y + 1, x + 1, "%s", str.c_str());
 }
 
 void Window::del(int x, int y)
@@ -89,6 +89,7 @@ void Window::del(int x, int y)
 
 void Window::refresh()
 {
+    box(window, 0, 0);
     wrefresh(window);
 }
 
