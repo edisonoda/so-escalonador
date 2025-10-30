@@ -25,7 +25,6 @@ void Menu::setupMenu(string title, vector<string> options)
     screen->erase();
     wresize(window, height, width);
     screen->refresh();
-    ui->updateInfo();
 
     valid_entries.clear();
     valid_entries.push_back(KEY_ENTER);

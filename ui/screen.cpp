@@ -55,6 +55,7 @@ void Screen::refresh()
 void Screen::erase()
 {
     ::erase();
+    update();
 }
 
 void Screen::initColor(int color, int bg_color)

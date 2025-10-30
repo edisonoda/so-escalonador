@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
+#include "refresh_observer.hpp"
 
 #include "screen.hpp"
 #include "window.hpp"
@@ -12,7 +13,7 @@ using namespace Core;
 
 namespace UI
 {
-    class SetupUI
+    class SetupUI : public RefreshObserver
     {
     private:
         Screen* screen;
@@ -27,9 +28,9 @@ namespace UI
     public:
         SetupUI(SimulationConfig* config);
         ~SetupUI();
-    
+
         // --- Funções de Desenho de Tela ---
-        void updateInfo();
+        virtual void update();
     
         int showMainMenu();
         int showEditor();

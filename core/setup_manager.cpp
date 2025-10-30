@@ -1,6 +1,7 @@
 #include "setup_manager.hpp"
 #include "../scheduler/scheduling_algorithm.hpp"
 #include <ncurses.h>
+#include <string>
 
 #define CONFIG_FILE "configs/default.txt"
 
@@ -16,7 +17,7 @@ SetupManager::SetupManager()
     for (TCB *task : config.tasks)
         screen->initColor(0, task->getColor());
 
-    ui.updateInfo();
+    ui.update();
 }
 
 SetupManager::~SetupManager()
@@ -66,8 +67,10 @@ SimulationConfig SetupManager::run()
                 config.simulation_should_run = false;
                 return config;
         }
+
+        ui.update();
     }
-    
+
     config.simulation_should_run = true;
     return config;
 }
@@ -91,7 +94,7 @@ bool SetupManager::loadFromFile(const string &filename)
     list<TCB *> tasks_list = config_reader.readTasks();
     config.tasks.assign(tasks_list.begin(), tasks_list.end());
 
-    ui.updateInfo();
+    ui.update();
 
     return true;
 }
@@ -118,10 +121,9 @@ void SetupManager::runEditor()
             runTaskListEditor();
             break;
         }
+    } while (ch != '0' + config.tasks.size() - 1);
 
-    } while (ch != '0' + config.tasks.size());
-
-    ui.updateInfo();
+    ui.update();
 }
 
 void SetupManager::runTaskListEditor()
@@ -147,9 +149,9 @@ void SetupManager::runTaskListEditor()
             break;
         }
 
-    } while (ch != '0' + config.tasks.size());
+    } while (ch != '0' + config.tasks.size() - 1);
 
-    ui.updateInfo();
+    ui.update();
 }
 
 void SetupManager::runAlgorithmEditor()
@@ -175,9 +177,9 @@ void SetupManager::runAlgorithmEditor()
             break;
         }
 
-    } while (ch != '0' + config.tasks.size());
+    } while (ch != '0' + config.tasks.size() - 1);
 
-    ui.updateInfo();
+    ui.update();
 }
 
 void SetupManager::addNewTask()
@@ -198,7 +200,7 @@ void SetupManager::addNewTask()
 
     screen->initColor(0, stoi(color));
 
-    ui.updateInfo();
+    ui.update();
 }
 
 void SetupManager::deleteTask()
@@ -214,7 +216,7 @@ void SetupManager::deleteTask()
     delete config.tasks.at(stoi(str));
     config.tasks.erase(config.tasks.begin() + stoi(str));
 
-    ui.updateInfo();
+    ui.update();
 }
 
 void SetupManager::editTask(int index)

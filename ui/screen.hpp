@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
+#include "refresh_subject.hpp"
 
 #define INITIAL_COLORS 4
 
@@ -14,7 +15,7 @@ namespace UI
         GREEN = 4
     };
 
-    class Screen
+    class Screen : public RefreshSubject
     {
     private:
         static Screen* instance;

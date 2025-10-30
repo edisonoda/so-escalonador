@@ -20,15 +20,18 @@ SetupUI::SetupUI(SimulationConfig* config)
     task_info.setWindowDimensions(0, INFO_WIDTH, INFO_X_OFFSET, 0);
     mensagem.setWindowDimensions(2, MAIN_WIDTH, 0, 0);
     input.setWindowDimensions(5, MAIN_WIDTH, 0, 0);
+
+    screen->attach(this);
 }
 
 SetupUI::~SetupUI()
 {
+    screen->detach(this);
     screen = nullptr;
     config = nullptr;
 }
 
-void SetupUI::updateInfo()
+void SetupUI::update()
 {
     int y = 0;
 
@@ -175,12 +178,11 @@ void SetupUI::clearMessage()
 
 string SetupUI::promptForField(string field)
 {
-    menu.clear();
-    input.clear();
-    menu.refresh();
+    screen->erase();
+    screen->refresh();
 
     input.print(0, 0, "--- Editar " + field + " ---");
-    input.print(0, 2, "> ");
+    input.print(0, 1, "> ");
     input.refresh();
 
     return readString();
@@ -188,9 +190,8 @@ string SetupUI::promptForField(string field)
 
 string SetupUI::promptForFilename()
 {
-    menu.clear();
-    input.clear();
-    menu.refresh();
+    screen->erase();
+    screen->refresh();
 
     input.print(0, 0, "--- Carregar Arquivo de Configuração ---");
     input.print(0, 1, "Digite o nome do arquivo (ex: meu_arquivo.txt):");
@@ -211,7 +212,9 @@ string SetupUI::readString()
         {
             if (!str.empty())
             {
-                input.del(input.getPosX() - 1, input.getPosY());
+                input.move(input.getPosX() - 1, input.getPosY());
+                input.print(' ');
+                input.move(input.getPosX() - 1, input.getPosY());
                 str.pop_back();
             }
         }

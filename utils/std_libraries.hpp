@@ -5,6 +5,7 @@
 #include <list>
 #include <vector>
 #include <map>
+#include <set>
 
 // bibliotecas de utilidade
 #include <fstream>
