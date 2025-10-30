@@ -79,6 +79,7 @@ int SetupUI::showMainMenu()
         "Carregar",
         "Editar",
         "Restaurar PADRÃO",
+        "Trocar modo",
         "Sair do programa"
     });
 

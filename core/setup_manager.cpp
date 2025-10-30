@@ -53,16 +53,18 @@ SimulationConfig SetupManager::run()
                 break;
 
             case '5':
-                config.simulation_should_run = false;
-                return config;
-
-            case ' ':
                 if (config.mode == 'A')
                     config.mode = 'P';
                 else
                     config.mode = 'A';
                 break;
+
+            case '6':
+                config.simulation_should_run = false;
+                return config;
         }
+
+        ui.updateInfo();
     }
 
     config.simulation_should_run = true;
