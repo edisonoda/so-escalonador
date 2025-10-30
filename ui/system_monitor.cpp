@@ -61,4 +61,6 @@ void SystemMonitor::drawTick(int tick)
         print(x + 35, i, rem_str);
         print(x + 50, i, prio_str);
     }
+
+    refresh();
 }

@@ -38,4 +38,5 @@ void GanttChart::drawTick(int tick)
 
     setColor(DefaultColor::WHITE); // branco no preto
     print(x, ord_tasks->size(), to_string(tick));
+    refresh();
 }

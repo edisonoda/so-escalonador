@@ -36,9 +36,9 @@ namespace Core
         list<TCB*> ready_list;
         list<TCB*> suspended_list;
 
-        UI::Screen* screen;
-        UI::GanttChart gantt_chart;
-        UI::SystemMonitor system_monitor;
+        Screen* screen;
+        GanttChart gantt_chart;
+        SystemMonitor system_monitor;
 
         Utils::ChartGenerator chart_generator;
         SetupManager setup;

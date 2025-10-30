@@ -1,6 +1,7 @@
 #include "system.hpp"
 
 #include "clock/clock.hpp"
+#include <algorithm>
 
 using namespace Core;
 
@@ -11,7 +12,7 @@ System::System()
     , clock(this)
     , chart_generator(&ord_tasks)
     , gantt_chart(&chart_generator)
-    , screen(UI::Screen::getInstance())
+    , screen(Screen::getInstance())
 {
     current_task = nullptr;
     task_count = 0;
@@ -165,19 +166,24 @@ bool System::loadConfig()
     task_count = new_list.size();
 
     int total_time = 0;
+    int latest_start = 0;
     for (TCB* task : ord_tasks)
+    {
         total_time += task->getDuration();
+        latest_start = task->getStart() > latest_start ? task->getStart() : latest_start;
+    }
+    total_time += latest_start;
 
     gantt_chart.setWindowDimensions(
         task_count + 2,
-        total_time * UNIT_WIDTH,
+        (total_time + 2) * UNIT_WIDTH,
         0,
         0
     );
 
     system_monitor.setWindowDimensions(
         task_count + 2,
-        20,
+        75,
         0,
         task_count + 2
     );
