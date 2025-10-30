@@ -1,7 +1,10 @@
 #include "setup_manager.hpp"
+#include "../scheduler/scheduling_algorithm.hpp"
 #include <ncurses.h>
 
 #define CONFIG_FILE "configs/default.txt"
+
+using namespace Scheduler;
 
 SetupManager::SetupManager()
     : ui(&config)
@@ -97,11 +100,84 @@ bool SetupManager::loadFromFile(const string &filename)
 
 void SetupManager::runEditor()
 {
-    bool in_editor = true;
-    while (in_editor)
+    int ch;
+
+    do
     {
-        ui.showEditor();
-    }
+        ch = ui.showEditor();
+        
+        switch (ch)
+        {
+        case '1':
+            runAlgorithmEditor();
+            break;
+        
+        case '2':
+            config.quantum = stoi(ui.promptForField("Quantum"));
+            break;
+
+        case '3':
+            runTaskListEditor();
+            break;
+        }
+
+    } while (ch != '0' + config.tasks.size());
+
+    ui.updateInfo();
+}
+
+void SetupManager::runTaskListEditor()
+{
+    int ch;
+
+    do
+    {
+        ch = ui.showTaskList();
+        
+        switch (ch)
+        {
+        case '1':
+            addNewTask();
+            break;
+        
+        case '2':
+            deleteTask();
+            break;
+        
+        default:
+            // edit task
+            break;
+        }
+
+    } while (ch != '0' + config.tasks.size());
+
+    ui.updateInfo();
+}
+
+void SetupManager::runAlgorithmEditor()
+{
+    int ch;
+
+    do
+    {
+        ch = ui.showAlgorithm();
+        
+        switch (ch)
+        {
+        case '1':
+            config.alg_id = AlgorithmID::FCFS;
+            break;
+        
+        case '2':
+            config.alg_id = AlgorithmID::PRIOp;
+            break;
+        
+        case '3':
+            config.alg_id = AlgorithmID::SRTF;
+            break;
+        }
+
+    } while (ch != '0' + config.tasks.size());
 
     ui.updateInfo();
 }
@@ -141,6 +217,11 @@ void SetupManager::deleteTask()
     config.tasks.erase(config.tasks.begin() + stoi(str));
 
     ui.updateInfo();
+}
+
+void SetupManager::editTask(int index)
+{
+    
 }
 
 bool SetupManager::isNumber(const string &s)

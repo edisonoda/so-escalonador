@@ -95,7 +95,11 @@ void Window::refresh()
 void Window::clear()
 {
     wclear(window);
-    wrefresh(window);
+}
+
+void Window::erase()
+{
+    werase(window);
 }
 
 int Window::getCh()

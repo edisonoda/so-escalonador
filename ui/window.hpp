@@ -41,6 +41,7 @@ namespace UI
         void del(int x, int y);
         void refresh();
         void clear();
+        void erase();
         int getCh();
 
         int setColor(DefaultColor color);

@@ -18,6 +18,8 @@ Menu::~Menu()
 
 void Menu::setupMenu(string title, vector<string> options)
 {
+    clear();
+    refresh();
     this->title = title;
     this->options = options;
     height = options.size() + 2;
@@ -65,7 +67,7 @@ void Menu::printMenu()
 {
     int i = 0;
 
-    clear();
+    erase();
     print(0, 0, title);
 
     for (int it = 0; it < options.size(); it++)

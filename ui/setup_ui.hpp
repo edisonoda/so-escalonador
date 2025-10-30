@@ -34,6 +34,8 @@ namespace UI
         int showMainMenu();
         int showEditor();
         int showTaskEditor(string id = "");
+        int showTaskList();
+        int showAlgorithm();
         
         void showError(const string& message);
         void showMessage(const string& message);

@@ -35,9 +35,12 @@ namespace Core
 
         bool loadFromFile(const string& filename);
         void runEditor();
+        void runTaskListEditor();
+        void runAlgorithmEditor();
         
         void addNewTask();
         void deleteTask();
+        void editTask(int index);
         bool isNumber(const string &s);
 
     public:

@@ -89,12 +89,37 @@ int SetupUI::showMainMenu()
 
 int SetupUI::showEditor()
 {
-    vector<string> options = {"Algoritmo", "Quantum"};
+    menu.setupMenu("--- EDITAR CONFIGURAÇÕES ---", {
+        "Algoritmo", 
+        "Quantum", 
+        "Tarefas", 
+        "Voltar ao Menu Principal"
+    });
+
+    return menu.showMenu();
+}
+
+int SetupUI::showTaskList()
+{
+    vector<string> options = {"Adicionar", "Remover"};
     
     for (TCB* task : config->tasks)
         options.push_back("[" + task->getId() + "]");
 
-    menu.setupMenu("--- EDITAR PARÂMETROS ---", options);
+    options.push_back("Voltar");
+
+    menu.setupMenu("--- EDITAR LISTA DE TAREFAS ---", options);
+    return menu.showMenu();
+}
+
+int SetupUI::showAlgorithm()
+{
+    menu.setupMenu("--- ESCOLHER ALGORITMO ---", {
+        "FCFS",
+        "PRIOp",
+        "SRTF",
+        "Voltar"
+    });
     return menu.showMenu();
 }
 
@@ -106,7 +131,12 @@ int SetupUI::showTaskEditor(string id)
         title = "--- EDITAR TAREFA " + id + " ---";
 
     menu.setupMenu(title, {
-        ""
+        "Id",
+        "Cor",
+        "Início",
+        "Duração",
+        "Prioridade",
+        "Salvar e Sair"
     });
 
     return menu.showMenu();
@@ -129,12 +159,27 @@ void SetupUI::showMessage(const string& message)
 void SetupUI::clearMessage()
 {
     mensagem.clear();
+    mensagem.refresh();
+}
+
+string SetupUI::promptForField(string field)
+{
+    menu.clear();
+    input.clear();
+    menu.refresh();
+
+    input.print(0, 0, "--- Editar " + field + " ---");
+    input.print(0, 2, "> ");
+    input.refresh();
+
+    return readString();
 }
 
 string SetupUI::promptForFilename()
 {
     menu.clear();
     input.clear();
+    menu.refresh();
 
     input.print(0, 0, "--- Carregar Arquivo de Configuração ---");
     input.print(0, 1, "Digite o nome do arquivo (ex: meu_arquivo.txt):");
