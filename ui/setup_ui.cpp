@@ -17,8 +17,6 @@ SetupUI::SetupUI(SimulationConfig* config)
     taskInfo.setWindowDimensions(30, 60, INFO_X_OFFSET, 0);
     mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, menu.getHeight());
     input.setWindowDimensions(5, INFO_X_OFFSET, 0, 0);
-
-    showMainMenu();
 }
 
 SetupUI::~SetupUI()

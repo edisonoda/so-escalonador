@@ -50,6 +50,7 @@ void Menu::printMenu()
     for (int it = 0; it < options.size(); it++)
         printOption(it, options.at(it));
 
+    move(0, getPosY() + 1);
     refresh();
 }
 

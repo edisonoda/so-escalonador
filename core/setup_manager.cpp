@@ -38,7 +38,7 @@ SimulationConfig SetupManager::run()
         }
 
         if (ch == '\n')
-            ch = '0' + ui.showMainMenu() + 1;
+            ch = '0' + ch + 1;
 
         switch (ch)
         {
