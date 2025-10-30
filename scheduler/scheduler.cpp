@@ -15,6 +15,7 @@ namespace Scheduler
         delete algorithm;
         algorithm = nullptr;
         instance = nullptr;
+        task_list = nullptr;
     }
 
     Scheduler *Scheduler::getInstance()
