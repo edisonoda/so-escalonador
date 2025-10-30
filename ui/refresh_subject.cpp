@@ -8,6 +8,7 @@ RefreshSubject::RefreshSubject()
 
 RefreshSubject::~RefreshSubject()
 {
+    observers.clear();
 }
 
 void RefreshSubject::attach(RefreshObserver* obs)
