@@ -183,7 +183,7 @@ bool System::loadConfig()
 
     system_monitor.setWindowDimensions(
         task_count + 2,
-        75,
+        MONITOR_WIDTH,
         0,
         task_count + 2
     );

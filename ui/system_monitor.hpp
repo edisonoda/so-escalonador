@@ -2,6 +2,8 @@
 
 #include "task_visual.hpp"
 
+#define MONITOR_WIDTH 75
+
 namespace UI
 {
     class SystemMonitor : public TaskVisual

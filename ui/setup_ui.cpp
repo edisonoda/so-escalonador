@@ -5,6 +5,8 @@
 #include <string>
 
 #define INFO_X_OFFSET 50
+#define INFO_HEIGHT 20
+#define INFO_WIDTH 60
 
 using namespace UI;
 
@@ -14,7 +16,7 @@ SetupUI::SetupUI(SimulationConfig* config)
     , menu(this)
 {
     menu.setWindowDimensions(0, INFO_X_OFFSET, 0, 0);
-    task_info.setWindowDimensions(20, 60, INFO_X_OFFSET, 0);
+    task_info.setWindowDimensions(INFO_HEIGHT, INFO_WIDTH, INFO_X_OFFSET, 0);
     mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, 0);
     input.setWindowDimensions(5, INFO_X_OFFSET, 0, 0);
 }
