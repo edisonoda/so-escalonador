@@ -1,8 +1,9 @@
 #pragma once
 
 #include "task_visual.hpp"
-
 #include "../utils/chart_generator.hpp"
+
+#define UNIT_WIDTH 3
 
 namespace UI
 {

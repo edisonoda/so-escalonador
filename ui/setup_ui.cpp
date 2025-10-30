@@ -1,20 +1,24 @@
-#include "screen.hpp"
 #include "setup_ui.hpp"
 
 #include "../core/setup_manager.hpp"
 #include <ncurses.h>
 #include <string>
 
-#define MSG_Y_OFFSET 15
 #define INFO_X_OFFSET 60
 
 using namespace UI;
 
 SetupUI::SetupUI(SimulationConfig* config)
-    : screen(UI::Screen::getInstance())
+    : screen(Screen::getInstance())
     , config(config)
 {
-    selected = 0;
+    menu.setWindowDimensions(0, INFO_X_OFFSET, 0, 0);
+
+    taskInfo.setWindowDimensions(30, 60, INFO_X_OFFSET, 0);
+    mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, menu.getHeight());
+    input.setWindowDimensions(5, INFO_X_OFFSET, 0, 0);
+
+    showMainMenu();
 }
 
 SetupUI::~SetupUI()
@@ -27,7 +31,9 @@ void SetupUI::updateInfo()
 {
     int y = 0;
 
-    screen->print(INFO_X_OFFSET, y++, "--- Configuração Atual ---");
+    taskInfo.clear();
+
+    taskInfo.print(0, y++, "--- Configuração Atual ---");
     string alg_str;
     switch(config->alg_id)
     {
@@ -35,159 +41,132 @@ void SetupUI::updateInfo()
         case Scheduler::AlgorithmID::PRIOp: alg_str = "PRIOp"; break;
         case Scheduler::AlgorithmID::SRTF: alg_str = "SRTF"; break;
     }
-    screen->print(INFO_X_OFFSET, y++, "Algoritmo: " + alg_str);
-    screen->print(INFO_X_OFFSET, y++, "Quantum:   " + to_string(config->quantum));
-    screen->print(INFO_X_OFFSET, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
+    
+    taskInfo.print(0, y++, "Modo: " + string(1, config->mode));
+    taskInfo.print(0, y++, "Algoritmo: " + alg_str);
+    taskInfo.print(0, y++, "Quantum:   " + to_string(config->quantum));
+    taskInfo.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
     if (!config->tasks.empty())
         for (size_t i = 0; i < config->tasks.size(); i++)
         {
             TCB *task = config->tasks[i];
-            screen->setColor(i); // Cor da tarefa
-            screen->invertColor(true);
-            screen->print(INFO_X_OFFSET, y, task->getId());
-            screen->print(INFO_X_OFFSET + 4, y, "COLOR: " + to_string(task->getColor()) + " ");
+            taskInfo.setColor(i); // Cor da tarefa
+            taskInfo.invertColor(true);
+            taskInfo.print(0, y, task->getId());
+            taskInfo.print(4, y, "COLOR: " + to_string(task->getColor()) + " ");
             
-            screen->setColor(DefaultColor::WHITE);
-            screen->invertColor(false);
+            taskInfo.setColor(DefaultColor::WHITE);
+            taskInfo.invertColor(false);
             
             string start_str = "| START: " + to_string(task->getStart()) + " ";
             string duration_str = "| DURATION: " + to_string(task->getDuration()) + " ";
             string prio_str = "| PRIORITY: " + to_string(task->getPriority()) + " ";
             
-            screen->print(INFO_X_OFFSET + 14, y, start_str);
-            screen->print(INFO_X_OFFSET + 26, y, duration_str);
-            screen->print(INFO_X_OFFSET + 41, y, prio_str);
+            taskInfo.print(14, y, start_str);
+            taskInfo.print(26, y, duration_str);
+            taskInfo.print(41, y, prio_str);
             
             y++;
         }
 
-    screen->refresh();
+    taskInfo.refresh();
 }
 
-char SetupUI::navigateMainMenu()
+int SetupUI::showMainMenu()
 {
-    showMainMenu();
+    menu.clear();
 
-    char ch = getch();
+    menu.setupMenu("--- SETUP DA SIMULAÇÃO ---", {
+        "Iniciar",
+        "Carregar",
+        "Editar",
+        "Restaurar PADRÃO",
+        "Sair do programa"
+    });
 
-    // Flechas (3 ch): \033 + [ + (A, B, C ou D)
-    while (ch == '\033')
-    {
-        getch();
-        navigate(getch(), 5);
-        showMainMenu();
-        ch = getch();
-    }
-
-    return ch;
+    return menu.showMenu();
 }
 
-void SetupUI::showMainMenu()
+int SetupUI::showEditor()
 {
-    int i = 0;
+    menu.clear();
 
-    screen->clear();
-    screen->print(0, 0, "--- SETUP DA SIMULAÇÃO ---");
+    vector<string> options = {"Algoritmo", "Quantum"};
+    
+    for (TCB* task : config->tasks)
+        options.push_back("[" + task->getId() + "]");
 
-    printOption(i++, "Iniciar (Modo: " + string(1, config->mode) + ")");
-    printOption(i++, "Carregar");
-    printOption(i++, "Editar");
-    printOption(i++, "Restaurar PADRÃO");
-    printOption(i++, "Sair do programa");
-
-    screen->print(0, i + 2, "*Pressione -Espaço- para alterar o modo de execução");
-
-    screen->refresh();
-    updateInfo();
+    menu.setupMenu("--- EDITAR PARÂMETROS ---", options);
+    return menu.showMenu();
 }
 
-void SetupUI::showEditor()
+int SetupUI::showTaskEditor(string id)
 {
-}
+    menu.clear();
+    
+    string title = "--- ADICIONAR TAREFA ---";
 
-void SetupUI::showTaskEditor()
-{
-}
+    if (!id.empty())
+        title = "--- EDITAR TAREFA " + id + " ---";
 
-void SetupUI::navigate(char dir, int max_options)
-{
-    // Move para cima ou para baixo, dependendo do código da seta
-    switch (dir)
-    {
-        case 'A': selected--; break;
-        case 'B': selected++; break;
-    }
+    menu.setupMenu(title, {
+        ""
+    });
 
-    // Mantém a seleção dentre as opções
-    selected = (selected + max_options) % max_options;
-}
-
-void SetupUI::printOption(int index, string text)
-{
-    // Se a opção for a selecionada, formata ela
-    if (index == selected)
-    {
-        screen->setColor(DefaultColor::GREEN);
-        text = "> " + text;
-    }
-
-    index++;
-    screen->print(0, index, "[" + to_string(index) + "] " + text);
-    screen->setColor(DefaultColor::WHITE);
+    return menu.showMenu();
 }
 
 void SetupUI::showError(const string& message)
 {
-    screen->print(0, MSG_Y_OFFSET, "ERRO: " + message);
-    screen->refresh();
+    mensagem.moveWindow(0, menu.getHeight());
+    mensagem.print(0, 0, "ERRO: " + message);
+    mensagem.refresh();
 }
 
 void SetupUI::showMessage(const string& message)
 {
-    screen->print(0, MSG_Y_OFFSET, message);
-    screen->refresh();
+    mensagem.moveWindow(0, menu.getHeight());
+    mensagem.print(0, 0, message);
+    mensagem.refresh();
 }
 
 string SetupUI::promptForFilename()
 {
-    screen->clear();
-    updateInfo();
+    menu.clear();
+    input.clear();
 
-    screen->print(0, 0, "--- Carregar Arquivo de Configuração ---");
-    screen->print(0, 1, "Digite o nome do arquivo (ex: meu_arquivo.txt):");
-    screen->print(0, 2, "> ");
-    screen->refresh();
+    input.print(0, 0, "--- Carregar Arquivo de Configuração ---");
+    input.print(0, 1, "Digite o nome do arquivo (ex: meu_arquivo.txt):");
+    input.print(0, 2, "> ");
+    input.refresh();
 
     return readString();
 }
 
 string SetupUI::readString()
 {
-    char ch = getch();
+    int ch = input.getCh();
     string str = "";
 
     while (ch != '\n')
     {
-        // screen->print(screen->getPosX(), screen->getPosY(), to_string(ch));
-
-        if (ch == '\b' || ch == 127)
+        if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127)
         {
             if (!str.empty())
             {
-                screen->move(screen->getPosX() - 1, screen->getPosY());
+                input.del(input.getPosX() - 1, input.getPosY());
                 str.pop_back();
-                screen->print(' ');
-                screen->move(screen->getPosX() - 1, screen->getPosY());
             }
         }
         else
         {
-            screen->print(ch);
+            input.print(ch);
             str += ch;
         }
         
-        ch = getch();
+        input.refresh();
+        ch = input.getCh();
     }
 
     return str;

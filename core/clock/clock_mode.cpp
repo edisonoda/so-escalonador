@@ -9,19 +9,17 @@ using namespace Core;
 ClockMode::ClockMode(Clock* c, System* sys)
     : clock(c)
     , system(sys)
-    , screen(UI::Screen::getInstance())
 { }
 
 ClockMode::~ClockMode()
 {
     clock = nullptr;
     system = nullptr;
-    screen = nullptr;
 }
 
 void ClockMode::checkModeChange()
 {
-    char ch = getch();
+    int ch = getch();
 
     if (ch == ' ')
         clock->selectMode('P');

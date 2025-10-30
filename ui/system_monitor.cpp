@@ -2,9 +2,13 @@
 
 using namespace UI;
 
-SystemMonitor::SystemMonitor() : TaskVisual() { }
+SystemMonitor::SystemMonitor() : TaskVisual()
+{
+}
 
-SystemMonitor::~SystemMonitor() { }
+SystemMonitor::~SystemMonitor()
+{
+}
 
 void SystemMonitor::drawTick(int tick)
 {
@@ -14,8 +18,8 @@ void SystemMonitor::drawTick(int tick)
     {
         TCB *task = (*ord_tasks)[i];
 
-        screen->setColor(i); // Cor da tarefa
-        screen->invertColor(true);
+        setColor(i); // Cor da tarefa
+        invertColor(true);
         
         TCBState status = task->getState();
         string status_str;
@@ -33,7 +37,7 @@ void SystemMonitor::drawTick(int tick)
                 status_str = "READY     ";
                 break;
             case TCBState::RUNNING:
-                screen->invertColor(false);
+                invertColor(false);
                 status_str = "RUNNING   ";
                 break;
             case TCBState::SUSPENDED:
@@ -49,8 +53,8 @@ void SystemMonitor::drawTick(int tick)
 
         print(x, i, status_str);
         
-        screen->setColor(DefaultColor::WHITE);
-        screen->invertColor(false);
+        setColor(DefaultColor::WHITE);
+        invertColor(false);
         
         print(x + 10, i, start_str);
         print(x + 20, i, duration_str);

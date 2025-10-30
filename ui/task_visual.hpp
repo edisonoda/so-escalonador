@@ -1,33 +1,30 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
-#include "screen.hpp"
+#include "window.hpp"
 #include "../core/tcb.hpp"
 
 using namespace Core;
 
 namespace UI
 {
-    class TaskVisual
+    class TaskVisual : public Window
     {
     protected:
         vector<TCB*>* ord_tasks;
-        Screen* screen;
+        Window* window;
         int visual_edge_x;
         int visual_edge_y;
-        int offset;
 
         void checkEdges(int x, int y);
-        void print(int x, int y, string str);
-        void print(int x, int y, char ch);
+        virtual void print(int x, int y, string str);
+        virtual void print(int x, int y, int ch);
 
     public:
         TaskVisual();
         ~TaskVisual();
-
-        void setScreen(Screen* scr) { screen = scr; }
+        
         void setTasks(vector<TCB*>* tasks);
-        void setOffset(const int off);
         virtual void drawTick(int tick) = 0;
     };
 } // namespace UI

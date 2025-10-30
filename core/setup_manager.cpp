@@ -8,10 +8,11 @@ SetupManager::SetupManager()
 {
     loadFromFile(CONFIG_FILE);
     timeout(-1);
-    noecho();
 
     for (TCB *task : config.tasks)
         screen->initColor(0, task->getColor());
+
+    ui.updateInfo();
 }
 
 SetupManager::~SetupManager()
@@ -22,21 +23,22 @@ SetupManager::~SetupManager()
 SimulationConfig SetupManager::run()
 {
     bool in_setup = true;
-    char ch = '1';
+    int ch = '1';
 
-    vector<char> valid_entries = {'1', '2', '3', '4', '5', ' ', '\n'};
+    vector<int> valid_entries = {'1', '2', '3', '4', '5', ' ', '\n'};
 
     while (in_setup)
     {
-        ch = ui.navigateMainMenu();
+        ch = ui.showMainMenu();
         while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
         {
             ui.showError("digite uma opção válida!");
+            // Ajustar
             ch = getch();
         }
 
         if (ch == '\n')
-            ch = '0' + ui.getSelected() + 1;
+            ch = '0' + ui.showMainMenu() + 1;
 
         switch (ch)
         {

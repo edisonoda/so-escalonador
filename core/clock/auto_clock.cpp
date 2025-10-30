@@ -39,7 +39,7 @@ bool AutoClock::getTick()
     }
 
     timeout(0);
-    char ch = getch();
+    int ch = getch();
 
     if (ch == ' ')
     {

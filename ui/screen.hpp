@@ -2,6 +2,8 @@
 
 #include "../utils/std_libraries.hpp"
 
+#define INITIAL_COLORS 4
+
 namespace UI
 {
     enum class DefaultColor
@@ -17,29 +19,16 @@ namespace UI
     private:
         static Screen* instance;
         int color_pair_count;
-        bool inverted;
 
         Screen();
 
     public:
         ~Screen();
         static Screen* getInstance();
-        void getPos(int* x, int* y);
-        int getPosX();
-        int getPosY();
-
-        void move(int x, int y);
-        void print(char ch);
-        void print(int x, int y, char ch);
-        void print(int x, int y, string str);
-        void del(int x, int y);
+        
         void refresh();
         void clear();
-
+        
         void initColor(int color, int bg_color);
-        int setColor(DefaultColor color);
-        int setColor(int color_index);
-        void invertColor();
-        void invertColor(bool inv);
     };
 } // namespace UI

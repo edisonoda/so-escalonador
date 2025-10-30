@@ -164,14 +164,28 @@ bool System::loadConfig()
     new_list = list<TCB *>(begin(ord_tasks), end(ord_tasks));
     task_count = new_list.size();
 
-    gantt_chart.setScreen(screen);
-    gantt_chart.setTasks(&ord_tasks);
+    int total_time = 0;
+    for (TCB* task : ord_tasks)
+        total_time += task->getDuration();
 
-    system_monitor.setOffset(task_count + 2);
-    system_monitor.setScreen(screen);
+    gantt_chart.setWindowDimensions(
+        task_count + 2,
+        total_time * UNIT_WIDTH,
+        0,
+        0
+    );
+
+    system_monitor.setWindowDimensions(
+        task_count + 2,
+        20,
+        0,
+        task_count + 2
+    );
+
+    gantt_chart.setTasks(&ord_tasks);
     system_monitor.setTasks(&ord_tasks);
-    system_monitor.drawTick(0);
     
+    system_monitor.drawTick(0);
     clock.selectMode(configs.mode);
     clock.run();
 

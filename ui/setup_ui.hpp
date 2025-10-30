@@ -3,6 +3,8 @@
 #include "../utils/std_libraries.hpp"
 
 #include "screen.hpp"
+#include "window.hpp"
+#include "menu.hpp"
 
 // Forward declaration
 namespace Core { class SimulationConfig; }
@@ -13,33 +15,31 @@ namespace UI
     class SetupUI
     {
     private:
-        UI::Screen* screen;
+        Screen* screen;
+
+        Menu menu;
+        Window taskInfo;
+        Window mensagem;
+        Window input;
+
         SimulationConfig* config;
-
-        int selected;
-
-        void navigate(char dir, int max_options);
-        void printOption(int index, string text);
-        
-        void showMainMenu();
 
     public:
         SetupUI(SimulationConfig* config);
         ~SetupUI();
-
-        int getSelected() const { return selected; }
     
         // --- Funções de Desenho de Tela ---
         void updateInfo();
     
-        char navigateMainMenu();
-        void showEditor();
-        void showTaskEditor();
+        int showMainMenu();
+        int showEditor();
+        int showTaskEditor(string id = "");
         
         void showError(const string& message);
         void showMessage(const string& message);
         
         // --- Funções de UI Utility ---
+        string promptForField(string field);
         string promptForFilename();
         string readString();
     };
