@@ -1,17 +1,19 @@
 #include "menu.hpp"
+#include "setup_ui.hpp"
 #include <string>
 
 using namespace UI;
 
 const vector<int> Menu::navigation_keys({KEY_UP, KEY_DOWN});
 
-Menu::Menu() : Window()
+Menu::Menu(SetupUI* ui) : Window(), ui(ui)
 {
     selected = 0;
 }
 
 Menu::~Menu()
 {
+    ui = nullptr;
 }
 
 void Menu::setupMenu(string title, vector<string> options)
@@ -21,21 +23,40 @@ void Menu::setupMenu(string title, vector<string> options)
     height = options.size() + 2;
     wresize(window, height, width);
     screen->refresh();
+
+    valid_entries.clear();
+    valid_entries.push_back(KEY_ENTER);
+    valid_entries.push_back('\n');
+    for (int i = 0; i < options.size(); i++)
+        valid_entries.push_back('0' + i + 1);
+
+    selected = 0;
 }
 
 int Menu::showMenu()
 {
-    selected = 0;
     printMenu();
 
     int ch = wgetch(window);
 
-    while (find(navigation_keys.begin(), navigation_keys.end(), ch) != navigation_keys.end())
+    while(find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
     {
-        navigate(ch);
+        if (find(navigation_keys.begin(), navigation_keys.end(), ch) != navigation_keys.end())
+            navigate(ch);
+        else
+        {
+            ui->clearMessage();
+            ui->showError("digite uma opção válida!");
+        }
+
         printMenu();
         ch = wgetch(window);
     }
+
+    ui->clearMessage();
+
+    if (ch == KEY_ENTER || ch == '\n')
+        return '0' + selected + 1;
 
     return ch;
 }

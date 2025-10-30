@@ -1,4 +1,5 @@
 #include "setup_manager.hpp"
+#include <ncurses.h>
 
 #define CONFIG_FILE "configs/default.txt"
 
@@ -25,20 +26,9 @@ SimulationConfig SetupManager::run()
     bool in_setup = true;
     int ch = '1';
 
-    vector<int> valid_entries = {'1', '2', '3', '4', '5', ' ', '\n'};
-
     while (in_setup)
     {
         ch = ui.showMainMenu();
-        while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end())
-        {
-            ui.showError("digite uma opção válida!");
-            // Ajustar
-            ch = getch();
-        }
-
-        if (ch == '\n')
-            ch = '0' + ch + 1;
 
         switch (ch)
         {
@@ -98,6 +88,8 @@ bool SetupManager::loadFromFile(const string &filename)
     list<TCB *> tasks_list = config_reader.readTasks();
     config.tasks.assign(tasks_list.begin(), tasks_list.end());
 
+    ui.updateInfo();
+
     return true;
 }
 
@@ -108,6 +100,8 @@ void SetupManager::runEditor()
     {
         ui.showEditor();
     }
+
+    ui.updateInfo();
 }
 
 void SetupManager::addNewTask()
@@ -127,6 +121,8 @@ void SetupManager::addNewTask()
     ));
 
     screen->initColor(0, stoi(color));
+
+    ui.updateInfo();
 }
 
 void SetupManager::deleteTask()
@@ -141,6 +137,8 @@ void SetupManager::deleteTask()
 
     delete config.tasks.at(stoi(str));
     config.tasks.erase(config.tasks.begin() + stoi(str));
+
+    ui.updateInfo();
 }
 
 bool SetupManager::isNumber(const string &s)

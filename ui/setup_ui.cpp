@@ -11,10 +11,11 @@ using namespace UI;
 SetupUI::SetupUI(SimulationConfig* config)
     : screen(Screen::getInstance())
     , config(config)
+    , menu(this)
 {
     menu.setWindowDimensions(0, INFO_X_OFFSET, 0, 0);
 
-    taskInfo.setWindowDimensions(30, 60, INFO_X_OFFSET, 0);
+    task_info.setWindowDimensions(30, 75, INFO_X_OFFSET, 0);
     mensagem.setWindowDimensions(2, INFO_X_OFFSET, 0, menu.getHeight());
     input.setWindowDimensions(5, INFO_X_OFFSET, 0, 0);
 }
@@ -29,9 +30,9 @@ void SetupUI::updateInfo()
 {
     int y = 0;
 
-    taskInfo.clear();
+    task_info.clear();
 
-    taskInfo.print(0, y++, "--- Configuração Atual ---");
+    task_info.print(0, y++, "--- Configuração Atual ---");
     string alg_str;
     switch(config->alg_id)
     {
@@ -40,41 +41,39 @@ void SetupUI::updateInfo()
         case Scheduler::AlgorithmID::SRTF: alg_str = "SRTF"; break;
     }
     
-    taskInfo.print(0, y++, "Modo: " + string(1, config->mode));
-    taskInfo.print(0, y++, "Algoritmo: " + alg_str);
-    taskInfo.print(0, y++, "Quantum:   " + to_string(config->quantum));
-    taskInfo.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
+    task_info.print(0, y++, "Modo: " + string(1, config->mode));
+    task_info.print(0, y++, "Algoritmo: " + alg_str);
+    task_info.print(0, y++, "Quantum:   " + to_string(config->quantum));
+    task_info.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
     if (!config->tasks.empty())
         for (size_t i = 0; i < config->tasks.size(); i++)
         {
             TCB *task = config->tasks[i];
-            taskInfo.setColor(i); // Cor da tarefa
-            taskInfo.invertColor(true);
-            taskInfo.print(0, y, task->getId());
-            taskInfo.print(4, y, "COLOR: " + to_string(task->getColor()) + " ");
+            task_info.setColor(i); // Cor da tarefa
+            task_info.invertColor(true);
+            task_info.print(0, y, task->getId());
+            task_info.print(4, y, "COLOR: " + to_string(task->getColor()) + " ");
             
-            taskInfo.setColor(DefaultColor::WHITE);
-            taskInfo.invertColor(false);
+            task_info.setColor(DefaultColor::WHITE);
+            task_info.invertColor(false);
             
             string start_str = "| START: " + to_string(task->getStart()) + " ";
             string duration_str = "| DURATION: " + to_string(task->getDuration()) + " ";
             string prio_str = "| PRIORITY: " + to_string(task->getPriority()) + " ";
             
-            taskInfo.print(14, y, start_str);
-            taskInfo.print(26, y, duration_str);
-            taskInfo.print(41, y, prio_str);
+            task_info.print(14, y, start_str);
+            task_info.print(26, y, duration_str);
+            task_info.print(41, y, prio_str);
             
             y++;
         }
 
-    taskInfo.refresh();
+    task_info.refresh();
 }
 
 int SetupUI::showMainMenu()
 {
-    menu.clear();
-
     menu.setupMenu("--- SETUP DA SIMULAÇÃO ---", {
         "Iniciar",
         "Carregar",
@@ -88,8 +87,6 @@ int SetupUI::showMainMenu()
 
 int SetupUI::showEditor()
 {
-    menu.clear();
-
     vector<string> options = {"Algoritmo", "Quantum"};
     
     for (TCB* task : config->tasks)
@@ -101,8 +98,6 @@ int SetupUI::showEditor()
 
 int SetupUI::showTaskEditor(string id)
 {
-    menu.clear();
-    
     string title = "--- ADICIONAR TAREFA ---";
 
     if (!id.empty())
@@ -127,6 +122,11 @@ void SetupUI::showMessage(const string& message)
     mensagem.moveWindow(0, menu.getHeight());
     mensagem.print(0, 0, message);
     mensagem.refresh();
+}
+
+void SetupUI::clearMessage()
+{
+    mensagem.clear();
 }
 
 string SetupUI::promptForFilename()

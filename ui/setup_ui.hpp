@@ -18,7 +18,7 @@ namespace UI
         Screen* screen;
 
         Menu menu;
-        Window taskInfo;
+        Window task_info;
         Window mensagem;
         Window input;
 
@@ -37,6 +37,7 @@ namespace UI
         
         void showError(const string& message);
         void showMessage(const string& message);
+        void clearMessage();
         
         // --- Funções de UI Utility ---
         string promptForField(string field);
