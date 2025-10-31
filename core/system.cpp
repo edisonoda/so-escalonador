@@ -138,6 +138,7 @@ void System::terminateTask()
 
     if (task_count <= 0)
     {
+        tick();
         endProgram();
     }
 }
@@ -173,27 +174,6 @@ void System::loadConfig()
     ord_tasks = configs.tasks;
     new_list = list<TCB *>(begin(ord_tasks), end(ord_tasks));
     task_count = new_list.size();
-
-    int total_time = 0;
-    int latest_start = 0;
-    for (TCB *task : ord_tasks)
-    {
-        total_time += task->getDuration();
-        latest_start = task->getStart() > latest_start ? task->getStart() : latest_start;
-    }
-    total_time += latest_start;
-
-    gantt_chart.setWindowDimensions(
-        task_count + 2,
-        (total_time + 2) * UNIT_WIDTH,
-        0,
-        0);
-
-    system_monitor.setWindowDimensions(
-        task_count + 2,
-        MONITOR_WIDTH,
-        0,
-        task_count + 2);
 
     gantt_chart.setTasks(&ord_tasks);
     system_monitor.setTasks(&ord_tasks);

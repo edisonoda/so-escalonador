@@ -16,6 +16,7 @@ namespace UI
         GanttChart(Utils::ChartGenerator *chart_gen);
         ~GanttChart();
 
+        virtual void setTasks(vector<TCB *> *tasks);
         virtual void drawTick(int tick);
     };
 } // namespace UI

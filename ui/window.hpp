@@ -34,19 +34,20 @@ namespace UI
         int getPosY();
 
         void move(int x, int y);
-        virtual void print(int ch);
-        virtual void print(string str);
-        virtual void print(int x, int y, int ch);
-        virtual void print(int x, int y, string str);
         void del(int x, int y);
         void refresh();
         void clear();
         void erase();
         int getCh();
-
+        
         int setColor(DefaultColor color);
         int setColor(int color_index);
         void invertColor();
         void invertColor(bool inv);
+        
+        virtual void print(int ch);
+        virtual void print(string str);
+        virtual void print(int x, int y, int ch);
+        virtual void print(int x, int y, string str);
     };
 } // namespace UI

@@ -72,6 +72,7 @@ SimulationConfig SetupManager::run()
     } while (in_editor);
 
     config.simulation_should_run = true;
+    screen->detach(&ui);
     return config;
 }
 

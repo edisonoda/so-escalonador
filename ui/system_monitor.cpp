@@ -12,7 +12,7 @@ SystemMonitor::~SystemMonitor()
 
 void SystemMonitor::drawTick(int tick)
 {
-    int x = 4;
+    int x = offset;
 
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
@@ -63,4 +63,15 @@ void SystemMonitor::drawTick(int tick)
     }
 
     refresh();
+}
+
+void SystemMonitor::setTasks(vector<TCB *> *tasks)
+{
+    TaskVisual::setTasks(tasks);
+    setWindowDimensions(
+        tasks->size() + 2,
+        MONITOR_WIDTH + offset,
+        0,
+        tasks->size() + 2
+    );
 }

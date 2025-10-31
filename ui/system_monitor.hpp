@@ -12,6 +12,7 @@ namespace UI
         SystemMonitor();
         ~SystemMonitor();
         
+        virtual void setTasks(vector<TCB *> *tasks);
         virtual void drawTick(int tick);
     };
 } // namespace UI
