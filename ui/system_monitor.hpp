@@ -8,6 +8,10 @@ namespace UI
 {
     class SystemMonitor : public TaskVisual
     {
+    private:
+        map<string, string> MONITOR_LABELS;
+        map<string, string> MONITOR_LABELS_STATUS;
+
     public:
         SystemMonitor();
         ~SystemMonitor();

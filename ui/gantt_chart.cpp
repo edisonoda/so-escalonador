@@ -63,8 +63,8 @@ void GanttChart::setTasks(vector<TCB *> *tasks)
     total_time += latest_start;
 
     setWindowDimensions(
-        tasks->size() + 2,
-        ((total_time + 2) * UNIT_WIDTH) + offset,
+        tasks->size() + 1,
+        ((total_time) * UNIT_WIDTH) + offset,
         0,
         0
     );
