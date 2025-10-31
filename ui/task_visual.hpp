@@ -15,17 +15,19 @@ namespace UI
         Window *window;
         int visual_edge_x;
         int visual_edge_y;
-        int offset;
+        int x_offset;
+        int y_offset;
 
         void checkEdges(int x, int y);
-        virtual void print(int x, int y, string str);
-        virtual void print(int x, int y, int ch);
-
-    public:
+        
+        public:
         TaskVisual();
         virtual ~TaskVisual();
 
-        virtual void setTasks(vector<TCB *> *tasks);
+        virtual void setTasks(vector<TCB *> *tasks, int y_offset = 0);
+        
+        virtual void print(int x, int y, string str);
+        virtual void print(int x, int y, int ch);
         virtual void drawTick(int tick) = 0;
     };
 } // namespace UI

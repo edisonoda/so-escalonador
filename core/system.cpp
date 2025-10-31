@@ -7,7 +7,11 @@ using namespace Core;
 System *System::instance(nullptr);
 
 System::System()
-    : scheduler(Scheduler::Scheduler::getInstance()), clock(this), chart_generator(&ord_tasks), gantt_chart(&chart_generator), screen(Screen::getInstance())
+    : scheduler(Scheduler::Scheduler::getInstance()), 
+    clock(this), 
+    chart_generator(&ord_tasks), 
+    gantt_chart(&chart_generator), 
+    screen(Screen::getInstance())
 {
     current_task = nullptr;
     task_count = 0;
@@ -62,7 +66,7 @@ void System::tick()
     }
 
     gantt_chart.drawTick(clock.getTotalTime());
-    system_monitor.drawTick(clock.getTotalTime());
+    task_info.drawTick(clock.getTotalTime());
 }
 
 void System::handleInterruption(Interruption irq)
@@ -176,9 +180,10 @@ void System::loadConfig()
     task_count = new_list.size();
 
     gantt_chart.setTasks(&ord_tasks);
-    system_monitor.setTasks(&ord_tasks);
+    task_info.setTasks(&ord_tasks);
+    task_info.positionCorrectionForSimulation(gantt_chart.getHeight());
 
-    system_monitor.drawTick(0);
+    task_info.drawTick(0);
     clock.selectMode(configs.mode);
     clock.run();
 }

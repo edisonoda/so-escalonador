@@ -7,7 +7,7 @@
 #define MAIN_WIDTH 50
 #define INFO_X_OFFSET MAIN_WIDTH + 4
 #define INFO_HEIGHT 5
-#define INFO_WIDTH 60
+#define INFO_WIDTH 75
 
 using namespace UI;
 
@@ -52,33 +52,16 @@ void SetupUI::update()
     task_info.print(0, y++, "Quantum:   " + to_string(config->quantum));
     task_info.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
+    int header_line_count = y;
+
     if (!config->tasks.empty())
     {
-        for (size_t i = 0; i < config->tasks.size(); i++)
-        {
-            TCB *task = config->tasks[i];
-            task_info.setColor(i); // Cor da tarefa
-            task_info.invertColor(true);
-            task_info.print(0, y, task->getId());
-            task_info.print(4, y, "COLOR: " + to_string(task->getColor()) + " ");
-            
-            task_info.setColor(DefaultColor::WHITE);
-            task_info.invertColor(false);
-            
-            string start_str = "| START: " + to_string(task->getStart()) + " ";
-            string duration_str = "| DURATION: " + to_string(task->getDuration()) + " ";
-            string prio_str = "| PRIORITY: " + to_string(task->getPriority()) + " ";
-            
-            task_info.print(14, y, start_str);
-            task_info.print(26, y, duration_str);
-            task_info.print(41, y, prio_str);
-            
-            y++;
-        }
+        task_info.setTasks(&(config->tasks), header_line_count);
+        task_info.drawStaticInfo();
     }
 
     task_info.setWindowDimensions(
-        INFO_HEIGHT + config->tasks.size(),
+        header_line_count + config->tasks.size() + 2,
         INFO_WIDTH,
         INFO_X_OFFSET,
         0

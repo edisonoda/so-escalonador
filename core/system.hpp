@@ -10,7 +10,7 @@
 
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
-#include "../ui/system_monitor.hpp"
+#include "../ui/task_info.hpp"
 
 #include "../utils/chart_generator.hpp"
 
@@ -29,7 +29,6 @@ namespace Core
         
         Scheduler::Scheduler* scheduler;
         Clock clock;
-        // ConfigReader config_reader;
         TCB* current_task;
         vector<TCB*> ord_tasks;
         list<TCB*> new_list;
@@ -38,7 +37,7 @@ namespace Core
 
         Screen* screen;
         GanttChart gantt_chart;
-        SystemMonitor system_monitor;
+        TaskInfo task_info;
 
         Utils::ChartGenerator chart_generator;
         SetupManager setup;

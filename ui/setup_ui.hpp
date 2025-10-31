@@ -6,6 +6,7 @@
 #include "screen.hpp"
 #include "window.hpp"
 #include "menu.hpp"
+#include "task_info.hpp"
 
 // Forward declaration
 namespace Core { class SimulationConfig; }
@@ -19,7 +20,7 @@ namespace UI
         Screen* screen;
 
         Menu menu;
-        Window task_info;
+        TaskInfo task_info;
         Window mensagem;
         Window input;
 

@@ -41,17 +41,17 @@ void GanttChart::drawTick(int tick)
         }
 
         chart_generator->registerEntry(tick, i, color);
-        print(x, i, unit);
+        print(x, i + y_offset, unit);
     }
 
     setColor(DefaultColor::WHITE); // branco no preto
-    print(x, ord_tasks->size(), to_string(tick));
+    print(x, ord_tasks->size() + y_offset, to_string(tick));
     refresh();
 }
 
-void GanttChart::setTasks(vector<TCB *> *tasks)
+void GanttChart::setTasks(vector<TCB *> *tasks, int y_offset)
 {
-    TaskVisual::setTasks(tasks);
+    TaskVisual::setTasks(tasks, y_offset);
 
     int total_time = 0;
     int latest_start = 0;
@@ -63,8 +63,8 @@ void GanttChart::setTasks(vector<TCB *> *tasks)
     total_time += latest_start;
 
     setWindowDimensions(
-        tasks->size() + 1,
-        ((total_time) * UNIT_WIDTH) + offset,
+        tasks->size() + 2,
+        ((total_time) * UNIT_WIDTH) + x_offset,
         0,
         0
     );
