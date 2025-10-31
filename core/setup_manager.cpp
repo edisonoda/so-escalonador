@@ -80,7 +80,7 @@ bool SetupManager::loadFromFile(const string &filename)
 {
     if (!config_reader.openFile(filename))
     {
-        ui.showError("Não foi possível abrir o arquivo: " + filename);
+        ui.inputError("Não foi possível abrir o arquivo: " + filename);
         return false;
     }
 
@@ -104,6 +104,7 @@ void SetupManager::runEditor()
 {
     int ch;
     bool in_editor;
+    string quantum;
 
     do
     {
@@ -116,7 +117,9 @@ void SetupManager::runEditor()
             break;
 
         case '2':
-            config.quantum = stoi(ui.promptForField("Quantum"));
+            quantum = ui.promptForField("Quantum");
+            if (validateEntry(quantum))
+                config.quantum = stoi(quantum);
             break;
 
         case '3':
@@ -233,16 +236,29 @@ void SetupManager::addNewTask()
 
 void SetupManager::deleteTask()
 {
-    string str = ui.readString();
+    bool valid = false;
+    string str = ui.promptForField("Id");
+    vector<TCB *>::iterator i = config.tasks.begin();
 
-    while (!isNumber(str) || stoi(str) >= config.tasks.size() - 1)
+    while (i != config.tasks.end())
     {
-        ui.showError("digite uma task válida!");
-        str = ui.readString();
+        if ((*i)->getId() == str)
+        {
+            delete (*i);
+            config.tasks.erase(i++);
+            valid = true;
+        }
+        else
+        {
+            i++;
+        }
     }
 
-    delete config.tasks.at(stoi(str));
-    config.tasks.erase(config.tasks.begin() + stoi(str));
+    if (!valid)
+    {
+        ui.inputError("digite um ID válido!");
+    }
+    
 
     ui.update();
 }
@@ -312,7 +328,7 @@ bool SetupManager::validateEntry(string str)
 {
     if (!isNumber(str))
     {
-        ui.showError("Digite um valor válido!");
+        ui.inputError("Digite um valor válido!");
         return false;
     }
 

@@ -38,8 +38,8 @@ namespace UI
         int showTaskList();
         int showAlgorithm();
         
-        void showError(const string& message);
-        void showMessage(const string& message);
+        void showError(const string& message, Window* window = nullptr);
+        void inputError(const string& message);
         void clearMessage();
         
         // --- Funções de UI Utility ---

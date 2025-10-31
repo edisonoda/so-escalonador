@@ -156,18 +156,22 @@ int SetupUI::showTaskEditor(string id)
     return menu.showMenu();
 }
 
-void SetupUI::showError(const string& message)
+void SetupUI::showError(const string& message, Window* window)
 {
-    mensagem.moveWindow(0, menu.getHeight());
+    if (window)
+        mensagem.moveWindow(0, window->getHeight());
+    else
+        mensagem.moveWindow(0, menu.getHeight());
+
     mensagem.print(0, 0, "ERRO: " + message);
+    mensagem.print(0, 1, "Pressione qualquer tecla para seguir.");
+    getch();
     mensagem.refresh();
 }
 
-void SetupUI::showMessage(const string& message)
+void SetupUI::inputError(const string& message)
 {
-    mensagem.moveWindow(0, menu.getHeight());
-    mensagem.print(0, 0, message);
-    mensagem.refresh();
+    showError(message, &input);
 }
 
 void SetupUI::clearMessage()
@@ -180,7 +184,8 @@ string SetupUI::promptForField(string field)
 {
     screen->erase();
     screen->refresh();
-
+    
+    input.clear();
     input.print(0, 0, "--- Inserir " + field + " ---");
     input.print(0, 1, "> ");
     input.refresh();
@@ -193,6 +198,7 @@ string SetupUI::promptForFilename()
     screen->erase();
     screen->refresh();
 
+    input.clear();
     input.print(0, 0, "--- Carregar Arquivo de Configuração ---");
     input.print(0, 1, "Digite o nome do arquivo (ex: meu_arquivo.txt):");
     input.print(0, 2, "> ");
@@ -205,6 +211,11 @@ string SetupUI::readString()
 {
     int ch = input.getCh();
     string str = "";
+    vector<int> valid_entries = {
+        '_',
+        ' ',
+        '-'
+    };
 
     while (ch != '\n')
     {
@@ -218,7 +229,7 @@ string SetupUI::readString()
                 str.pop_back();
             }
         }
-        else
+        else if (isalnum(ch) || find(valid_entries.begin(), valid_entries.end(), ch) != valid_entries.end())
         {
             input.print(ch);
             str += ch;

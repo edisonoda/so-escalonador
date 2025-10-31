@@ -13,6 +13,7 @@
 #include <algorithm>
 #include <iostream>
 #include <chrono>
+#include <cctype>
 
 // headers do C
 #include <ncurses.h>
