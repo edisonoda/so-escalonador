@@ -165,8 +165,8 @@ void SetupUI::showError(const string& message, Window* window)
 
     mensagem.print(0, 0, "ERRO: " + message);
     mensagem.print(0, 1, "Pressione qualquer tecla para seguir.");
-    getch();
     mensagem.refresh();
+    getch();
 }
 
 void SetupUI::inputError(const string& message)
