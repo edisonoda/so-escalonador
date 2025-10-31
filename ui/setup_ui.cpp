@@ -211,11 +211,7 @@ string SetupUI::readString()
 {
     int ch = input.getCh();
     string str = "";
-    vector<int> valid_entries = {
-        '_',
-        ' ',
-        '-'
-    };
+    vector<int> valid_entries = {'_', ' ', '-', '.'};
 
     while (ch != '\n')
     {

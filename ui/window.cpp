@@ -15,7 +15,9 @@ Window::Window()
 Window::~Window()
 {
     clear();
+    refresh();
     delwin(window);
+    screen->erase();
     screen->refresh();
 
     screen = nullptr;

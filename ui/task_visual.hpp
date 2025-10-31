@@ -23,7 +23,7 @@ namespace UI
 
     public:
         TaskVisual();
-        ~TaskVisual();
+        virtual ~TaskVisual();
 
         virtual void setTasks(vector<TCB *> *tasks);
         virtual void drawTick(int tick) = 0;

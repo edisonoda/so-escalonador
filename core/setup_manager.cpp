@@ -155,8 +155,9 @@ void SetupManager::runTaskListEditor()
             break;
 
         default:
-            if (ch < '0' + config.tasks.size() + 1)
-                editTask((ch - 3) - '0');
+            ch = (ch - 3) - '0';
+            if (ch < config.tasks.size())
+                editTask(ch);
             else
                 in_editor = false;
             break;
@@ -274,7 +275,7 @@ void SetupManager::editTask(int index)
 
     do
     {
-        ch = ui.showTaskEditor();
+        ch = ui.showTaskEditor(task->getId());
 
         switch (ch)
         {

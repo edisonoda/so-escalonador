@@ -20,7 +20,7 @@ namespace UI
 
     public:
         Window();
-        ~Window();
+        virtual ~Window();
 
         void setWindowDimensions(int height, int width, int x, int y);
         int getHeight() const { return height; }

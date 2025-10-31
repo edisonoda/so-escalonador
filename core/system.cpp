@@ -190,4 +190,6 @@ void System::endProgram()
     timeout(-1);
     flushinp();
     handleInterruption(Interruption::FULL_STOP);
+    screen->erase();
+    screen->refresh();
 }
