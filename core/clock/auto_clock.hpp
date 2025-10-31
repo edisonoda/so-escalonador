@@ -1,9 +1,10 @@
 #pragma once
 
-#include "clock_mode.hpp"
-#include <chrono>
+#include "../../utils/std_libraries.hpp"
 
-using namespace std::chrono;
+#include "clock_mode.hpp"
+
+using namespace chrono;
 
 namespace Core
 {

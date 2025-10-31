@@ -1,9 +1,9 @@
 #pragma once
 
-#include <list>
+#include "../utils/std_libraries.hpp"
+
 #include "../core/tcb.hpp"
 
-using namespace std;
 using namespace Core;
 
 namespace Scheduler
@@ -23,7 +23,7 @@ namespace Scheduler
 
     public:
         SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list) : id(id), task_list(task_list) {};
-        virtual ~SchedulingAlgorithm() {};
+        virtual ~SchedulingAlgorithm() { task_list = nullptr; }
 
         AlgorithmID getID() const { return id; }
 

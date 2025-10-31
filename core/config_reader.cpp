@@ -1,6 +1,4 @@
 #include "config_reader.hpp"
-#include <list>
-#include <vector>
 
 using namespace Core;
 

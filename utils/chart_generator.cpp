@@ -1,5 +1,4 @@
 #include "chart_generator.hpp"
-#include <iomanip>
 
 using namespace Utils;
 
@@ -32,6 +31,7 @@ void ChartGenerator::generate(const string &filename, int total_time, int task_c
         return;
 
     file << "<svg width='" << img_width << "' height='" << img_height << "' xmlns='http://www.w3.org/2000/svg'>\n";
+    file << "<rect width='" << img_width << "' height='" << img_height << "' fill='white' />\n";
 
     for (int i = 0; i < tasks->size(); i++)
     {

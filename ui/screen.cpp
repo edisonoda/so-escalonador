@@ -1,21 +1,36 @@
 #include "screen.hpp"
+#include <ncurses.h>
 
 using namespace UI;
 
-#include <ncurses.h>
+Screen *Screen::instance(nullptr);
 
-Screen* Screen::instance(nullptr);
+int convertRGB(int color)
+{
+    return ((float)color / 255) * 1000;
+}
 
 Screen::Screen()
 {
     color_pair_count = 0;
-    inverted = false;
+
     initscr();
+    noecho();
     start_color();
-    init_color(8, 400,400,400);
-    initColor(7, 0); // branco no preto
-    initColor(0, 0); // preto no preto
-    initColor(0, 8); // cinza no preto
+    init_color(100, 250, 250, 250);
+    init_color(COLOR_BLACK, 100, 100, 125);
+    init_color(COLOR_BLUE, convertRGB(66), convertRGB(135), convertRGB(245));
+    init_color(COLOR_YELLOW, convertRGB(245), convertRGB(233), convertRGB(66));
+    init_color(COLOR_CYAN, convertRGB(66), convertRGB(245), convertRGB(197));
+    init_color(COLOR_RED, convertRGB(245), convertRGB(66), convertRGB(66));
+    init_color(COLOR_MAGENTA, convertRGB(245), convertRGB(66), convertRGB(135));
+
+    initColor(7, 0);           // branco no preto
+    initColor(0, 0);           // preto no preto
+    initColor(0, 100);         // preto no cinza
+    initColor(COLOR_GREEN, 0); // verde no preto
+
+    bkgd(COLOR_PAIR(1));
 }
 
 Screen::~Screen()
@@ -24,23 +39,12 @@ Screen::~Screen()
     endwin();
 }
 
-Screen* Screen::getInstance()
+Screen *Screen::getInstance()
 {
-    if (instance != nullptr)
-        return instance;
+    if (instance == nullptr)
+        instance = new Screen();
 
-    instance = new Screen();
     return instance;
-}
-
-void Screen::print(int x, int y, char ch)
-{
-    mvprintw(y, x, "%c", ch);
-}
-
-void Screen::print(int x, int y, string str)
-{
-    mvprintw(y, x, "%s", str.c_str());
 }
 
 void Screen::refresh()
@@ -48,45 +52,13 @@ void Screen::refresh()
     ::refresh();
 }
 
-void Screen::clear()
+void Screen::erase()
 {
-    ::clear();
+    ::erase();
+    update();
 }
 
 void Screen::initColor(int color, int bg_color)
 {
     init_pair(++color_pair_count, color, bg_color);
-}
-
-int Screen::setColor(DefaultColor color)
-{
-    attron(COLOR_PAIR(static_cast<int>(color)));
-    return static_cast<int>(color);
-}
-
-int Screen::setColor(int color_index)
-{
-    attron(COLOR_PAIR(color_index + 4));
-    return color_index + 4;
-}
-
-void Screen::invertColor()
-{
-    if (inverted)
-        attroff(A_REVERSE);
-    else
-        attron(A_REVERSE);
-
-    inverted = !inverted;
-}
-
-void Screen::invertColor(bool inv)
-{
-    inverted = !inv;
-    invertColor();
-}
-
-int Screen::getCh()
-{
-    return ::getch();
 }

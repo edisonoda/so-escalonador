@@ -3,6 +3,8 @@
 #include "task_visual.hpp"
 #include "../utils/chart_generator.hpp"
 
+#define UNIT_WIDTH 3
+
 namespace UI
 {
     class GanttChart : public TaskVisual
@@ -14,6 +16,7 @@ namespace UI
         GanttChart(Utils::ChartGenerator *chart_gen);
         ~GanttChart();
 
+        virtual void setTasks(vector<TCB *> *tasks);
         virtual void drawTick(int tick);
     };
 } // namespace UI

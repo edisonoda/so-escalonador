@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../ui/screen.hpp"
+#include "../../ui/window.hpp"
 
 // Forward declaration
 namespace Core { class Clock; }
@@ -13,7 +13,6 @@ namespace Core
     protected:
         Clock* clock;
         System* system;
-        UI::Screen* screen;
         
         void checkModeChange();
 

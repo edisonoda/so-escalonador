@@ -1,8 +1,9 @@
 #include "auto_clock.hpp"
+
 #include "clock.hpp"
+
 #include "../system.hpp"
 #include "../../utils/constants.hpp"
-#include <ncurses.h>
 
 using namespace Core;
 
@@ -38,7 +39,7 @@ bool AutoClock::getTick()
     }
 
     timeout(0);
-    int ch = screen->getCh();
+    int ch = getch();
 
     if (ch == ' ')
     {

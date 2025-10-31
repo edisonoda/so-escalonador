@@ -1,6 +1,9 @@
 #pragma once
-#include <string>
-using namespace std;
+
+#include "../utils/std_libraries.hpp"
+#include "refresh_subject.hpp"
+
+#define INITIAL_COLORS 4
 
 namespace UI
 {
@@ -8,30 +11,25 @@ namespace UI
     {
         WHITE = 1,
         BLACK = 2,
-        GRAY = 3
+        GRAY = 3,
+        GREEN = 4
     };
 
-    class Screen
+    class Screen : public RefreshSubject
     {
     private:
         static Screen* instance;
         int color_pair_count;
-        bool inverted;
 
         Screen();
 
     public:
         ~Screen();
         static Screen* getInstance();
-        void print(int x, int y, char ch = '*');
-        void print(int x, int y, string str);
+        
         void refresh();
-        void clear();
+        void erase();
+        
         void initColor(int color, int bg_color);
-        int setColor(DefaultColor color);
-        int setColor(int color_index);
-        void invertColor();
-        void invertColor(bool inv);
-        int getCh();
     };
 } // namespace UI

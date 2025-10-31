@@ -1,9 +1,8 @@
 #include "scheduler.hpp"
+
 #include "fcfs_algorithm.hpp"
 #include "srtf_algorithm.hpp"
 #include "priop_algorithm.hpp"
-
-using namespace std;
 
 namespace Scheduler
 {
@@ -16,6 +15,7 @@ namespace Scheduler
         delete algorithm;
         algorithm = nullptr;
         instance = nullptr;
+        task_list = nullptr;
     }
 
     Scheduler *Scheduler::getInstance()
@@ -30,21 +30,10 @@ namespace Scheduler
     {
         switch (id)
         {
-        case AlgorithmID::FCFS:
-            algorithm = new FCFS(task_list);
-            break;
-
-        case AlgorithmID::SRTF:
-            algorithm = new SRTF(task_list);
-            break;
-
-        case AlgorithmID::PRIOp:
-            algorithm = new PRIOp(task_list);
-            break;
-
-        default:
-            algorithm = new FCFS(task_list);
-            break;
+            case AlgorithmID::FCFS: algorithm = new FCFS(task_list); break;
+            case AlgorithmID::SRTF: algorithm = new SRTF(task_list); break;
+            case AlgorithmID::PRIOp: algorithm = new PRIOp(task_list); break;
+            default: algorithm = new FCFS(task_list); break;
         }
     }
 

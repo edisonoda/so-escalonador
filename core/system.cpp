@@ -1,4 +1,5 @@
 #include "system.hpp"
+
 #include "clock/clock.hpp"
 
 using namespace Core;
@@ -6,28 +7,31 @@ using namespace Core;
 System *System::instance(nullptr);
 
 System::System()
-    : scheduler(Scheduler::Scheduler::getInstance())
-    , clock(this)
-    , chart_generator(&ord_tasks)
-    , gantt_chart(&chart_generator)
+    : scheduler(Scheduler::Scheduler::getInstance()), clock(this), chart_generator(&ord_tasks), gantt_chart(&chart_generator), screen(Screen::getInstance())
 {
     current_task = nullptr;
     task_count = 0;
 
     scheduler->setTaskList(&ready_list);
-    screen = UI::Screen::getInstance();
 }
 
 System::~System()
 {
     delete screen;
     delete scheduler;
-    
+
     instance = nullptr;
     screen = nullptr;
     scheduler = nullptr;
+    current_task = nullptr;
 
-    // TODO: delete all tasks
+    for (TCB *task : ord_tasks)
+        delete task;
+
+    ord_tasks.clear();
+    new_list.clear();
+    ready_list.clear();
+    suspended_list.clear();
 }
 
 System *System::getInstance()
@@ -69,7 +73,7 @@ void System::handleInterruption(Interruption irq)
         preemptTask();
         break;
     case Interruption::FULL_STOP:
-        screen->getCh();
+        getch();
         break;
     default:
         break;
@@ -91,7 +95,6 @@ void System::changeState(TCBState state)
         case TCBState::SUSPENDED:
             suspended_list.remove(current_task);
             break;
-
         case TCBState::READY:
             ready_list.remove(current_task);
             break;
@@ -130,13 +133,13 @@ void System::checkNewTasks()
 void System::terminateTask()
 {
     changeState(TCBState::TERMINATED);
-    
+
     task_count--;
 
     if (task_count <= 0)
     {
-        clock.stop();
-        chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+        tick();
+        endProgram();
     }
 }
 
@@ -156,38 +159,35 @@ void System::preemptTask()
     changeState(TCBState::READY);
 }
 
-bool System::loadConfig(const string &filename)
+void System::loadConfig()
 {
-    char mode = clock.initialSelection();
+    SimulationConfig configs = setup.run();
 
-    if (!config_reader.openFile(filename))
-    {
-        printf("Failed to open config file.\n");
-        return false;
-    }
+    if (!configs.simulation_should_run)
+        return;
 
-    config_reader.readPattern();
-    scheduler->setAlgorithm(config_reader.getAlgorithm());
-    clock.setQuantum(config_reader.getQuantum());
+    screen->erase();
 
-    new_list = config_reader.readTasks();
+    scheduler->setAlgorithm(configs.alg_id);
+    clock.setQuantum(configs.quantum);
+
+    ord_tasks = configs.tasks;
+    new_list = list<TCB *>(begin(ord_tasks), end(ord_tasks));
     task_count = new_list.size();
 
-    for (TCB *task : new_list)
-        screen->initColor(0, task->getColor());
-
-    ord_tasks = vector<TCB *>(begin(new_list), end(new_list));
-
-    gantt_chart.setScreen(screen);
     gantt_chart.setTasks(&ord_tasks);
-
-    system_monitor.setOffset(task_count + 2);
-    system_monitor.setScreen(screen);
     system_monitor.setTasks(&ord_tasks);
-    system_monitor.drawTick(0);
-    
-    clock.selectMode(mode);
-    clock.run();
 
-    return true;
+    system_monitor.drawTick(0);
+    clock.selectMode(configs.mode);
+    clock.run();
+}
+
+void System::endProgram()
+{
+    clock.stop();
+    chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+    timeout(-1);
+    flushinp();
+    handleInterruption(Interruption::FULL_STOP);
 }
