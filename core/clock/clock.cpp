@@ -8,9 +8,8 @@
 
 using namespace Core;
 
-Clock::Clock(System* sys)
-    : system(sys)
-    , quantum_interval(Constants::DEFAULT_QUANTUM)
+Clock::Clock(System *sys)
+    : system(sys), quantum_interval(Constants::DEFAULT_QUANTUM)
 {
     mode = nullptr;
     total_time = -1;
@@ -18,7 +17,8 @@ Clock::Clock(System* sys)
     running = false;
 }
 
-Clock::~Clock() {
+Clock::~Clock()
+{
     delete mode;
     mode = nullptr;
     system = nullptr;
@@ -35,10 +35,16 @@ void Clock::run()
             total_time++;
             quantum++;
 
-            if (quantum >= quantum_interval)
-                system->handleInterruption(Interruption::QUANTUM);
+            system->tick(); // Antes o tick era feito depois do tratamento da interrupção
+                            // porém isso fazia com que a task não tivesse o valor decrementado
+                            // que acontece dentro do tick tipo o tick já aconteceu
+                            // depois tem que tratar a interrupção
 
-            system->tick();
+            if (quantum >= quantum_interval)
+            {
+                system->handleInterruption(Interruption::QUANTUM);
+            }
+
         }
     }
 }
@@ -57,8 +63,14 @@ void Clock::selectMode(char m)
 
     switch (m)
     {
-        case 'A': mode = new AutoClock(this, system); break;
-        case 'P': mode = new ManualClock(this, system); break;
-        default: mode = new AutoClock(this, system); break;
+    case 'A':
+        mode = new AutoClock(this, system);
+        break;
+    case 'P':
+        mode = new ManualClock(this, system);
+        break;
+    default:
+        mode = new AutoClock(this, system);
+        break;
     }
 }

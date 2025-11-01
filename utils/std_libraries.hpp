@@ -20,3 +20,16 @@
 #include <locale.h>
 
 using namespace std;
+
+// inline void clear_log() {
+//     // Limpa o log antigo
+//     std::ofstream log_file("debug.log", std::ios::out | std::ios::trunc);
+// }
+
+// inline void Log(const std::string& message) {
+//     // Adiciona ao log
+//     std::ofstream log_file("debug.log", std::ios::out | std::ios::app);
+//     if (log_file.is_open()) {
+//         log_file << message << std::endl;
+//     }
+// }

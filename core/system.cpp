@@ -58,17 +58,21 @@ void System::tick()
         clock.resetQuantum();
     }
 
-    if (current_task != nullptr)
-    {
-        if (current_task->getRemaining() <= 0)
-            terminateTask();
+    // Antes os ifs seguidos quando ele voltava de dar terminate na task ele ainda decrementava
+    // mesmo a task nova selecionada não tendo executado ainda, gerando estourous no remaining
+    // remaining = -1
+    // além disso o desenho estava acontecendo depois de tudo isso, de forma que as vezes a task
+    // fosse trocada sem desenhar o decremento pq ela era terminada e a informação se perdia
+    // agora ele só troca depois de desenhar a execução que já aconteceu
 
-        if (current_task != nullptr)
-            current_task->decrementRemaining(1);
-    }
+    if (current_task != nullptr && current_task->getRemaining() > 0)
+        current_task->decrementRemaining(1);
 
     gantt_chart.drawTick(clock.getTotalTime());
     task_info.drawTick(clock.getTotalTime());
+
+    if (current_task != nullptr && current_task->getRemaining() <= 0)
+        terminateTask();
 }
 
 void System::handleInterruption(Interruption irq)
@@ -138,12 +142,9 @@ void System::checkNewTasks()
 
 void System::terminateTask()
 {
-    current_task->setCompletionTime(clock.getTotalTime() + 1);
-
     changeState(TCBState::TERMINATED);
 
     task_count--;
-
     if (task_count <= 0)
     {
         tick();
@@ -161,10 +162,25 @@ void System::preemptTask()
 {
     clock.resetQuantum();
 
-    if (current_task != nullptr)
-        ready_list.push_back(current_task);
+    // Antes a task já tinha remaining 0, mas chegava aqui e era colocada de volta na fila
+    // por que o terminate só ia ser chamado depois, mas como ela saia antes mudando de estado
+    // ele recolocava ela na fila, e tinhamos task com tempo 0 na fila e como ready
+    // com esse novo if else, ele testa antes se ela já não acabou antes de preemptar de fato
 
-    changeState(TCBState::READY);
+    if (current_task != nullptr)
+    {
+        if (current_task->getRemaining() <= 0)
+        {
+            terminateTask();
+        }
+        else
+        {
+            ready_list.push_back(current_task);
+            changeState(TCBState::READY);
+        }
+    }
+    else
+        changeState(TCBState::READY);
 }
 
 void System::calcAverageTimes()
