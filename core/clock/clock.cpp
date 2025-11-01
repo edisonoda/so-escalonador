@@ -30,16 +30,21 @@ void Clock::run()
 
     while (running)
     {
-        if (mode->getTick())
+        // Chama o método virtual do modo de execução para verificar quando acontece um tick
+        // -> Muda de acordo com a strategy
+        if (mode->getTick()) 
         {
             total_time++;
             quantum++;
 
+            // Começa a execução do tick
             system->startTick();
-            
+
+            // Verifica o quantum e executa a preempção por tempo
             if (quantum >= quantum_interval)
                 system->handleInterruption(Interruption::QUANTUM);
 
+            // Encerra a execução do tick
             system->endTick();
         }
     }
@@ -57,6 +62,7 @@ void Clock::selectMode(char m)
     if (mode != nullptr)
         delete mode;
 
+    // Seleção da strategy para o clock
     switch (m)
     {
     case 'A':

@@ -14,8 +14,8 @@ namespace Core
         ClockMode* mode;
         
         int total_time;
-        int quantum_interval;
-        int quantum;
+        int quantum_interval; // fixo
+        int quantum; // dinâmico
         bool running;
 
     public:
