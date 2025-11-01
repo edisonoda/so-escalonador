@@ -2,6 +2,13 @@
 
 using namespace UI;
 
+static string to_string_with_precision(double val, int precision = 2)
+{
+    stringstream stream;
+    stream << fixed << setprecision(precision) << val;
+    return stream.str();
+}
+
 TaskInfo::TaskInfo() : TaskVisual()
 {
     MONITOR_LABELS = {
@@ -20,26 +27,16 @@ TaskInfo::TaskInfo() : TaskVisual()
         {"Terminated", "TERMINATED "},
         {"Error", "ERROR      "}
     };
+
+    simulation_finished = false;
+    avg_turnaround = 0.0;
+    avg_wait = 0.0;
 }
 
 TaskInfo::~TaskInfo()
 {
 }
 
-void TaskInfo::setTasks(vector<TCB *> *tasks, int y_offset)
-{
-    TaskVisual::setTasks(tasks, y_offset);
-}
-
-void TaskInfo::positionCorrectionForSimulation(int y_pos)
-{
-    setWindowDimensions(
-        ord_tasks ? ord_tasks->size() : 5,
-        MONITOR_WIDTH,
-        0,
-        y_pos
-    );
-}
 
 void TaskInfo::drawStaticInfo()
 {
@@ -50,33 +47,59 @@ void TaskInfo::drawStaticInfo()
     int data_3_x = bar_3_x + 2;
     int bar_4_x = data_3_x + 15;
     int data_4_x = bar_4_x + 2;
-
+    
     if (!ord_tasks)
-        return;
-
+    return;
+    
     for (size_t i = 0; i < ord_tasks->size(); i++)
     {
         TCB *task = (*ord_tasks)[i];
-
+        
         string color_str = MONITOR_LABELS.at("Color") + to_string(task->getColor());
         string start_str = MONITOR_LABELS.at("Start") + to_string(task->getStart());
         string duration_str = MONITOR_LABELS.at("Duration") + to_string(task->getDuration());
         string prio_str = MONITOR_LABELS.at("Priority") + to_string(task->getPriority());
-
+        
         setColor(DefaultColor::WHITE);
         invertColor(false);
-
+        
         print(data_1_x, i + y_offset, color_str);
         
         print(bar_2_x, i + y_offset, "|");
         print(data_2_x, i + y_offset, start_str);
-
+        
         print(bar_3_x, i + y_offset, "|");
         print(data_3_x, i + y_offset, duration_str);
-
+        
         print(bar_4_x, i + y_offset, "|");
         print(data_4_x, i + y_offset, prio_str);
     }
+}
+
+void TaskInfo::positionCorrectionForSimulation(int y_pos)
+{
+    setWindowDimensions(
+        (ord_tasks ? ord_tasks->size() : 5) + 3,
+        MONITOR_WIDTH,
+        0,
+        y_pos
+    );
+}
+
+void TaskInfo::displayFinalStatistics(double avg_t, double avg_w)
+{
+    this->avg_turnaround = avg_t;
+    this->avg_wait = avg_w;
+    this->simulation_finished = true;
+    
+    // Força um último "tick" para redesenhar a janela
+    // com as estatísticas finais
+    drawTick(0);
+}
+
+void TaskInfo::setTasks(vector<TCB *> *tasks, int y_offset)
+{
+    TaskVisual::setTasks(tasks, y_offset);
 }
 
 void TaskInfo::drawTick(int tick)
@@ -146,6 +169,21 @@ void TaskInfo::drawTick(int tick)
         print(data_4_x, i + y_offset, rem_str);
         print(bar_5_x, i + y_offset, "|");
         print(data_5_x, i + y_offset, prio_str);
+    }
+
+    if (simulation_finished)
+    {
+        setColor(DefaultColor::WHITE);
+        invertColor(false);
+        
+        // Posição Y: 1 linha abaixo da última task
+        int stats_y_pos = ord_tasks->size() + 1; 
+        
+        string turn_str = "Tempo de Vida Médio (Turnaround): " + to_string_with_precision(avg_turnaround);
+        string wait_str = "Tempo de Espera Médio:           " + to_string_with_precision(avg_wait);
+
+        print(1, stats_y_pos, turn_str);
+        print(1, stats_y_pos + 1, wait_str);
     }
 
     refresh();

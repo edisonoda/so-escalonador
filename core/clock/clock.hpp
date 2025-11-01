@@ -24,7 +24,7 @@ namespace Core
 
         int getQuantum() const { return quantum_interval; }
         void setQuantum(const int q) { quantum_interval = q; }
-        void resetQuantum() { quantum = quantum_interval; }
+        void resetQuantum() { quantum = 0; }
         int getTotalTime() const { return total_time; }
 
         void selectMode(char mode);

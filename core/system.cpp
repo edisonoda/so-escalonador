@@ -7,14 +7,16 @@ using namespace Core;
 System *System::instance(nullptr);
 
 System::System()
-    : scheduler(Scheduler::Scheduler::getInstance()), 
-    clock(this), 
-    chart_generator(&ord_tasks), 
-    gantt_chart(&chart_generator), 
-    screen(Screen::getInstance())
+    : scheduler(Scheduler::Scheduler::getInstance()),
+      clock(this),
+      chart_generator(&ord_tasks),
+      gantt_chart(&chart_generator),
+      screen(Screen::getInstance())
 {
     current_task = nullptr;
     task_count = 0;
+    avg_turnaround = 0;
+    avg_wait = 0;
 
     scheduler->setTaskList(&ready_list);
 }
@@ -136,6 +138,8 @@ void System::checkNewTasks()
 
 void System::terminateTask()
 {
+    current_task->setCompletionTime(clock.getTotalTime() + 1);
+
     changeState(TCBState::TERMINATED);
 
     task_count--;
@@ -161,6 +165,29 @@ void System::preemptTask()
         ready_list.push_back(current_task);
 
     changeState(TCBState::READY);
+}
+
+void System::calcAverageTimes()
+{
+    double total_turnaround_time = 0;
+    double total_wait_time = 0;
+    int task_n = ord_tasks.size();
+
+    for (TCB *task : ord_tasks)
+    {
+        int arrival = task->getStart();
+        int duration = task->getDuration();
+        int completion = task->getCompletionTime();
+
+        int turnaround = completion - arrival;
+        total_turnaround_time += turnaround;
+
+        int wait = turnaround - duration;
+        total_wait_time += wait;
+    }
+
+    avg_turnaround = (task_n > 0) ? (total_turnaround_time / task_n) : 0;
+    avg_wait = (task_n > 0) ? (total_wait_time / task_n) : 0;
 }
 
 void System::loadConfig()
@@ -192,6 +219,8 @@ void System::endProgram()
 {
     clock.stop();
     chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+    calcAverageTimes();
+    task_info.displayFinalStatistics(avg_turnaround, avg_wait);
     timeout(-1);
     flushinp();
     handleInterruption(Interruption::FULL_STOP);

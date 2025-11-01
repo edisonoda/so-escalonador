@@ -71,6 +71,10 @@ void TCB::setDuration(const int _duration) { duration = _duration; }
 
 void TCB::setPriority(const int _priority) { priority = _priority; }
 
+void TCB::setCompletionTime(int time) { this->completion_time = time; }
+
+int TCB::getCompletionTime() const { return this->completion_time; }
+
 int TCB::getRemaining() const { return remaining; }
 
 TCBState TCB::getState() const { return state; }
