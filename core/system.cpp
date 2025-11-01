@@ -149,6 +149,8 @@ void System::checkNewTasks()
 
 void System::terminateTask()
 {
+    current_task->setCompletionTime(clock.getTotalTime());
+
     changeState(TCBState::TERMINATED);
 
     task_count--;
@@ -222,7 +224,6 @@ void System::loadConfig()
     task_info.setTasks(&ord_tasks);
     task_info.positionCorrectionForSimulation(gantt_chart.getHeight());
 
-    gantt_chart.drawTick(0);
     task_info.drawTick(0);
     clock.selectMode(configs.mode);
     clock.run();
