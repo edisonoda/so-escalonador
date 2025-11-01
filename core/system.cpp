@@ -58,13 +58,6 @@ void System::tick()
         clock.resetQuantum();
     }
 
-    // Antes os ifs seguidos quando ele voltava de dar terminate na task ele ainda decrementava
-    // mesmo a task nova selecionada não tendo executado ainda, gerando estourous no remaining
-    // remaining = -1
-    // além disso o desenho estava acontecendo depois de tudo isso, de forma que as vezes a task
-    // fosse trocada sem desenhar o decremento pq ela era terminada e a informação se perdia
-    // agora ele só troca depois de desenhar a execução que já aconteceu
-
     if (current_task != nullptr && current_task->getRemaining() > 0)
         current_task->decrementRemaining(1);
 
@@ -80,7 +73,7 @@ void System::handleInterruption(Interruption irq)
     switch (irq)
     {
     case Interruption::QUANTUM:
-        preemptTask();
+        preemptTask(Scheduler::PreemptType::QUANTUM);
         break;
     case Interruption::FULL_STOP:
         getch();
@@ -90,13 +83,13 @@ void System::handleInterruption(Interruption irq)
     }
 }
 
-void System::changeState(TCBState state)
+void System::changeState(TCBState state, Scheduler::PreemptType type)
 {
     TCB *previous_task = current_task;
     if (current_task != nullptr)
         current_task->setState(state);
 
-    current_task = scheduler->chooseTask(current_task);
+    current_task = scheduler->chooseTask(current_task, type);
 
     if (current_task != nullptr)
     {
@@ -118,10 +111,17 @@ void System::changeState(TCBState state)
 
     if (current_task != nullptr)
         current_task->setState(TCBState::RUNNING);
+
+    Log("T=" + to_string(clock.getTotalTime()));
+    for (TCB* task:ready_list)
+    {
+        Log(" | " + task->getId());
+    }
 }
 
 void System::checkNewTasks()
 {
+    bool new_task_arrived = false;
     list<TCB *>::iterator i = new_list.begin();
 
     while (i != new_list.end())
@@ -131,13 +131,16 @@ void System::checkNewTasks()
             (*i)->setState(TCBState::READY);
             ready_list.push_back((*i));
             new_list.erase(i++);
-            preemptTask();
+            new_task_arrived = true;
         }
         else
         {
             i++;
         }
     }
+
+    if (new_task_arrived)
+        preemptTask(Scheduler::PreemptType::NEW_TASK);
 }
 
 void System::terminateTask()
@@ -158,14 +161,9 @@ void System::suspendTask()
     changeState(TCBState::SUSPENDED);
 }
 
-void System::preemptTask()
+void System::preemptTask(Scheduler::PreemptType type)
 {
     clock.resetQuantum();
-
-    // Antes a task já tinha remaining 0, mas chegava aqui e era colocada de volta na fila
-    // por que o terminate só ia ser chamado depois, mas como ela saia antes mudando de estado
-    // ele recolocava ela na fila, e tinhamos task com tempo 0 na fila e como ready
-    // com esse novo if else, ele testa antes se ela já não acabou antes de preemptar de fato
 
     if (current_task != nullptr)
     {
@@ -176,11 +174,11 @@ void System::preemptTask()
         else
         {
             ready_list.push_back(current_task);
-            changeState(TCBState::READY);
+            changeState(TCBState::READY, type);
         }
     }
     else
-        changeState(TCBState::READY);
+        changeState(TCBState::READY, type);
 }
 
 void System::calcAverageTimes()

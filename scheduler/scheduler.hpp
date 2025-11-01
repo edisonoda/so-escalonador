@@ -27,6 +27,6 @@ namespace Scheduler
 
         void setAlgorithm(AlgorithmID id);
         void setTaskList(list<TCB *> *task_list);
-        TCB *chooseTask(TCB *current_task = nullptr);
+        TCB *chooseTask(TCB *current_task = nullptr, PreemptType type = PreemptType::NONE);
     };
 } // namespace Scheduler

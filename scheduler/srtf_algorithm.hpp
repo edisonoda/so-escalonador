@@ -9,6 +9,6 @@ namespace Scheduler
         public:
             SRTF(list<TCB*>* task_list);
             ~SRTF();
-            virtual TCB* chooseTask(TCB* current_task = nullptr);
+            virtual TCB* chooseTask(TCB* current_task = nullptr, PreemptType type = PreemptType::NONE);
     };
 } // namespace Scheduler

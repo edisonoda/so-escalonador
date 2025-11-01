@@ -10,10 +10,15 @@ FCFS::~FCFS()
 {
 }
     
-TCB *FCFS::chooseTask(TCB *current_task)
+TCB *FCFS::chooseTask(TCB *current_task, PreemptType type)
 {
     if (task_list->empty())
         return nullptr;
-        
+ 
+    if (type == PreemptType::NEW_TASK)
+    {
+        return current_task;
+    }
+    
     return task_list->front();
 }

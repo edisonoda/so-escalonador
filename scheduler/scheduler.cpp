@@ -42,8 +42,8 @@ namespace Scheduler
         this->task_list = task_list;
     }
 
-    TCB *Scheduler::chooseTask(TCB *current_task)
+    TCB *Scheduler::chooseTask(TCB *current_task, PreemptType type)
     {
-        return algorithm->chooseTask(current_task);
+        return algorithm->chooseTask(current_task, type);
     }
 }

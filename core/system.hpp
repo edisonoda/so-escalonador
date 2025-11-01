@@ -7,6 +7,7 @@
 #include "setup_manager.hpp"
 
 #include "../scheduler/scheduler.hpp"
+#include "../scheduler/scheduling_algorithm.hpp"
 
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
@@ -49,11 +50,11 @@ namespace Core
         // Singleton
         System();
 
-        void changeState(TCBState state);
+        void changeState(TCBState state, Scheduler::PreemptType type = Scheduler::PreemptType::NONE);
         void checkNewTasks();
         void terminateTask();
         void suspendTask();
-        void preemptTask();
+        void preemptTask(Scheduler::PreemptType type);
         void calcAverageTimes();
     
         void endProgram();

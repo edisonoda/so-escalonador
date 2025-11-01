@@ -15,6 +15,13 @@ namespace Scheduler
         PRIOp
     };
 
+    enum class PreemptType
+    {
+        QUANTUM,
+        NEW_TASK,
+        NONE
+    };
+
     class SchedulingAlgorithm
     {
     protected:
@@ -27,6 +34,6 @@ namespace Scheduler
 
         AlgorithmID getID() const { return id; }
 
-        virtual TCB *chooseTask(TCB *current_task = nullptr) = 0;
+        virtual TCB *chooseTask(TCB *current_task = nullptr, PreemptType type = PreemptType::NONE) = 0;
     };
 } // namespace Scheduler

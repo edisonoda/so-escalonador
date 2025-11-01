@@ -10,7 +10,7 @@ PRIOp::~PRIOp()
 {
 }
 
-TCB *PRIOp::chooseTask(TCB *current_task)
+TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type)
 {
     if (task_list->empty())
     {

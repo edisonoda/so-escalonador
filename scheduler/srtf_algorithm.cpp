@@ -10,7 +10,7 @@ SRTF::~SRTF()
 {
 }
 
-TCB *SRTF::chooseTask(TCB *current_task)
+TCB *SRTF::chooseTask(TCB *current_task, PreemptType type)
 {
     if (task_list->empty())
     {
