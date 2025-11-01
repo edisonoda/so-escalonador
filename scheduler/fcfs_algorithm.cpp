@@ -16,9 +16,7 @@ TCB *FCFS::chooseTask(TCB *current_task, PreemptType type)
         return nullptr;
  
     if (type == PreemptType::NEW_TASK)
-    {
         return current_task;
-    }
     
     return task_list->front();
 }

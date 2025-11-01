@@ -65,6 +65,7 @@ namespace Core
 
         void loadConfig();
         void handleInterruption(Interruption irq);
-        void tick();
+        void startTick();
+        void endTick();
     };
 } // namespace Core

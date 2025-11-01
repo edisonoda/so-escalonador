@@ -2,3 +2,4 @@ escalonador
 -lncurses
 .vscode
 chart.svg
+debug.log

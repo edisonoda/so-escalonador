@@ -48,24 +48,34 @@ System *System::getInstance()
     return instance;
 }
 
-void System::tick()
+void System::startTick()
 {
+    Log("T=" + to_string(clock.getTotalTime()) + " Q=" + to_string(clock.getCurrentQ()));
+    Log("Task: " + (current_task == nullptr ? "NULL" : current_task->getId()));
+
     checkNewTasks();
 
     if (current_task == nullptr)
-    {
         changeState(TCBState::RUNNING);
-        clock.resetQuantum();
-    }
 
+    if (current_task != nullptr && current_task->getRemaining() <= 0)
+        terminateTask();
+
+    string str = "";
+    for (TCB *task : ready_list)
+    {
+        str += task->getId() + ", ";
+    }
+    Log(str);
+}
+
+void System::endTick()
+{
     if (current_task != nullptr && current_task->getRemaining() > 0)
         current_task->decrementRemaining(1);
 
     gantt_chart.drawTick(clock.getTotalTime());
     task_info.drawTick(clock.getTotalTime());
-
-    if (current_task != nullptr && current_task->getRemaining() <= 0)
-        terminateTask();
 }
 
 void System::handleInterruption(Interruption irq)
@@ -111,12 +121,6 @@ void System::changeState(TCBState state, Scheduler::PreemptType type)
 
     if (current_task != nullptr)
         current_task->setState(TCBState::RUNNING);
-
-    Log("T=" + to_string(clock.getTotalTime()));
-    for (TCB* task:ready_list)
-    {
-        Log(" | " + task->getId());
-    }
 }
 
 void System::checkNewTasks()
@@ -148,9 +152,10 @@ void System::terminateTask()
     changeState(TCBState::TERMINATED);
 
     task_count--;
-    if (task_count <= 0)
+    if (task_count == 0)
     {
-        tick();
+        startTick();
+        endTick();
         endProgram();
     }
 }
@@ -163,22 +168,12 @@ void System::suspendTask()
 
 void System::preemptTask(Scheduler::PreemptType type)
 {
-    clock.resetQuantum();
-
-    if (current_task != nullptr)
+    if (current_task != nullptr && current_task->getRemaining() > 0)
     {
-        if (current_task->getRemaining() <= 0)
-        {
-            terminateTask();
-        }
-        else
-        {
-            ready_list.push_back(current_task);
-            changeState(TCBState::READY, type);
-        }
+        ready_list.push_back(current_task);
     }
-    else
-        changeState(TCBState::READY, type);
+
+    changeState(TCBState::READY, type);
 }
 
 void System::calcAverageTimes()

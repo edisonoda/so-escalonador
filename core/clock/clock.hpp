@@ -23,6 +23,7 @@ namespace Core
         virtual ~Clock();
 
         int getQuantum() const { return quantum_interval; }
+        int getCurrentQ() const { return quantum; }
         void setQuantum(const int q) { quantum_interval = q; }
         void resetQuantum() { quantum = 0; }
         int getTotalTime() const { return total_time; }

@@ -35,16 +35,12 @@ void Clock::run()
             total_time++;
             quantum++;
 
-            system->tick(); // Antes o tick era feito depois do tratamento da interrupção
-                            // porém isso fazia com que a task não tivesse o valor decrementado
-                            // que acontece dentro do tick tipo o tick já aconteceu
-                            // depois tem que tratar a interrupção
-
+            system->startTick();
+            
             if (quantum >= quantum_interval)
-            {
                 system->handleInterruption(Interruption::QUANTUM);
-            }
 
+            system->endTick();
         }
     }
 }
