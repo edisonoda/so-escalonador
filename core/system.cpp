@@ -149,6 +149,7 @@ void System::checkNewTasks()
 
 void System::terminateTask()
 {
+    // Armazena o tempo em que a task foi terminada para o cálculo dos tempos médios
     current_task->setCompletionTime(clock.getTotalTime());
 
     changeState(TCBState::TERMINATED);
@@ -179,6 +180,7 @@ void System::preemptTask(Scheduler::PreemptType type)
     changeState(TCBState::READY, type);
 }
 
+// Calcula os tempos médios de vida e espera
 void System::calcAverageTimes()
 {
     double total_turnaround_time = 0;

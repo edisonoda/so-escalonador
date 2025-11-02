@@ -30,9 +30,7 @@ void TaskVisual::setTasks(vector<TCB*>* tasks, int y_offset)
         TCB* task = (*tasks)[i];
         string id_str = task->getId();
         if (id_str.length() >= max_lenght)
-        {
             max_lenght = id_str.length(); 
-        }
 
         setColor(i);
         

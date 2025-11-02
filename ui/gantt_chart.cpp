@@ -14,8 +14,7 @@ GanttChart::~GanttChart()
 
 void GanttChart::drawTick(int tick)
 {
-    // um tick = três colunas
-    // vamos desenhar coluna por coluna
+    // Um tick é igual a três colunas e desenhamos por coluna
     int x = visual_edge_x;
     string unit = string(UNIT_WIDTH, ' ');
 
@@ -40,6 +39,7 @@ void GanttChart::drawTick(int tick)
             break;
         }
 
+        // Registra como está a task no ponto do tick para criação da imagem final
         chart_generator->registerEntry(tick, i, color);
         print(x, i + y_offset, unit);
     }
@@ -49,6 +49,7 @@ void GanttChart::drawTick(int tick)
     refresh();
 }
 
+// Seta o tamanho do gráfico dinâmicamente com base na quantidade de tasks e duração
 void GanttChart::setTasks(vector<TCB *> *tasks, int y_offset)
 {
     TaskVisual::setTasks(tasks, y_offset);
