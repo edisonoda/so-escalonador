@@ -6,8 +6,6 @@
 
 #define MAIN_WIDTH 50
 #define INFO_X_OFFSET MAIN_WIDTH + 4
-#define INFO_HEIGHT 5
-#define INFO_WIDTH 75
 
 using namespace UI;
 
@@ -17,7 +15,7 @@ SetupUI::SetupUI(SimulationConfig* config)
     , menu(this)
 {
     menu.setWindowDimensions(0, MAIN_WIDTH, 0, 0);
-    task_info.setWindowDimensions(0, INFO_WIDTH, INFO_X_OFFSET, 0);
+    task_info.setWindowDimensions(0, 0, INFO_X_OFFSET, 0);
     mensagem.setWindowDimensions(2, MAIN_WIDTH, 0, 0);
     input.setWindowDimensions(5, MAIN_WIDTH, 0, 0);
 
@@ -36,7 +34,6 @@ void SetupUI::update()
     int y = 0;
 
     task_info.clear();
-
     task_info.print(0, y++, "--- Configuração Atual ---");
 
     string alg_str;
@@ -52,21 +49,13 @@ void SetupUI::update()
     task_info.print(0, y++, "Quantum:   " + to_string(config->quantum));
     task_info.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
-    int header_line_count = y;
+    task_info.setTasks(&(config->tasks), y);
 
     if (!config->tasks.empty())
-    {
-        task_info.setTasks(&(config->tasks), header_line_count);
-        task_info.drawStaticInfo();
-    }
+        for (int i = 0; i < config->tasks.size(); i++)
+            task_info.drawStaticInfo(i);
 
-    task_info.setWindowDimensions(
-        header_line_count + config->tasks.size() + 2,
-        INFO_WIDTH,
-        INFO_X_OFFSET,
-        0
-    );
-    
+    task_info.moveWindow(INFO_X_OFFSET, 0);
     task_info.refresh();
 }
 

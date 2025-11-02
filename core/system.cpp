@@ -224,9 +224,9 @@ void System::loadConfig()
 
     gantt_chart.setTasks(&ord_tasks);
     task_info.setTasks(&ord_tasks);
-    task_info.positionCorrectionForSimulation(gantt_chart.getHeight());
-
+    task_info.moveWindow(0, gantt_chart.getHeight());
     task_info.drawTick(0);
+    
     clock.selectMode(configs.mode);
     clock.run();
 }
