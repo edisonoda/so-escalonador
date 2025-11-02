@@ -191,6 +191,8 @@ void System::endProgram() {
   gantt_exporter.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
   task_info.displayFinalStatistics();
 
+  gantt_chart.scrollChart();
+
   // Retorna o tipo de input para bloqueante e limpa o buffer
   timeout(-1);
   flushinp();

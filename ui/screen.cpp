@@ -73,7 +73,10 @@ void Screen::initColor(int color, int bg_color) {
 
 // Window definition
 
-Window::Window() : window(newwin(0, 0, 0, 0)), screen(Screen::getInstance()) {
+Window::Window() : screen(Screen::getInstance()) {
+  window = newpad(0, 0);
+  getmaxyx(stdscr, max_height, max_width);
+
   inverted = false;
   keypad(window, true); // Inicia as macros KEY_ do NCURSES
   screen->refresh();
@@ -136,7 +139,7 @@ void Window::del(int x, int y) {
 
 void Window::refresh() {
   box(window, 0, 0);
-  wrefresh(window);
+  prefresh(window, 0, 0, 0, 0, max_height, max_width);
 }
 
 void Window::clear() { wclear(window); }

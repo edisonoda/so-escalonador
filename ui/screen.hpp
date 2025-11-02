@@ -62,6 +62,8 @@ namespace UI {
       WINDOW* window;
       Screen* screen;
 
+      int max_height;
+      int max_width;
       int height;
       int width;
       int x;

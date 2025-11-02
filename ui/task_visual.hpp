@@ -72,11 +72,14 @@ namespace UI {
   
   class GanttChart : public TaskVisual {
     private:
+      static const vector<int> scrollKeys;
       GanttExporter *gantt_exporter;
 
     public:
       GanttChart(GanttExporter *chart_gen);
       ~GanttChart();
+
+      void scrollChart();
 
       virtual void setTasks(vector<Core::TCB*> *tasks, int y_offset = 0);
       virtual void drawTick(int tick);

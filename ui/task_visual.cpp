@@ -2,6 +2,7 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <algorithm>
 
 using namespace UI;
 
@@ -328,11 +329,40 @@ string GanttExporter::convertColor(int color) {
 
 // GanttChart definition
 
+const vector<int> GanttChart::scrollKeys({KEY_LEFT, KEY_RIGHT});
+
 GanttChart::GanttChart(GanttExporter *chart_gen) : TaskVisual() {
   gantt_exporter = chart_gen;
+  // scrollok(window, true);
 }
 
 GanttChart::~GanttChart() { gantt_exporter = nullptr; }
+
+void GanttChart::scrollChart() {
+  timeout(-1);
+
+  int mrow, mcol, scroll = 0;
+  getmaxyx(stdscr, mrow, mcol);
+
+  prefresh(window, 0, scroll, 0, 0, mrow, mcol);
+
+  int ch = wgetch(window);
+  while(find(scrollKeys.begin(), scrollKeys.end(), ch) != scrollKeys.end()) {
+    switch (ch) {
+      case KEY_LEFT:
+        if (scroll >= 0)
+          prefresh(window, mrow, scroll -= 3, 0, 0, mrow, mcol);
+        break;
+      case KEY_RIGHT:
+        if (scroll < width)
+          prefresh(window, mrow, scroll += 3, 0, 0, mrow, mcol);
+        break;
+    }
+
+    prefresh(window, 0, scroll, 0, 0, mrow, mcol);
+    ch = wgetch(window);
+  }
+}
 
 void GanttChart::drawTick(int tick) {
   // Um tick é igual a três colunas e desenhamos por coluna
