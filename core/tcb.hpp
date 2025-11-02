@@ -4,6 +4,8 @@
 #include <list>
 #include <map>
 
+using namespace std;
+
 namespace Core
 {
   enum class TCBState {
@@ -28,9 +30,9 @@ namespace Core
 
   class TCB {
     private:
-      const static std::map<std::string, EventType> events_map;
+      const static map<string, EventType> events_map;
 
-      std::string id;
+      string id;
       int color;
       int start;
       int duration;
@@ -38,21 +40,21 @@ namespace Core
       int remaining;
       int completion_time;
       TCBState state;
-      std::list<Event> events;
+      list<Event> events;
 
-      void createEvent(std::string ev);
+      void createEvent(string ev);
 
     public:
-      TCB(std::string id, int color, int start, int duration, int priority, std::list<std::string> events = {});
+      TCB(string id, int color, int start, int duration, int priority, list<string> events = {});
       ~TCB();
 
-      std::string getId() const;
+      string getId() const;
       int getColor() const;
       int getStart() const;
       int getDuration() const;
       int getPriority() const;
 
-      void setId(const std::string _id);
+      void setId(const string _id);
       void setColor(const int _color);
       void setStart(const int _start);
       void setDuration(const int _duration);

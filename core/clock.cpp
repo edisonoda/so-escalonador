@@ -18,17 +18,18 @@ void ClockMode::checkModeChange() {
     clock->selectMode('P');
 }
 
-AutoClock::AutoClock(Clock *c, System *sys)
-    : ClockMode(c, sys), tick_interval(DEFAULT_TICK_INTERVAL) {
+AutoClock::AutoClock(Clock *c, System *sys) : ClockMode(c, sys),
+  tick_interval(DEFAULT_TICK_INTERVAL)
+{
   tick_counter = 0;
   ticked = false;
-  start_time = std::chrono::system_clock::now();
+  start_time = chrono::system_clock::now();
 }
 
 AutoClock::~AutoClock() {}
 
 bool AutoClock::getTick() {
-  end_time = std::chrono::system_clock::now();
+  end_time = chrono::system_clock::now();
   elapsed = end_time - start_time;
   int elap = (int)(elapsed.count() * 1000);
 

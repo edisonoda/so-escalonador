@@ -2,13 +2,13 @@
 
 using namespace Core;
 
-const std::map<std::string, EventType> TCB::events_map({
+const map<string, EventType> TCB::events_map({
   {"IO", EventType::IO},
   {"ML", EventType::ML},
   {"MU", EventType::MU}
 });
 
-TCB::TCB(std::string id, int color, int start, int duration, int priority, std::list<std::string> events) :
+TCB::TCB(string id, int color, int start, int duration, int priority, list<string> events) :
   id(id),
   color(color),
   start(start),
@@ -18,16 +18,16 @@ TCB::TCB(std::string id, int color, int start, int duration, int priority, std::
   this->remaining = duration;
   this->state = TCBState::NEW;
 
-  for (std::string event : events)
+  for (string event : events)
     createEvent(event);
 }
 
 TCB::~TCB() {}
 
-void TCB::createEvent(std::string ev) {
+void TCB::createEvent(string ev) {
   size_t sep = ev.find(':');
 
-  if (sep == std::string::npos)
+  if (sep == string::npos)
     return;
 
   auto it = events_map.find(ev.substr(0, sep));
@@ -36,7 +36,7 @@ void TCB::createEvent(std::string ev) {
     return;
 
   EventType type = it->second;
-  std::string duration_info = ev.substr(sep + 1, ev.length() - 1);
+  string duration_info = ev.substr(sep + 1, ev.length() - 1);
   Event event = {type};
 
   switch (type) {
@@ -54,7 +54,7 @@ void TCB::createEvent(std::string ev) {
   this->events.push_back(event);
 }
 
-std::string TCB::getId() const { return id; }
+string TCB::getId() const { return id; }
 
 int TCB::getColor() const { return color; }
 
@@ -64,7 +64,7 @@ int TCB::getDuration() const { return duration; }
 
 int TCB::getPriority() const { return priority; }
 
-void TCB::setId(const std::string _id) { id = _id; }
+void TCB::setId(const string _id) { id = _id; }
 
 void TCB::setColor(const int _color) { color = _color; }
 

@@ -8,6 +8,8 @@
 #define Y_PAD 1
 #define INITIAL_COLORS 4
 
+using namespace std;
+
 namespace UI
 {
   enum class DefaultColor {
@@ -27,7 +29,7 @@ namespace UI
 
   class RefreshSubject {
     private:
-      std::set<RefreshObserver*> observers;
+      set<RefreshObserver*> observers;
 
     public:
       RefreshSubject();
@@ -95,8 +97,8 @@ namespace UI
       void invertColor(bool inv);
       
       virtual void print(int ch);
-      virtual void print(std::string str);
+      virtual void print(string str);
       virtual void print(int x, int y, int ch);
-      virtual void print(int x, int y, std::string str);
+      virtual void print(int x, int y, string str);
   };
 } // namespace UI

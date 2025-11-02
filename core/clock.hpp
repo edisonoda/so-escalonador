@@ -5,6 +5,8 @@
 #define DEFAULT_QUANTUM 5.f
 #define DEFAULT_TICK_INTERVAL 250 // Milisegundos
 
+using namespace std;
+
 // Forward declaration
 namespace Core { class Clock; }
 namespace Core { class System; }
@@ -30,9 +32,9 @@ namespace Core {
       int tick_counter;
       bool ticked;
 
-      std::chrono::time_point<std::chrono::system_clock> start_time;
-      std::chrono::time_point<std::chrono::system_clock> end_time;
-      std::chrono::duration<double> elapsed;
+      chrono::time_point<chrono::system_clock> start_time;
+      chrono::time_point<chrono::system_clock> end_time;
+      chrono::duration<double> elapsed;
 
     public:
       AutoClock(Clock* clock, System* sys);
