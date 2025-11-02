@@ -237,8 +237,17 @@ void GanttExporter::registerEntry(int tick, int task_index, int color) {
 }
 
 void GanttExporter::generate(const string &filename, int total_time, int task_count) {
+  int max_id = TICK_WIDTH;
+  for (int i = 0; i < tasks->size(); i++) {
+    string id = (*tasks)[i]->getId();
+    int length = id.length() * 10;
+
+    if (length > max_id)
+      max_id = length;
+  }
+
   // Tamanho da imagem: +1 para os eixos
-  int img_width = (total_time + 1) * TICK_WIDTH;
+  int img_width = (total_time * TICK_WIDTH) + max_id;
   int img_height = (task_count + 1) * TASK_HEIGHT;
 
   ofstream file(filename);
@@ -247,21 +256,22 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
 
   // Cria o svg e um background branco
   file << "<svg width='" << img_width << "' height='" << img_height
-       << "' xmlns='http://www.w3.org/2000/svg'>\n";
+       << "' font-family='Courier New'" << " xmlns='http://www.w3.org/2000/svg'>\n";
   file << "<rect width='" << img_width << "' height='" << img_height
        << "' fill='white' />\n";
 
   // Eixo vertical (tasks)
   for (int i = 0; i < tasks->size(); i++) {
     int y = i * TASK_HEIGHT;
-    file << "<text x='0' y='" << y + 5 << "' width='" << TICK_WIDTH
+
+    file << "<text x='0' y='" << y + 5 << "' width='" << max_id
          << "' height='" << TASK_HEIGHT << "' dominant-baseline='hanging'>"
          << (*tasks)[i]->getId() << "</text>";
   }
 
   // Cada entrada do gráfico
   for (const auto &entry : chart_history) {
-    int x = (entry.tick + 1) * TICK_WIDTH;
+    int x = (entry.tick * TICK_WIDTH) + max_id;
     int y = entry.task_index * TASK_HEIGHT;
     string color = entry.color;
 
@@ -272,7 +282,8 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
 
   // Eixo horizontal (ticks)
   for (int i = 0; i < total_time + 1; i++) {
-    int x = (i + 1) * TICK_WIDTH;
+    int x = (i * TICK_WIDTH) + max_id;
+
     file << "<text x='" << x << "' y='" << img_height - TASK_HEIGHT + 5
          << "' width='" << TICK_WIDTH << "' height='" << TASK_HEIGHT
          << "' dominant-baseline='hanging'>" << i << "</text>";
