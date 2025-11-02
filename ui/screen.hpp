@@ -7,6 +7,7 @@
 #define X_PAD 2
 #define Y_PAD 1
 #define INITIAL_COLORS 4
+#define GRAY_INDEX 100
 
 using namespace std;
 

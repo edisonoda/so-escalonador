@@ -8,8 +8,10 @@ using namespace UI;
 // TaskVisual Definition
 
 TaskVisual::TaskVisual() : Window() {
+  // Guarda os limites do que foi escrito em tela
   visual_edge_x = 0;
   visual_edge_y = 0;
+  // Guarda a posição inicial das informações das tarefas
   x_offset = 0;
   y_offset = 0;
   ord_tasks = nullptr;
@@ -20,9 +22,10 @@ TaskVisual::~TaskVisual() { ord_tasks = nullptr; }
 void TaskVisual::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
   ord_tasks = tasks;
   this->y_offset = y_offset;
-  int max_lenght = 0;
   invertColor(true);
-
+  
+  // Busca o tamanho do maior ID e imprime todos os IDs
+  int max_lenght = 0;
   for (size_t i = 0; i < tasks->size(); i++) {
     Core::TCB *task = (*tasks)[i];
     string id_str = task->getId();
@@ -53,6 +56,7 @@ void TaskVisual::print(int x, int y, int ch) {
   Window::print(x, y, ch);
 }
 
+// Se o caracter impresso estiver fora do limite aumenta o limite
 void TaskVisual::checkEdges(int x, int y) {
   if (x > visual_edge_x)
     visual_edge_x = x;
@@ -63,13 +67,14 @@ void TaskVisual::checkEdges(int x, int y) {
 
 // TaskInfo Definition
 
-static string to_string_with_precision(double val, int precision = 2) {
+static string toStringWithPrecision(double val, int precision = 2) {
   stringstream stream;
   stream << fixed << setprecision(precision) << val;
   return stream.str();
 }
 
 TaskInfo::TaskInfo() : TaskVisual() {
+  // Faz o mapeamento dos parâmetros de exibição das tasks
   MONITOR_LABELS = {
     {"Color",     "COLOR: "},
     {"Start",     "START: "},
@@ -78,6 +83,7 @@ TaskInfo::TaskInfo() : TaskVisual() {
     {"Remaining", "REMAINING: "}
   };
 
+  // Faz o mapeamento dos possíveis status das tasks
   MONITOR_LABELS_STATUS = {
     {"New",         "NEW        "},
     {"Ready",       "READY      "},
@@ -91,10 +97,11 @@ TaskInfo::TaskInfo() : TaskVisual() {
 TaskInfo::~TaskInfo() {}
 
 void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
+  // Chama a função original (Function overload)
   TaskVisual::setTasks(tasks, y_offset);
 
+  // Define o tamanho da janela
   int width = MONITOR_LABELS_STATUS["Terminated"].length() + INFO_SPACE;
-
   for (auto label : MONITOR_LABELS)
     width += label.second.length() + INFO_SPACE;
 
@@ -109,6 +116,7 @@ void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
 void TaskInfo::drawTick(int tick) {
   int x;
 
+  // Imprime as informações atuais de cada task
   for (size_t i = 0; i < ord_tasks->size(); i++) {
     Core::TCB *task = (*ord_tasks)[i];
     x = x_offset;
@@ -146,6 +154,7 @@ void TaskInfo::drawTick(int tick) {
     invertColor(true);
     print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), i + y_offset, rem_str);
 
+    // Imprime as informações estáticas da tarefa
     drawStaticInfo(i, x + INFO_SPACE + MONITOR_LABELS["Remaining"].length() - x_offset);
   }
 
@@ -167,12 +176,14 @@ void TaskInfo::drawStaticInfo(int i, int offset) {
   setColor(DefaultColor::WHITE);
   invertColor(false);
 
+  // Faz a impressão com base no final da anterior
   print(x, i + y_offset, color_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Color"].length(), i + y_offset, start_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Start"].length(), i + y_offset, duration_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Duration"].length(), i + y_offset, prio_str);
 }
 
+// Faz o cálculo dos tempos médios
 void TaskInfo::calcFinalStatistics(double *avg_turnaround, double *avg_wait) {
   double total_turnaround_time = 0;
   double total_wait_time = 0;
@@ -210,8 +221,8 @@ void TaskInfo::displayFinalStatistics() {
 
   calcFinalStatistics(&avg_turnaround, &avg_wait);
 
-  string turn_str = "Tempo de Vida Médio:   " + to_string_with_precision(avg_turnaround);
-  string wait_str = "Tempo de Espera Médio: " + to_string_with_precision(avg_wait);
+  string turn_str = "Tempo de Vida Médio:   " + toStringWithPrecision(avg_turnaround);
+  string wait_str = "Tempo de Espera Médio: " + toStringWithPrecision(avg_wait);
 
   print(1, stats_y_pos, turn_str);
   print(1, stats_y_pos + 1, wait_str);
@@ -330,6 +341,7 @@ void GanttChart::drawTick(int tick) {
     Core::TCB *task = (*ord_tasks)[i];
     int color;
 
+    // Muda a cor dependendo do estado
     switch (task->getState()) {
       case Core::TCBState::RUNNING:
         color = setColor(i);
@@ -355,22 +367,22 @@ void GanttChart::drawTick(int tick) {
   refresh();
 }
 
-// Seta o tamanho do gráfico dinâmicamente com base na quantidade de tasks e
-// duração
+// Define o tamanho do gráfico dinâmicamente com base na quantidade de tasks e duração
 void GanttChart::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
   TaskVisual::setTasks(tasks, y_offset);
 
   int total_time = 0;
   int latest_start = 0;
 
+  // Busca o inicio mais tardio dentre as tarefas
   for (Core::TCB *task : *tasks) {
     total_time += task->getDuration();
-    latest_start =
-        task->getStart() > latest_start ? task->getStart() : latest_start;
+    latest_start = task->getStart() > latest_start ? task->getStart() : latest_start;
   }
 
   total_time += latest_start;
 
+  // Largura com base no offset e total máximo de ticks
   setWindowDimensions(
     tasks->size() + 1,
     ((total_time + 1) * UNIT_WIDTH) + x_offset,

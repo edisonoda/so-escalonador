@@ -26,10 +26,12 @@ void RefreshSubject::update() {
 Screen::Screen() {
   color_pair_count = 0;
 
-  initscr();
-  noecho();
+  initscr(); // Inicia uma tela do NCURSES
+  noecho(); // Não mostra caracteres digitados pelo usuário
   start_color();
-  init_color(100, 250, 250, 250);
+  init_color(GRAY_INDEX, 250, 250, 250); // Inicia o cinza fora da faixa de tarefas
+
+  // Inicializa as cores com um tom mais visível
   init_color(COLOR_BLACK, 100, 100, 125);
   init_color(COLOR_BLUE, convertRGB(66), convertRGB(135), convertRGB(245));
   init_color(COLOR_YELLOW, convertRGB(245), convertRGB(233), convertRGB(66));
@@ -39,10 +41,10 @@ Screen::Screen() {
 
   initColor(7, 0);           // branco no preto
   initColor(0, 0);           // preto no preto
-  initColor(0, 100);         // preto no cinza
+  initColor(0, GRAY_INDEX);  // preto no cinza
   initColor(COLOR_GREEN, 0); // verde no preto
 
-  bkgd(COLOR_PAIR(1));
+  bkgd(COLOR_PAIR(1)); // Define a cor de fundo para preto
 }
 
 Screen::~Screen() {
@@ -64,6 +66,7 @@ void Screen::erase() {
   update();
 }
 
+// Por padrão o NCURSES inicia as cores em pares, texto e fundo
 void Screen::initColor(int color, int bg_color) {
   init_pair(++color_pair_count, color, bg_color);
 }
@@ -72,7 +75,7 @@ void Screen::initColor(int color, int bg_color) {
 
 Window::Window() : window(newwin(0, 0, 0, 0)), screen(Screen::getInstance()) {
   inverted = false;
-  keypad(window, true);
+  keypad(window, true); // Inicia as macros KEY_ do NCURSES
   screen->refresh();
 }
 
@@ -88,6 +91,7 @@ Window::~Window() {
 }
 
 void Window::setWindowDimensions(int h, int w, int _x, int _y) {
+  // Adiciona uma margem às janelas
   height = h + (Y_PAD * 2);
   width = w + (X_PAD * 2);
   x = _x;
@@ -105,6 +109,7 @@ int Window::getPosX() { return getcurx(window); }
 
 int Window::getPosY() { return getcury(window); }
 
+// As funções de janela do NCURSES começam com w
 void Window::moveWindow(int x, int y) {
   mvwin(window, y, x), screen->refresh();
 }
@@ -115,6 +120,7 @@ void Window::print(int ch) { wprintw(window, "%c", ch); }
 
 void Window::print(std::string str) { wprintw(window, "%s", str.c_str()); }
 
+// Move o cursor e depois imprime na janela
 void Window::print(int x, int y, int ch) {
   mvwprintw(window, y + Y_PAD, x + X_PAD, "%c", ch);
 }
@@ -139,16 +145,20 @@ void Window::erase() { werase(window); }
 
 int Window::getCh() { return wgetch(window); }
 
+// Define a cor com base nas cores padrão
 int Window::setColor(DefaultColor color) {
+  // Função do NCURSES para atribuir cor ao terminal
   wattron(window, COLOR_PAIR(static_cast<int>(color)));
   return static_cast<int>(color);
 }
 
+// Define a cor com base no index acima das cores padrão
 int Window::setColor(int color_index) {
   wattron(window, COLOR_PAIR(color_index + INITIAL_COLORS + 1));
   return color_index + INITIAL_COLORS + 1;
 }
 
+// Inverte as cores do texto e fundo
 void Window::invertColor() {
   if (inverted)
     wattroff(window, A_REVERSE);
