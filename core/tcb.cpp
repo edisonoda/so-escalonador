@@ -2,56 +2,59 @@
 
 using namespace Core;
 
-const map<string, EventType> TCB::events_map({
-    {"IO", EventType::IO},
-    {"ML", EventType::ML},
-    {"MU", EventType::MU}
+const std::map<std::string, EventType> TCB::events_map({
+  {"IO", EventType::IO},
+  {"ML", EventType::ML},
+  {"MU", EventType::MU}
 });
 
-TCB::TCB(string id, int color, int start, int duration, int priority, list<string> events)
-    : id(id), color(color), start(start), duration(duration), priority(priority)
+TCB::TCB(std::string id, int color, int start, int duration, int priority, std::list<std::string> events) :
+  id(id),
+  color(color),
+  start(start),
+  duration(duration),
+  priority(priority)
 {
-    this->remaining = duration;
-    this->state = TCBState::NEW;
+  this->remaining = duration;
+  this->state = TCBState::NEW;
 
-    for (string event : events)
-        createEvent(event);
+  for (std::string event : events)
+    createEvent(event);
 }
 
 TCB::~TCB() {}
 
-void TCB::createEvent(string ev)
-{
-    size_t sep = ev.find(':');
+void TCB::createEvent(std::string ev) {
+  size_t sep = ev.find(':');
 
-    if (sep == string::npos)
-        return;
+  if (sep == std::string::npos)
+    return;
 
-    auto it = events_map.find(ev.substr(0, sep));
+  auto it = events_map.find(ev.substr(0, sep));
 
-    if (it == events_map.end())
-        return;
+  if (it == events_map.end())
+    return;
 
-    EventType type = it->second;
-    string duration_info = ev.substr(sep + 1, ev.length() - 1);
-    Event event = { type };
+  EventType type = it->second;
+  std::string duration_info = ev.substr(sep + 1, ev.length() - 1);
+  Event event = {type};
 
-    switch (type)
-    {
-        case EventType::IO:
-            sep = duration_info.find("-");
-            event.start = stoi(duration_info.substr(0, sep));
-            event.duration = stoi(duration_info.substr(sep + 1, duration_info.length() - 1));
-            break;
-        default:
-            event.start = stoi(duration_info);
-            break;
-    }
+  switch (type) {
+  case EventType::IO:
+    sep = duration_info.find("-");
+    event.start = stoi(duration_info.substr(0, sep));
+    event.duration =
+        stoi(duration_info.substr(sep + 1, duration_info.length() - 1));
+    break;
+  default:
+    event.start = stoi(duration_info);
+    break;
+  }
 
-    this->events.push_back(event);
+  this->events.push_back(event);
 }
 
-string TCB::getId() const { return id; }
+std::string TCB::getId() const { return id; }
 
 int TCB::getColor() const { return color; }
 
@@ -61,7 +64,7 @@ int TCB::getDuration() const { return duration; }
 
 int TCB::getPriority() const { return priority; }
 
-void TCB::setId(const string _id) { id = _id; }
+void TCB::setId(const std::string _id) { id = _id; }
 
 void TCB::setColor(const int _color) { color = _color; }
 
