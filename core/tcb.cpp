@@ -2,6 +2,7 @@
 
 using namespace Core;
 
+// Faz o mapeamento dos tipos de evento
 const map<string, EventType> TCB::events_map({
   {"IO", EventType::IO},
   {"ML", EventType::ML},
@@ -40,15 +41,14 @@ void TCB::createEvent(string ev) {
   Event event = {type};
 
   switch (type) {
-  case EventType::IO:
-    sep = duration_info.find("-");
-    event.start = stoi(duration_info.substr(0, sep));
-    event.duration =
-        stoi(duration_info.substr(sep + 1, duration_info.length() - 1));
-    break;
-  default:
-    event.start = stoi(duration_info);
-    break;
+    case EventType::IO:
+      sep = duration_info.find("-");
+      event.start = stoi(duration_info.substr(0, sep));
+      event.duration = stoi(duration_info.substr(sep + 1, duration_info.length() - 1));
+      break;
+    default:
+      event.start = stoi(duration_info);
+      break;
   }
 
   this->events.push_back(event);

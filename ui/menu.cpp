@@ -10,6 +10,7 @@ using namespace UI;
 
 // Menu declaration
 
+// Mapeia as teclas de navegação e confirmação
 const vector<int> Menu::navigation_keys({KEY_UP, KEY_DOWN});
 const vector<int> Menu::confirm_keys({KEY_ENTER, KEY_RIGHT, '\n', ' '});
 
@@ -17,6 +18,7 @@ Menu::Menu(SetupUI *ui) : Window(), ui(ui) { selected = 0; }
 
 Menu::~Menu() { ui = nullptr; }
 
+// Ajusta o tamanho do menu conforme o número de opções
 void Menu::setupMenu(string title, vector<string> options) {
   this->title = title;
   this->options = options;
@@ -25,6 +27,7 @@ void Menu::setupMenu(string title, vector<string> options) {
   wresize(window, height, width);
   screen->refresh();
 
+  // Adiciona as opções atuais à lista de entradas válidas
   valid_entries.clear();
   valid_entries.push_back(KEY_ENTER);
   valid_entries.push_back('\n');
@@ -39,10 +42,9 @@ int Menu::showMenu() {
 
   int ch = wgetch(window);
 
-  while (find(valid_entries.begin(), valid_entries.end(), ch) ==
-         valid_entries.end()) {
-    if (find(navigation_keys.begin(), navigation_keys.end(), ch) !=
-        navigation_keys.end())
+  // Verifica se a entrada do usuário está dentro das opções válidas
+  while (find(valid_entries.begin(), valid_entries.end(), ch) == valid_entries.end()) {
+    if (find(navigation_keys.begin(), navigation_keys.end(), ch) != navigation_keys.end())
       navigate(ch);
     else {
       ui->showError("Digite uma opção válida!");
@@ -53,6 +55,7 @@ int Menu::showMenu() {
     ch = wgetch(window);
   }
 
+  // Converte a opção selecionada num char somando +1 devido à indexação do menu
   if (find(confirm_keys.begin(), confirm_keys.end(), ch) != confirm_keys.end())
     return '0' + selected + 1;
 
@@ -77,12 +80,12 @@ void Menu::navigate(int dir) {
 
   // Move para cima ou para baixo, dependendo do código da seta
   switch (dir) {
-  case KEY_UP:
-    selected--;
-    break;
-  case KEY_DOWN:
-    selected++;
-    break;
+    case KEY_UP:
+      selected--;
+      break;
+    case KEY_DOWN:
+      selected++;
+      break;
   }
 
   // Mantém a seleção dentre as opções
@@ -102,8 +105,10 @@ void Menu::printOption(int index, string option) {
 
 // SetupUI declaration
 
-SetupUI::SetupUI(Core::SimulationConfig *config)
-    : screen(Screen::getInstance()), config(config), menu(this) {
+SetupUI::SetupUI(Core::SimulationConfig *config) 
+: screen(Screen::getInstance()), config(config), menu(this) {
+  // Tamanho do menu e task info são atualizados dinamicamente
+  // Height, Width, X e Y
   menu.setWindowDimensions(0, MAIN_WIDTH, 0, 0);
   task_info.setWindowDimensions(0, 0, INFO_X_OFFSET, 0);
   mensagem.setWindowDimensions(3, MAIN_WIDTH, 0, 0);
@@ -118,6 +123,7 @@ SetupUI::~SetupUI() {
   config = nullptr;
 }
 
+// Mostra continuamente as configurações atualizadas
 void SetupUI::update() {
   int y = 0;
 
@@ -126,15 +132,15 @@ void SetupUI::update() {
 
   string alg_str;
   switch (config->alg_id) {
-  case Core::AlgorithmID::FIFO:
-    alg_str = "FIFO";
-    break;
-  case Core::AlgorithmID::PRIOp:
-    alg_str = "PRIOp";
-    break;
-  case Core::AlgorithmID::SRTF:
-    alg_str = "SRTF";
-    break;
+    case Core::AlgorithmID::FIFO:
+      alg_str = "FIFO";
+      break;
+    case Core::AlgorithmID::PRIOp:
+      alg_str = "PRIOp";
+      break;
+    case Core::AlgorithmID::SRTF:
+      alg_str = "SRTF";
+      break;
   }
 
   task_info.print(0, y++, "Modo: " + string(1, config->mode));
@@ -153,17 +159,25 @@ void SetupUI::update() {
 }
 
 int SetupUI::showMainMenu() {
-  menu.setupMenu("--- SETUP DA SIMULAÇÃO ---",
-                 {"Iniciar", "Carregar", "Editar", "Restaurar PADRÃO",
-                  "Trocar modo", "Sair do programa"});
+  menu.setupMenu("--- SETUP DA SIMULAÇÃO ---", {
+    "Iniciar", 
+    "Carregar", 
+    "Editar", 
+    "Restaurar PADRÃO",
+    "Trocar modo", 
+    "Sair do programa"
+  });
 
   return menu.showMenu();
 }
 
 int SetupUI::showEditor() {
-  menu.setupMenu(
-      "--- EDITAR CONFIGURAÇÕES ---",
-      {"Algoritmo", "Quantum", "Tarefas", "Voltar ao Menu Principal"});
+  menu.setupMenu("--- EDITAR CONFIGURAÇÕES ---", {
+    "Algoritmo", 
+    "Quantum", 
+    "Tarefas", 
+    "Voltar ao Menu Principal"
+  });
 
   return menu.showMenu();
 }
@@ -181,8 +195,12 @@ int SetupUI::showTaskList() {
 }
 
 int SetupUI::showAlgorithm() {
-  menu.setupMenu("--- ESCOLHER ALGORITMO ---",
-                 {"FIFO", "PRIOp", "SRTF", "Voltar"});
+  menu.setupMenu("--- ESCOLHER ALGORITMO ---", {
+    "FIFO", 
+    "PRIOp", 
+    "SRTF", 
+    "Voltar"
+  });
   return menu.showMenu();
 }
 
@@ -192,8 +210,14 @@ int SetupUI::showTaskEditor(string id) {
   if (!id.empty())
     title = "--- EDITAR TAREFA " + id + " ---";
 
-  menu.setupMenu(title,
-                 {"Id", "Cor", "Início", "Duração", "Prioridade", "Sair"});
+  menu.setupMenu(title, {
+    "Id", 
+    "Cor", 
+    "Início", 
+    "Duração", 
+    "Prioridade", 
+    "Sair"
+  });
 
   return menu.showMenu();
 }
@@ -252,18 +276,23 @@ string SetupUI::promptForFilename() {
 string SetupUI::readString() {
   int ch = input.getCh();
   string str = "";
+  // Vetor de entradas não alfa numéricas válidas
   vector<int> valid_entries = {'_', ' ', '-', '.'};
 
+  // Enquanto a entrada não for um ENTER continua lendo
   while (ch != '\n') {
+    // Verifica se a entrada foi um BACKSPACE
     if (ch == KEY_BACKSPACE || ch == '\b' || ch == 127) {
       if (!str.empty()) {
+        // Substitui o caracter anterior por um espaço
         input.move(input.getPosX() - 1, input.getPosY());
         input.print(' ');
         input.move(input.getPosX() - 1, input.getPosY());
         str.pop_back();
       }
-    } else if (isalnum(ch) || find(valid_entries.begin(), valid_entries.end(),
-                                   ch) != valid_entries.end()) {
+
+      // Verifica se a entrada é alfa numérica ou está no vetor de entradas válidas
+    } else if (isalnum(ch) || find(valid_entries.begin(), valid_entries.end(), ch) != valid_entries.end()) {
       input.print(ch);
       str += ch;
     }
