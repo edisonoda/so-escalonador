@@ -1,10 +1,8 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
-#include "refresh_observer.hpp"
 
 #include "screen.hpp"
-#include "window.hpp"
 #include "menu.hpp"
 #include "task_info.hpp"
 

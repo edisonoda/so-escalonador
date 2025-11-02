@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
-#include "window.hpp"
+#include "screen.hpp"
 
 namespace UI { class SetupUI; }
 

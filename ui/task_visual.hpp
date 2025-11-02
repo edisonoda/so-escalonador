@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../utils/std_libraries.hpp"
-#include "window.hpp"
+#include "screen.hpp"
 #include "../core/tcb.hpp"
 
 using namespace Core;

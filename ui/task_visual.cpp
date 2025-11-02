@@ -1,7 +1,5 @@
 #include "task_visual.hpp"
 
-#include "window.hpp"
-
 using namespace UI;
 
 TaskVisual::TaskVisual() : Window()

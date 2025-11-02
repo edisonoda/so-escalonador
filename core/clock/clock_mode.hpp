@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../ui/window.hpp"
+#include "../../ui/screen.hpp"
 
 // Forward declaration
 namespace Core { class Clock; }
