@@ -3,7 +3,7 @@
 #include "../utils/std_libraries.hpp"
 
 #include "tcb.hpp"
-#include "clock/clock.hpp"
+#include "clock.hpp"
 #include "setup_manager.hpp"
 
 #include "../scheduler/scheduler.hpp"

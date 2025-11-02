@@ -4,9 +4,6 @@
 
 namespace Constants
 {
-    constexpr int DEFAULT_TICK_INTERVAL = 250; // Milliseconds
-    constexpr float DEFAULT_QUANTUM = 5.f;
-
     const string COLORS[8] = {
         "00F5FF",
         "FCE700",
