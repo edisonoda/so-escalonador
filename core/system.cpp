@@ -15,8 +15,6 @@ System::System()
 {
     current_task = nullptr;
     task_count = 0;
-    avg_turnaround = 0;
-    avg_wait = 0;
 
     scheduler->setTaskList(&ready_list);
 }
@@ -180,30 +178,6 @@ void System::preemptTask(Scheduler::PreemptType type)
     changeState(TCBState::READY, type);
 }
 
-// Calcula os tempos médios de vida e espera
-void System::calcAverageTimes()
-{
-    double total_turnaround_time = 0;
-    double total_wait_time = 0;
-    int task_n = ord_tasks.size();
-
-    for (TCB *task : ord_tasks)
-    {
-        int arrival = task->getStart();
-        int duration = task->getDuration();
-        int completion = task->getCompletionTime();
-
-        int turnaround = completion - arrival;
-        total_turnaround_time += turnaround;
-
-        int wait = turnaround - duration;
-        total_wait_time += wait;
-    }
-
-    avg_turnaround = (task_n > 0) ? (total_turnaround_time / task_n) : 0;
-    avg_wait = (task_n > 0) ? (total_wait_time / task_n) : 0;
-}
-
 void System::loadConfig()
 {
     // Executa o menu de configurações
@@ -235,8 +209,7 @@ void System::endProgram()
 {
     clock.stop();
     chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
-    calcAverageTimes();
-    task_info.displayFinalStatistics(avg_turnaround, avg_wait);
+    task_info.displayFinalStatistics();
 
     // Retorna o tipo de input para bloqueante e limpa o buffer
     timeout(-1);

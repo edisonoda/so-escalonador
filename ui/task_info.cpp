@@ -1,6 +1,7 @@
 #include "task_info.hpp"
 
 #define INFO_SPACE 4
+#define STATS_SPACE 3
 
 using namespace UI;
 
@@ -29,9 +30,6 @@ TaskInfo::TaskInfo() : TaskVisual()
         {"Terminated",  "TERMINATED "},
         {"Error",       "ERROR      "}
     };
-
-    avg_turnaround = 0.0;
-    avg_wait = 0.0;
 }
 
 TaskInfo::~TaskInfo()
@@ -48,7 +46,7 @@ void TaskInfo::setTasks(vector<TCB *> *tasks, int y_offset)
         width += label.second.length() + INFO_SPACE;
 
     setWindowDimensions(
-        tasks->size() + y_offset,
+        tasks->size() + y_offset + STATS_SPACE,
         width + x_offset,
         0,
         tasks->size() + 3
@@ -126,11 +124,33 @@ void TaskInfo::drawStaticInfo(int i, int offset)
     print(x = x + INFO_SPACE + MONITOR_LABELS["Duration"].length(), i + y_offset, prio_str);
 }
 
-void TaskInfo::displayFinalStatistics(double avg_t, double avg_w)
+void TaskInfo::calcFinalStatistics(double *avg_turnaround, double *avg_wait)
 {
-    this->avg_turnaround = avg_t;
-    this->avg_wait = avg_w;
-    
+    double total_turnaround_time = 0;
+    double total_wait_time = 0;
+
+    if (ord_tasks->empty())
+        return;
+
+    for (TCB *task : *ord_tasks)
+    {
+        int arrival = task->getStart();
+        int duration = task->getDuration();
+        int completion = task->getCompletionTime();
+
+        int turnaround = completion - arrival;
+        total_turnaround_time += turnaround;
+
+        int wait = turnaround - duration;
+        total_wait_time += wait;
+    }
+
+    (*avg_turnaround) = total_turnaround_time / ord_tasks->size();
+    (*avg_wait) = total_wait_time / ord_tasks->size();
+}
+
+void TaskInfo::displayFinalStatistics()
+{
     // Força um último "tick" para redesenhar a janela com as estatísticas finais
     drawTick(0);
 
@@ -138,11 +158,16 @@ void TaskInfo::displayFinalStatistics(double avg_t, double avg_w)
     invertColor(false);
     
     // Posição Y: 1 linha abaixo da última task
-    int stats_y_pos = y_offset + ord_tasks->size() + 1; 
+    int stats_y_pos = y_offset + ord_tasks->size() + 1;
+    double avg_turnaround = 0;
+    double avg_wait = 0;
+
+    calcFinalStatistics(&avg_turnaround, &avg_wait);
     
-    string turn_str = "Tempo de Vida Médio:\t" + to_string_with_precision(avg_turnaround);
-    string wait_str = "Tempo de Espera Médio:\t" + to_string_with_precision(avg_wait);
+    string turn_str = "Tempo de Vida Médio:   " + to_string_with_precision(avg_turnaround);
+    string wait_str = "Tempo de Espera Médio: " + to_string_with_precision(avg_wait);
 
     print(1, stats_y_pos, turn_str);
     print(1, stats_y_pos + 1, wait_str);
+    refresh();
 }

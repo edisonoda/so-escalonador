@@ -44,8 +44,6 @@ namespace Core
         SetupManager setup;
 
         int task_count;
-        double avg_turnaround;
-        double avg_wait;
 
         // Singleton
         System();
@@ -55,7 +53,6 @@ namespace Core
         void terminateTask();
         void suspendTask();
         void preemptTask(Scheduler::PreemptType type);
-        void calcAverageTimes();
     
         void endProgram();
         
