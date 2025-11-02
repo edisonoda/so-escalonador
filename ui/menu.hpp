@@ -10,8 +10,7 @@
 namespace UI { class SetupUI; }
 namespace Core { class SimulationConfig; }
 
-namespace UI
-{
+namespace UI {
   class Menu : public Window {
     private:
       const static vector<int> navigation_keys;

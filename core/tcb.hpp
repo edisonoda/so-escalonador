@@ -6,8 +6,7 @@
 
 using namespace std;
 
-namespace Core
-{
+namespace Core {
   enum class TCBState {
     NEW,
     READY,

@@ -2,8 +2,7 @@
 
 using namespace Core;
 
-int main()
-{
+int main() {
     setlocale(LC_ALL, "pt_BR.UTF-8");
 
     System *system = System::getInstance();

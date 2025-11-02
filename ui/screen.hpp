@@ -11,8 +11,7 @@
 
 using namespace std;
 
-namespace UI
-{
+namespace UI {
   enum class DefaultColor {
     WHITE = 1,
     BLACK = 2,
