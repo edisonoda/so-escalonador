@@ -1,4 +1,5 @@
 #include "gantt_chart.hpp"
+#include <climits>
 
 using namespace UI;
 
@@ -55,17 +56,17 @@ void GanttChart::setTasks(vector<TCB *> *tasks, int y_offset)
     TaskVisual::setTasks(tasks, y_offset);
 
     int total_time = 0;
-    int latest_start = 0;
+    int earliest_start = INT_MAX;
     for (TCB *task : *tasks)
     {
         total_time += task->getDuration();
-        latest_start = task->getStart() > latest_start ? task->getStart() : latest_start;
+        earliest_start = task->getStart() < earliest_start ? task->getStart() : earliest_start;
     }
-    total_time += latest_start;
+    total_time += earliest_start;
 
     setWindowDimensions(
         tasks->size() + 1,
-        ((total_time) * UNIT_WIDTH) + x_offset,
+        ((total_time + 1) * UNIT_WIDTH) + x_offset,
         0,
         0
     );
