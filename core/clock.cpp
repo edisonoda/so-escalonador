@@ -4,6 +4,8 @@
 
 using namespace Core;
 
+// ClockMode definition
+
 ClockMode::ClockMode(Clock *c, System *sys) : clock(c), system(sys) {}
 
 ClockMode::~ClockMode() {
@@ -17,6 +19,8 @@ void ClockMode::checkModeChange() {
   if (ch == ' ')
     clock->selectMode('P');
 }
+
+// AutoClock definition
 
 AutoClock::AutoClock(Clock *c, System *sys) : ClockMode(c, sys),
   tick_interval(DEFAULT_TICK_INTERVAL)
@@ -58,6 +62,8 @@ bool AutoClock::getTick() {
   return ticked;
 }
 
+// ManualClock definition
+
 ManualClock::ManualClock(Clock *c, System *sys) : ClockMode(c, sys) {}
 
 ManualClock::~ManualClock() {}
@@ -73,6 +79,8 @@ bool ManualClock::getTick() {
 
   return true;
 }
+
+// Clock definition
 
 Clock::Clock(System *sys) : system(sys), quantum_interval(DEFAULT_QUANTUM) {
   mode = nullptr;

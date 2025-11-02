@@ -39,9 +39,9 @@ void SetupUI::update()
     string alg_str;
     switch(config->alg_id)
     {
-        case Scheduler::AlgorithmID::FCFS: alg_str = "FCFS"; break;
-        case Scheduler::AlgorithmID::PRIOp: alg_str = "PRIOp"; break;
-        case Scheduler::AlgorithmID::SRTF: alg_str = "SRTF"; break;
+        case AlgorithmID::FIFO: alg_str = "FIFO"; break;
+        case AlgorithmID::PRIOp: alg_str = "PRIOp"; break;
+        case AlgorithmID::SRTF: alg_str = "SRTF"; break;
     }
     
     task_info.print(0, y++, "Modo: " + string(1, config->mode));
@@ -101,7 +101,7 @@ int SetupUI::showTaskList()
 int SetupUI::showAlgorithm()
 {
     menu.setupMenu("--- ESCOLHER ALGORITMO ---", {
-        "FCFS",
+        "FIFO",
         "PRIOp",
         "SRTF",
         "Voltar"

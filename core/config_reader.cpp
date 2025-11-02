@@ -3,10 +3,11 @@
 using namespace Core;
 
 ConfigReader::ConfigReader() : alg_map({
-    {"FCFS", Scheduler::AlgorithmID::FCFS}, 
-    {"PRIOp", Scheduler::AlgorithmID::PRIOp},
-    {"SRTF", Scheduler::AlgorithmID::SRTF},
-    {"FIFO", Scheduler::AlgorithmID::FCFS}
+    {"FCFS", AlgorithmID::FIFO},
+    {"RR", AlgorithmID::FIFO},
+    {"FIFO", AlgorithmID::FIFO},
+    {"PRIOp", AlgorithmID::PRIOp},
+    {"SRTF", AlgorithmID::SRTF}
 }) 
 {
 }
@@ -16,7 +17,7 @@ ConfigReader::~ConfigReader()
     closeFile();
 }
 
-Scheduler::AlgorithmID ConfigReader::getAlgorithm() const
+AlgorithmID ConfigReader::getAlgorithm() const
 {
     return alg_map.find(algorithm)->second;
 }

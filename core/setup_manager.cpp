@@ -1,11 +1,8 @@
 #include "setup_manager.hpp"
-#include "../scheduler/scheduling_algorithm.hpp"
 #include <ncurses.h>
 #include <string>
 
 #define CONFIG_FILE "configs/default.txt"
-
-using namespace Scheduler;
 
 SetupManager::SetupManager()
     : ui(&config), screen(Screen::getInstance())
@@ -180,7 +177,7 @@ void SetupManager::runAlgorithmEditor()
         switch (ch)
         {
         case '1':
-            config.alg_id = AlgorithmID::FCFS;
+            config.alg_id = AlgorithmID::FIFO;
             break;
 
         case '2':

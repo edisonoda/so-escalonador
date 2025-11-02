@@ -7,7 +7,7 @@ using namespace Core;
 System *System::instance(nullptr);
 
 System::System()
-    : scheduler(Scheduler::Scheduler::getInstance()),
+    : scheduler(Scheduler::getInstance()),
       clock(this),
       chart_generator(&ord_tasks),
       gantt_chart(&chart_generator),
@@ -75,7 +75,7 @@ void System::handleInterruption(Interruption irq)
     switch (irq)
     {
     case Interruption::QUANTUM:
-        preemptTask(Scheduler::PreemptType::QUANTUM);
+        preemptTask(PreemptType::QUANTUM);
         break;
     case Interruption::FULL_STOP:
         getch();
@@ -85,7 +85,7 @@ void System::handleInterruption(Interruption irq)
     }
 }
 
-void System::changeState(TCBState state, Scheduler::PreemptType type)
+void System::changeState(TCBState state, PreemptType type)
 {
     TCB *previous_task = current_task;
 
@@ -142,7 +142,7 @@ void System::checkNewTasks()
 
     // Se houve ingresso de nova task, faz a preempção
     if (new_task_arrived)
-        preemptTask(Scheduler::PreemptType::NEW_TASK);
+        preemptTask(PreemptType::NEW_TASK);
 }
 
 void System::terminateTask()
@@ -165,7 +165,7 @@ void System::suspendTask()
     changeState(TCBState::SUSPENDED);
 }
 
-void System::preemptTask(Scheduler::PreemptType type)
+void System::preemptTask(PreemptType type)
 {
     // Se a task em execução ainda não tiver terminado, coloca ela de volta na lista de prontas
     if (current_task != nullptr && current_task->getRemaining() > 0)

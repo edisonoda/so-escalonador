@@ -5,7 +5,7 @@
 #include "tcb.hpp"
 #include "config_reader.hpp"
 
-#include "../scheduler/scheduling_algorithm.hpp"
+#include "scheduler.hpp"
 
 #include "../ui/setup_ui.hpp"
 #include "../ui/screen.hpp"
@@ -16,7 +16,7 @@ namespace Core
 {
     struct SimulationConfig
     {
-        Scheduler::AlgorithmID alg_id = Scheduler::AlgorithmID::FCFS;
+        AlgorithmID alg_id = AlgorithmID::FIFO;
         vector<TCB*> tasks;
 
         int quantum = 2;

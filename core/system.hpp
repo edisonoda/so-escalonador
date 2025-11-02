@@ -6,8 +6,7 @@
 #include "clock.hpp"
 #include "setup_manager.hpp"
 
-#include "../scheduler/scheduler.hpp"
-#include "../scheduler/scheduling_algorithm.hpp"
+#include "scheduler.hpp"
 
 #include "../ui/screen.hpp"
 #include "../ui/gantt_chart.hpp"
@@ -28,7 +27,7 @@ namespace Core
     private:
         static System* instance;
         
-        Scheduler::Scheduler* scheduler;
+        Scheduler* scheduler;
         Clock clock;
         TCB* current_task;
         vector<TCB*> ord_tasks;
@@ -48,11 +47,11 @@ namespace Core
         // Singleton
         System();
 
-        void changeState(TCBState state, Scheduler::PreemptType type = Scheduler::PreemptType::NONE);
+        void changeState(TCBState state, PreemptType type = PreemptType::NONE);
         void checkNewTasks();
         void terminateTask();
         void suspendTask();
-        void preemptTask(Scheduler::PreemptType type);
+        void preemptTask(PreemptType type);
     
         void endProgram();
         
