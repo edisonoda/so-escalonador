@@ -9,10 +9,7 @@
 #include "scheduler.hpp"
 
 #include "../ui/screen.hpp"
-#include "../ui/gantt_chart.hpp"
-#include "../ui/task_info.hpp"
-
-#include "../utils/gantt_exporter.hpp"
+#include "../ui/task_visual.hpp"
 
 namespace Core
 {
@@ -39,7 +36,7 @@ namespace Core
         GanttChart gantt_chart;
         TaskInfo task_info;
 
-        Utils::GanttExporter gantt_exporter;
+        GanttExporter gantt_exporter;
         SetupManager setup;
 
         int task_count;

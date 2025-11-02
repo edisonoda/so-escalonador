@@ -4,7 +4,7 @@
 
 #include "screen.hpp"
 #include "menu.hpp"
-#include "task_info.hpp"
+#include "task_visual.hpp"
 
 // Forward declaration
 namespace Core { class SimulationConfig; }
