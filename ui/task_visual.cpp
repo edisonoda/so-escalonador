@@ -256,8 +256,10 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
       max_id = length;
   }
 
-  // Tamanho da imagem: +1 para os eixos
-  int img_width = (total_time * TICK_WIDTH) + max_id;
+  // Largura: +1 para o número do tick final e +max_id para o eixo vertical (tarefas)
+  int img_width = ((total_time + 1) * TICK_WIDTH) + max_id;
+
+  // Altura: +1 para o eixo horizontal (ticks)
   int img_height = (task_count + 1) * TASK_HEIGHT;
 
   ofstream file(filename);
@@ -291,7 +293,7 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
   }
 
   // Eixo horizontal (ticks)
-  for (int i = 0; i < total_time + 1; i++) {
+  for (int i = 0; i <= total_time + 1; i++) {
     int x = (i * TICK_WIDTH) + max_id;
 
     file << "<text x='" << x << "' y='" << img_height - TASK_HEIGHT + 5
