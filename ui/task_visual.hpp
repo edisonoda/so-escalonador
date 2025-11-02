@@ -20,7 +20,6 @@ namespace UI {
   class TaskVisual : public Window {
     protected:
       vector<Core::TCB*> *ord_tasks;
-      Window *window;
       int visual_edge_x;
       int visual_edge_y;
       int x_offset;
