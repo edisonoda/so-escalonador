@@ -6,6 +6,7 @@
 using namespace UI;
 
 const vector<int> Menu::navigation_keys({KEY_UP, KEY_DOWN});
+const vector<int> Menu::confirm_keys({KEY_ENTER, KEY_RIGHT, '\n', ' '});
 
 Menu::Menu(SetupUI* ui) : Window(), ui(ui)
 {
@@ -47,17 +48,15 @@ int Menu::showMenu()
             navigate(ch);
         else
         {
+            ui->showError("Digite uma opção válida!");
             ui->clearMessage();
-            ui->showError("digite uma opção válida!");
         }
 
         printMenu();
         ch = wgetch(window);
     }
 
-    ui->clearMessage();
-
-    if (ch == KEY_ENTER || ch == '\n')
+    if (find(confirm_keys.begin(), confirm_keys.end(), ch) != confirm_keys.end())
         return '0' + selected + 1;
 
     return ch;

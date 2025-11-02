@@ -1,6 +1,9 @@
 #include "window.hpp"
 #include <ncurses.h>
 
+#define X_PAD 2
+#define Y_PAD 1
+
 using namespace UI;
 
 Window::Window()
@@ -26,8 +29,8 @@ Window::~Window()
 
 void Window::setWindowDimensions(int h, int w, int _x, int _y)
 {
-    height = h + 2;
-    width = w + 2;
+    height = h + (Y_PAD * 2);
+    width = w + (X_PAD * 2);
     x = _x;
     y = _y;
 
@@ -75,12 +78,12 @@ void Window::print(string str)
 
 void Window::print(int x, int y, int ch)
 {
-    mvwprintw(window, y + 1, x + 1, "%c", ch);
+    mvwprintw(window, y + Y_PAD, x + X_PAD, "%c", ch);
 }
 
 void Window::print(int x, int y, string str)
 {
-    mvwprintw(window, y + 1, x + 1, "%s", str.c_str());
+    mvwprintw(window, y + Y_PAD, x + X_PAD, "%s", str.c_str());
 }
 
 void Window::del(int x, int y)

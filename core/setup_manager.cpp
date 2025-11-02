@@ -80,7 +80,7 @@ bool SetupManager::loadFromFile(const string &filename)
 {
     if (!config_reader.openFile(filename))
     {
-        ui.inputError("Não foi possível abrir o arquivo: " + filename);
+        ui.inputError("Não foi possível abrir: " + filename);
         return false;
     }
 
@@ -257,7 +257,7 @@ void SetupManager::deleteTask()
 
     if (!valid)
     {
-        ui.inputError("digite um ID válido!");
+        ui.inputError("Digite um ID válido!");
     }
     
 

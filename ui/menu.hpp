@@ -11,6 +11,7 @@ namespace UI
     {
     private:
         const static vector<int> navigation_keys;
+        const static vector<int> confirm_keys;
         vector<int> valid_entries;
         vector<string> options;
 

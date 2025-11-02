@@ -16,7 +16,7 @@ SetupUI::SetupUI(SimulationConfig* config)
 {
     menu.setWindowDimensions(0, MAIN_WIDTH, 0, 0);
     task_info.setWindowDimensions(0, 0, INFO_X_OFFSET, 0);
-    mensagem.setWindowDimensions(2, MAIN_WIDTH, 0, 0);
+    mensagem.setWindowDimensions(3, MAIN_WIDTH, 0, 0);
     input.setWindowDimensions(5, MAIN_WIDTH, 0, 0);
 
     screen->attach(this);
@@ -135,8 +135,9 @@ void SetupUI::showError(const string& message, Window* window)
     else
         mensagem.moveWindow(0, menu.getHeight());
 
-    mensagem.print(0, 0, "ERRO: " + message);
-    mensagem.print(0, 1, "Pressione qualquer tecla para seguir.");
+    mensagem.print(0, 0, "--- ERRO ---");
+    mensagem.print(0, 1, message);
+    mensagem.print(0, 2, "Pressione qualquer tecla para seguir.");
     mensagem.refresh();
     getch();
 }
@@ -150,6 +151,9 @@ void SetupUI::clearMessage()
 {
     mensagem.clear();
     mensagem.refresh();
+
+    screen->erase();
+    screen->refresh();
 }
 
 string SetupUI::promptForField(string field)
