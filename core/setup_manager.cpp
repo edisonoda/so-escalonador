@@ -6,9 +6,17 @@
 
 using namespace Core;
 
+bool isNumber(const string &s) {
+  string::const_iterator it = s.begin();
+  while (it != s.end() && isdigit(*it))
+    ++it;
+  return !s.empty() && it == s.end();
+}
+
 // ConfigReader definition
 
-ConfigReader::ConfigReader() : alg_map({
+// O alg_map faz o mapeamento dos nomes dos algoritmos com os IDS
+ConfigReader::ConfigReader(SetupUI *ui) : ui(ui), alg_map({
   {"FCFS", AlgorithmID::FIFO},
   {"RR", AlgorithmID::FIFO},
   {"FIFO", AlgorithmID::FIFO},
@@ -40,16 +48,28 @@ string ConfigReader::readLine() {
   return "";
 }
 
-void ConfigReader::readPattern() {
+// Busca o separador da primeira linha e a separa em algoritmo e quantum
+bool ConfigReader::readPattern() {
   string pattern = readLine();
   if (!pattern.empty()) {
     size_t sep = pattern.find(';');
     if (sep != string::npos) {
       algorithm = pattern.substr(0, sep);
-      quantum = stoi(pattern.substr(sep + 1, pattern.length() - 1));
-    }
-  }
+      if (alg_map.find(algorithm) == alg_map.end())
+        ui->inputError("Algoritmo inválido!");
+
+      string str = pattern.substr(sep + 1, pattern.length() - 1);
+      if (isNumber(str))
+        quantum = stoi(str);
+      else
+        ui->inputError("Valor de quantum inválido!");
+
+    } else return false;
+  } else return false;
+
+  return true;
 }
+
 
 list<TCB *> ConfigReader::readTasks() {
   vector<string> configs = {};
@@ -64,12 +84,34 @@ list<TCB *> ConfigReader::readTasks() {
     }
     configs.push_back(line);
 
-    TCB *tcb = new TCB(
-        // id, cor, inicio, duracão e prioridade
-        configs[0], stoi(configs[1]), stoi(configs[2]), stoi(configs[3]),
-        stoi(configs[4]), list<string>(configs.begin() + 5, configs.end()));
+    if (configs.size() >= 6) {
+      bool valid = true;
 
-    tasks.push_back(tcb);
+      for (int i = 1; i < 5; i++) {
+        if (!isNumber(configs[i])) {
+          ui->inputError("Tarefa com formato inválido: " + configs[0]);
+          valid = false;
+          break;
+        }
+      }
+
+      if (valid) {
+        TCB *tcb = new TCB(
+          // id, cor, inicio, duracão e prioridade
+          configs[0], 
+          stoi(configs[1]), 
+          stoi(configs[2]), 
+          stoi(configs[3]),
+          stoi(configs[4]), 
+          list<string>(configs.begin() + 5, configs.end())
+        );
+    
+        tasks.push_back(tcb);
+      }
+    } else {
+      ui->inputError("Tarefa com informações insuficientes!");
+    }
+
     configs.clear();
   }
 
@@ -78,7 +120,7 @@ list<TCB *> ConfigReader::readTasks() {
 
 // SetupManager definition
 
-SetupManager::SetupManager() : ui(&config), screen(Screen::getInstance()) {
+SetupManager::SetupManager() : ui(&config), config_reader(&ui), screen(Screen::getInstance()) {
   loadFromFile(CONFIG_FILE);
   timeout(-1);
 
@@ -143,7 +185,11 @@ bool SetupManager::loadFromFile(const string &filename) {
     return false;
   }
 
-  config_reader.readPattern();
+  if (!config_reader.readPattern()) {
+    ui.inputError("Informações insuficientes de algoritmo ou quantum!");
+    return false;
+  }
+
   config.alg_id = config_reader.getAlgorithm();
   config.quantum = config_reader.getQuantum();
 
@@ -350,13 +396,6 @@ void SetupManager::editTask(int index) {
   } while (in_editor);
 
   ui.update();
-}
-
-bool SetupManager::isNumber(const string &s) {
-  string::const_iterator it = s.begin();
-  while (it != s.end() && isdigit(*it))
-    ++it;
-  return !s.empty() && it == s.end();
 }
 
 bool SetupManager::validateEntry(string str) {

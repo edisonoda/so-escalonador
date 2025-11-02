@@ -211,7 +211,10 @@ void SetupUI::showError(const string &message, Window *window) {
   getch();
 }
 
-void SetupUI::inputError(const string &message) { showError(message, &input); }
+void SetupUI::inputError(const string &message) { 
+  showError(message, &input); 
+  clearMessage();
+}
 
 void SetupUI::clearMessage() {
   mensagem.clear();

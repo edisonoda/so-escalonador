@@ -26,17 +26,18 @@ namespace Core {
       ifstream file;
       string algorithm;
       int quantum;
+      SetupUI *ui;
       const map<string, AlgorithmID> alg_map;
 
       string readLine();
   
     public:
-      ConfigReader();
+      ConfigReader(SetupUI *ui);
       ~ConfigReader();
 
       bool openFile(const string &filename);
       void closeFile();
-      void readPattern();
+      bool readPattern();
       AlgorithmID getAlgorithm() const;
       int getQuantum() const { return quantum; }
       list<TCB*> readTasks();
@@ -58,7 +59,6 @@ namespace Core {
       void addNewTask();
       void deleteTask();
       void editTask(int index);
-      bool isNumber(const string &s);
 
       bool validateEntry(string str);
 
