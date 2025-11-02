@@ -55,9 +55,12 @@ bool ConfigReader::readPattern() {
     size_t sep = pattern.find(';');
     if (sep != string::npos) {
       algorithm = pattern.substr(0, sep);
+
+      // Verifica se o algoritmo lido está no mapa de algoritmos
       if (alg_map.find(algorithm) == alg_map.end())
         ui->inputError("Algoritmo inválido!");
 
+      // Verifica se o quantum lido é um número
       string str = pattern.substr(sep + 1, pattern.length() - 1);
       if (isNumber(str))
         quantum = stoi(str);
@@ -78,17 +81,21 @@ list<TCB *> ConfigReader::readTasks() {
   size_t pos = 0;
 
   while (!(line = readLine()).empty()) {
+
+    // Busca todos os parâmetros separados por ponto e vírgula
     while (pos = line.find(';'), pos != string::npos) {
       configs.push_back(line.substr(0, pos));
       line.erase(0, pos + 1);
     }
     configs.push_back(line);
 
+    // Verifica se há o número mínimo de parâmetros
     if (configs.size() >= 6) {
       bool valid = true;
 
+      // Testa se as entradas numéricas são válidas
       for (int i = 1; i < 5; i++) {
-        if (!isNumber(configs[i])) {
+        if (!isNumber(configs[i]) || (configs[i] == "0" && i > 2)) {
           ui->inputError("Tarefa com formato inválido: " + configs[0]);
           valid = false;
           break;
@@ -121,6 +128,7 @@ list<TCB *> ConfigReader::readTasks() {
 // SetupManager definition
 
 SetupManager::SetupManager() : ui(&config), config_reader(&ui), screen(Screen::getInstance()) {
+  // Carrega incialmente o arquivo padrão
   loadFromFile(CONFIG_FILE);
   timeout(-1);
 
@@ -140,34 +148,34 @@ SimulationConfig SetupManager::run() {
     ch = ui.showMainMenu();
 
     switch (ch) {
-    case '1': // LÓGICA: Iniciar Simulação
-      in_editor = false;
-      break;
+      case '1': // Iniciar a simulação
+        in_editor = false;
+        break;
 
-    case '2': {
-      string filename = ui.promptForFilename();
-      if (!filename.empty())
-        loadFromFile("configs/" + filename);
-    } break;
+      case '2': { // Configuração por arquivo
+        string filename = ui.promptForFilename();
+        if (!filename.empty())
+          loadFromFile("configs/" + filename);
+      } break;
 
-    case '3':
-      runEditor();
-      break;
+      case '3': // Abre o editor
+        runEditor();
+        break;
 
-    case '4':
-      loadFromFile("configs/default.txt");
-      break;
+      case '4': // Retorna à configuração padrão
+        loadFromFile("configs/default.txt");
+        break;
 
-    case '5':
-      if (config.mode == 'A')
-        config.mode = 'P';
-      else
-        config.mode = 'A';
-      break;
+      case '5': // Troca o modo de execução
+        if (config.mode == 'A')
+          config.mode = 'P';
+        else
+          config.mode = 'A';
+        break;
 
-    case '6':
-      config.simulation_should_run = false;
-      return config;
+      case '6': // Sai do programa
+        config.simulation_should_run = false;
+        return config;
     }
 
     ui.update();
@@ -179,6 +187,7 @@ SimulationConfig SetupManager::run() {
   return config;
 }
 
+// Faz a leitura de todos os parâmetros do arquivo
 bool SetupManager::loadFromFile(const string &filename) {
   if (!config_reader.openFile(filename)) {
     ui.inputError("Não foi possível abrir: " + filename);
@@ -214,21 +223,21 @@ void SetupManager::runEditor() {
     ch = ui.showEditor();
 
     switch (ch) {
-      case '1':
+      case '1': // Executa o editor de algoritmo
         runAlgorithmEditor();
         break;
 
-      case '2':
+      case '2': // Edita o quantum
         quantum = ui.promptForField("Quantum");
         if (validateEntry(quantum))
           config.quantum = stoi(quantum);
         break;
 
-      case '3':
+      case '3': // Executa o editor de tasks
         runTaskListEditor();
         break;
 
-      default:
+      default: // Volta ao menu principal
         in_editor = false;
         break;
     }
@@ -245,15 +254,15 @@ void SetupManager::runTaskListEditor() {
     ch = ui.showTaskList();
 
     switch (ch) {
-      case '1':
+      case '1': // Cria uma nova task
         addNewTask();
         break;
 
-      case '2':
+      case '2': // Deleta uma task existente
         deleteTask();
         break;
 
-      default:
+      default: // Edita a task selecionada
         ch = (ch - 3) - '0';
         if (ch < config.tasks.size())
           editTask(ch);
@@ -316,8 +325,7 @@ void SetupManager::addNewTask() {
   if (!validateEntry(priority))
     return;
 
-  TCB *task =
-      new TCB(id, stoi(color), stoi(start), stoi(duration), stoi(priority));
+  TCB *task = new TCB(id, stoi(color), stoi(start), stoi(duration), stoi(priority));
 
   config.tasks.push_back(task);
 
@@ -331,6 +339,7 @@ void SetupManager::deleteTask() {
   string str = ui.promptForField("Id");
   vector<TCB *>::iterator i = config.tasks.begin();
 
+  // Percorre as tasks procurando a solicitada
   while (i != config.tasks.end()) {
     if ((*i)->getId() == str) {
       delete (*i);
@@ -360,35 +369,35 @@ void SetupManager::editTask(int index) {
     ch = ui.showTaskEditor(task->getId());
 
     switch (ch) {
-      case '1':
+      case '1': // Edita o ID
         task->setId(ui.promptForField("Id"));
         break;
 
-      case '2':
+      case '2': // Edita a Cor
         entry = ui.promptForField("Cor");
         if (validateEntry(entry))
           task->setColor(stoi(entry));
         break;
 
-      case '3':
+      case '3': // Edita o Inicio
         entry = ui.promptForField("Início");
         if (validateEntry(entry))
           task->setStart(stoi(entry));
         break;
 
-      case '4':
+      case '4': // Edita a Duração
         entry = ui.promptForField("Duração");
         if (validateEntry(entry))
           task->setDuration(stoi(entry));
         break;
 
-      case '5':
+      case '5': // Edita a Prioridade
         entry = ui.promptForField("Prioridade");
         if (validateEntry(entry))
           task->setPriority(stoi(entry));
         break;
 
-      default:
+      default: // Volta à lista de tarefas
         in_editor = false;
         break;
     }

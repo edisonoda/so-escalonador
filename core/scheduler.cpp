@@ -17,8 +17,7 @@ TCB *FIFO::chooseTask(TCB *current_task, PreemptType type) {
   if (type == PreemptType::NEW_TASK)
     return current_task;
 
-  // Se ainda tem tasks e a preempção não foi por tempo, retorna a que entrou
-  // primeiro
+  // Se ainda tem tasks e a preempção não foi por tempo, retorna a que entrou primeiro
   return task_list->front();
 }
 
@@ -29,17 +28,19 @@ SRTF::SRTF(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::SRTF, task
 SRTF::~SRTF() {}
 
 TCB *SRTF::chooseTask(TCB *current_task, PreemptType type) {
+  // Apenas retorna a task atual caso ela não tenha terminado ainda
   if (task_list->empty()) {
-    if (current_task == nullptr ||
-        current_task->getState() == TCBState::TERMINATED)
+    if (current_task == nullptr || current_task->getState() == TCBState::TERMINATED)
       return nullptr;
 
     return current_task;
   }
 
+  // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
     current_task = task_list->front();
 
+  // Busca a tarefa com menor tempo restante
   for (TCB *task : *task_list) {
     if (task->getRemaining() < current_task->getRemaining())
       current_task = task;
@@ -55,17 +56,19 @@ PRIOp::PRIOp(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PRIOp, t
 PRIOp::~PRIOp() {}
 
 TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
+  // Apenas retorna a task atual caso ela não tenha terminado ainda 
   if (task_list->empty()) {
-    if (current_task == nullptr ||
-        current_task->getState() == TCBState::TERMINATED)
+    if (current_task == nullptr || current_task->getState() == TCBState::TERMINATED)
       return nullptr;
 
     return current_task;
   }
 
+  // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
     current_task = task_list->front();
 
+  // Busca a tarefa com maior prioridade
   for (TCB *task : *task_list) {
     if (task->getPriority() > current_task->getPriority())
       current_task = task;
@@ -95,19 +98,22 @@ Scheduler *Scheduler::getInstance() {
 }
 
 void Scheduler::setAlgorithm(AlgorithmID id) {
+  if (algorithm != nullptr)
+    delete algorithm;
+
   switch (id) {
-  case AlgorithmID::FIFO:
-    algorithm = new FIFO(task_list);
-    break;
-  case AlgorithmID::SRTF:
-    algorithm = new SRTF(task_list);
-    break;
-  case AlgorithmID::PRIOp:
-    algorithm = new PRIOp(task_list);
-    break;
-  default:
-    algorithm = new FIFO(task_list);
-    break;
+    case AlgorithmID::FIFO:
+      algorithm = new FIFO(task_list);
+      break;
+    case AlgorithmID::SRTF:
+      algorithm = new SRTF(task_list);
+      break;
+    case AlgorithmID::PRIOp:
+      algorithm = new PRIOp(task_list);
+      break;
+    default:
+      algorithm = new FIFO(task_list);
+      break;
   }
 }
 
