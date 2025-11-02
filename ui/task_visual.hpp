@@ -5,7 +5,7 @@
 #include "screen.hpp"
 #include "../core/tcb.hpp"
 
-#define INFO_SPACE 4
+#define INFO_SPACE 6
 #define STATS_SPACE 3
 
 #define UNIT_WIDTH 3
