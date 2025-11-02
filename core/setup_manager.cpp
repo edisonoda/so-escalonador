@@ -4,6 +4,8 @@
 
 #define CONFIG_FILE "configs/default.txt"
 
+using namespace Core;
+
 SetupManager::SetupManager()
     : ui(&config), screen(Screen::getInstance())
 {

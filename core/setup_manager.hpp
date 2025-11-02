@@ -7,7 +7,7 @@
 
 #include "scheduler.hpp"
 
-#include "../ui/setup_ui.hpp"
+#include "../ui/menu.hpp"
 #include "../ui/screen.hpp"
 
 using namespace UI;
