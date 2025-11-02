@@ -156,11 +156,7 @@ void System::terminateTask()
 
     // Verifica se ainda existem tasks para execução
     if (task_count == 0)
-    {
-        startTick();
-        endTick();
         endProgram();
-    }
 }
 
 void System::suspendTask()
@@ -207,6 +203,9 @@ void System::loadConfig()
 
 void System::endProgram()
 {
+    startTick();
+    endTick();
+    
     clock.stop();
     chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
     task_info.displayFinalStatistics();
