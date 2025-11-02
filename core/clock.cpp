@@ -13,6 +13,7 @@ ClockMode::~ClockMode() {
   system = nullptr;
 }
 
+// Verifica se o usuário trocou de modo de execução, durante a simulação
 void ClockMode::checkModeChange() {
   int ch = getch();
 
@@ -33,27 +34,33 @@ AutoClock::AutoClock(Clock *c, System *sys) : ClockMode(c, sys),
 AutoClock::~AutoClock() {}
 
 bool AutoClock::getTick() {
+  // Faz cálculo do tempo decorrido desde a última verificação e converte em milisegundos
   end_time = chrono::system_clock::now();
   elapsed = end_time - start_time;
   int elap = (int)(elapsed.count() * 1000);
 
   ticked = false;
 
+  // Se o tempo decorrido for maior ou igual ao tempo padrão de tick, o tick ocorre
   if (elap >= tick_interval && elap > 0) {
     ticked = true;
 
+    // Calcula quantos ticks aconteceram de fato
     int t = (elap - (elap % tick_interval)) / tick_interval;
     tick_counter += t;
 
+    // Reseta o contador de ticks, para evitar int overflow
     if (tick_counter >= 60)
       tick_counter = 0;
 
     start_time = end_time;
   }
 
+  // Permite a pausa não bloqueante para trocar o modo para manual mesmo no modo automático
   timeout(0);
   int ch = getch();
 
+  // Caso a troca tenha sido solicitada, seta o modo manual e cancela o tick
   if (ch == ' ') {
     clock->selectMode('P');
     ticked = false;
@@ -69,6 +76,7 @@ ManualClock::ManualClock(Clock *c, System *sys) : ClockMode(c, sys) {}
 ManualClock::~ManualClock() {}
 
 bool ManualClock::getTick() {
+  // Como está ocorrendo pausadamente espera pela entrada de troca de forma bloqueante
   timeout(-1);
   int ch = getch();
 
