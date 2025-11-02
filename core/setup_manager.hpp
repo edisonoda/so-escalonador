@@ -1,54 +1,71 @@
 #pragma once
 
-#include "../utils/std_libraries.hpp"
-
 #include "tcb.hpp"
-#include "config_reader.hpp"
 
 #include "scheduler.hpp"
 
 #include "../ui/menu.hpp"
 #include "../ui/screen.hpp"
 
+#include <fstream>
+
 using namespace UI;
 
-namespace Core
-{
-    struct SimulationConfig
-    {
-        AlgorithmID alg_id = AlgorithmID::FIFO;
-        vector<TCB*> tasks;
+namespace Core {
+  struct SimulationConfig {
+    AlgorithmID alg_id = AlgorithmID::FIFO;
+    vector<TCB*> tasks;
 
-        int quantum = 2;
-        char mode = 'A';
-        bool simulation_should_run = false;
-    };
+    int quantum = 2;
+    char mode = 'A';
+    bool simulation_should_run = false;
+  };
 
-    class SetupManager
-    {
+  class ConfigReader {
     private:
-        ConfigReader config_reader;
-        Screen* screen;
-        SetupUI ui;
+      ifstream file;
+      string algorithm;
+      int quantum;
+      const map<string, AlgorithmID> alg_map;
 
-        SimulationConfig config;
+      string readLine();
+  
+    public:
+      ConfigReader();
+      ~ConfigReader();
 
-        bool loadFromFile(const string& filename);
-        void runEditor();
-        void runTaskListEditor();
-        void runAlgorithmEditor();
-        
-        void addNewTask();
-        void deleteTask();
-        void editTask(int index);
-        bool isNumber(const string &s);
+      bool openFile(const string &filename);
+      void closeFile();
+      void readPattern();
+      AlgorithmID getAlgorithm() const;
+      int getQuantum() const { return quantum; }
+      list<TCB*> readTasks();
+  };
 
-        bool validateEntry(string str);
+  class SetupManager {
+    private:
+      ConfigReader config_reader;
+      Screen* screen;
+      SetupUI ui;
+
+      SimulationConfig config;
+
+      bool loadFromFile(const string& filename);
+      void runEditor();
+      void runTaskListEditor();
+      void runAlgorithmEditor();
+      
+      void addNewTask();
+      void deleteTask();
+      void editTask(int index);
+      bool isNumber(const string &s);
+
+      bool validateEntry(string str);
 
     public:
-        SetupManager();
-        ~SetupManager();
+      SetupManager();
+      ~SetupManager();
 
-        SimulationConfig run();
-    };
+      SimulationConfig run();
+  };
 } // namespace Core

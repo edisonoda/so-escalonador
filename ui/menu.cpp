@@ -2,6 +2,7 @@
 #include "../core/scheduler.hpp"
 #include "../core/setup_manager.hpp"
 
+#include <algorithm>
 #include <ncurses.h>
 #include <string>
 
