@@ -1,7 +1,7 @@
 #pragma once
 
 #include "task_visual.hpp"
-#include "../utils/chart_generator.hpp"
+#include "../utils/gantt_exporter.hpp"
 
 #define UNIT_WIDTH 3
 
@@ -10,10 +10,10 @@ namespace UI
     class GanttChart : public TaskVisual
     {
     private:
-        Utils::ChartGenerator *chart_generator;
+        Utils::GanttExporter *gantt_exporter;
 
     public:
-        GanttChart(Utils::ChartGenerator *chart_gen);
+        GanttChart(Utils::GanttExporter *chart_gen);
         ~GanttChart();
 
         virtual void setTasks(vector<TCB *> *tasks, int y_offset = 0);

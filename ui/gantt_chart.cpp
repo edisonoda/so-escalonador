@@ -3,14 +3,14 @@
 
 using namespace UI;
 
-GanttChart::GanttChart(Utils::ChartGenerator *chart_gen) : TaskVisual()
+GanttChart::GanttChart(Utils::GanttExporter *chart_gen) : TaskVisual()
 {
-    chart_generator = chart_gen;
+    gantt_exporter = chart_gen;
 }
 
 GanttChart::~GanttChart()
 {
-    chart_generator = nullptr;
+    gantt_exporter = nullptr;
 }
 
 void GanttChart::drawTick(int tick)
@@ -41,7 +41,7 @@ void GanttChart::drawTick(int tick)
         }
 
         // Registra como está a task no ponto do tick para criação da imagem final
-        chart_generator->registerEntry(tick, i, color);
+        gantt_exporter->registerEntry(tick, i, color);
         print(x, i + y_offset, unit);
     }
 

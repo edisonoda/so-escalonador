@@ -9,8 +9,8 @@ System *System::instance(nullptr);
 System::System()
     : scheduler(Scheduler::getInstance()),
       clock(this),
-      chart_generator(&ord_tasks),
-      gantt_chart(&chart_generator),
+      gantt_exporter(&ord_tasks),
+      gantt_chart(&gantt_exporter),
       screen(Screen::getInstance())
 {
     current_task = nullptr;
@@ -207,7 +207,7 @@ void System::endProgram()
     endTick();
     
     clock.stop();
-    chart_generator.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+    gantt_exporter.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
     task_info.displayFinalStatistics();
 
     // Retorna o tipo de input para bloqueante e limpa o buffer

@@ -1,19 +1,19 @@
-#include "chart_generator.hpp"
+#include "gantt_exporter.hpp"
 
 using namespace Utils;
 
-ChartGenerator::ChartGenerator(vector<Core::TCB *> *task_list)
+GanttExporter::GanttExporter(vector<Core::TCB *> *task_list)
 {
     tasks = task_list;
 }
 
-ChartGenerator::~ChartGenerator()
+GanttExporter::~GanttExporter()
 {
     tasks = nullptr;
 }
 
 // Função para registrar cada tarefa em todo tick, enquanto o programa executa
-void ChartGenerator::registerEntry(int tick, int task_index, int color)
+void GanttExporter::registerEntry(int tick, int task_index, int color)
 {
     chart_history.push_back({
         tick: tick,
@@ -22,7 +22,7 @@ void ChartGenerator::registerEntry(int tick, int task_index, int color)
     });
 }
 
-void ChartGenerator::generate(const string &filename, int total_time, int task_count)
+void GanttExporter::generate(const string &filename, int total_time, int task_count)
 {
     // Tamanho da imagem: +1 para os eixos
     int img_width = (total_time + 1) * TICK_WIDTH;
@@ -71,7 +71,7 @@ void ChartGenerator::generate(const string &filename, int total_time, int task_c
 }
 
 // Conversão de cores do formato RGB para hexadecimal
-string ChartGenerator::convertColor(int color)
+string GanttExporter::convertColor(int color)
 {
     short r, g, b;
     short fgcolor, bgcolor;

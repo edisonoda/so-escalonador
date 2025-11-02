@@ -12,7 +12,7 @@
 #include "../ui/gantt_chart.hpp"
 #include "../ui/task_info.hpp"
 
-#include "../utils/chart_generator.hpp"
+#include "../utils/gantt_exporter.hpp"
 
 namespace Core
 {
@@ -39,7 +39,7 @@ namespace Core
         GanttChart gantt_chart;
         TaskInfo task_info;
 
-        Utils::ChartGenerator chart_generator;
+        Utils::GanttExporter gantt_exporter;
         SetupManager setup;
 
         int task_count;

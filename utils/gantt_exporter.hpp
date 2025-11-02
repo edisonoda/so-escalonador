@@ -6,24 +6,24 @@
 
 namespace Utils
 {
-    struct ChartEntry
+    struct GanttEntry
     {
         int tick;
         int task_index;
         string color;
     };
 
-    class ChartGenerator
+    class GanttExporter
     {
     private:
         const int TICK_WIDTH = 30;  // Largura de cada tick
         const int TASK_HEIGHT = 30; // Altura de cada tarefa
-        vector<ChartEntry> chart_history;
+        vector<GanttEntry> chart_history;
         vector<Core::TCB*> *tasks;
         
     public:
-        ChartGenerator(vector<Core::TCB*> *task_list);
-        ~ChartGenerator();
+        GanttExporter(vector<Core::TCB*> *task_list);
+        ~GanttExporter();
         void registerEntry(int tick, int task_index, int color);
         void generate(const string& filename, int total_time, int task_count);
         string convertColor(int color);
