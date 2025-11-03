@@ -1,4 +1,5 @@
 #include "screen.hpp"
+#include <algorithm>
 
 static int convertRGB(int color) { return ((float)color / 255) * 1000; }
 
@@ -100,9 +101,13 @@ void Window::setWindowDimensions(int h, int w, int _x, int _y) {
   x = _x;
   y = _y;
 
-  wresize(window, height, width);
-  mvwin(window, y, x);
+  if (window != nullptr)
+    delwin(window);
 
+  window = newpad(height, width);
+  prefresh(window, 0, 0, y, x, min(y + height, max_height - 1), min(x + width, max_width - 1));
+  keypad(window, true); // Inicia as macros KEY_ do NCURSES
+  
   screen->refresh();
 }
 
@@ -112,9 +117,11 @@ int Window::getPosX() { return getcurx(window); }
 
 int Window::getPosY() { return getcury(window); }
 
-// As funções de janela do NCURSES começam com w
-void Window::moveWindow(int x, int y) {
-  mvwin(window, y, x), screen->refresh();
+void Window::moveWindow(int _x, int _y) {
+  x = _x;
+  y = _y;
+  refresh();
+  screen->refresh();
 }
 
 void Window::move(int x, int y) { wmove(window, y, x); }
@@ -139,7 +146,7 @@ void Window::del(int x, int y) {
 
 void Window::refresh() {
   box(window, 0, 0);
-  prefresh(window, 0, 0, 0, 0, max_height, max_width);
+  prefresh(window, 0, 0, y, x, min(y + height, max_height - 1), min(x + width, max_width - 1));
 }
 
 void Window::clear() { wclear(window); }

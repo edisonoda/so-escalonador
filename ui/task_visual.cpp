@@ -112,6 +112,8 @@ void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
     0,
     tasks->size() + 3
   );
+
+  TaskVisual::setTasks(tasks, y_offset);
 }
 
 void TaskInfo::drawTick(int tick) {
@@ -341,25 +343,23 @@ GanttChart::~GanttChart() { gantt_exporter = nullptr; }
 void GanttChart::scrollChart() {
   timeout(-1);
 
-  int mrow, mcol, scroll = 0;
-  getmaxyx(stdscr, mrow, mcol);
+  int scroll = 0;
 
-  prefresh(window, 0, scroll, 0, 0, mrow, mcol);
+  prefresh(window, 0, scroll, 0, 0, height, max_width - 1);
 
   int ch = wgetch(window);
   while(find(scrollKeys.begin(), scrollKeys.end(), ch) != scrollKeys.end()) {
     switch (ch) {
       case KEY_LEFT:
-        if (scroll >= 0)
-          prefresh(window, mrow, scroll -= 3, 0, 0, mrow, mcol);
+        if (scroll > 0)
+          prefresh(window, 0, scroll -= 3, 0, 0, height, max_width - 1);
         break;
       case KEY_RIGHT:
-        if (scroll < width)
-          prefresh(window, mrow, scroll += 3, 0, 0, mrow, mcol);
+        if (scroll < width - max_width - 1)
+          prefresh(window, 0, scroll += 3, 0, 0, height, max_width - 1);
         break;
     }
 
-    prefresh(window, 0, scroll, 0, 0, mrow, mcol);
     ch = wgetch(window);
   }
 }
@@ -421,4 +421,6 @@ void GanttChart::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
     0,
     0
   );
+
+  TaskVisual::setTasks(tasks, y_offset);
 }

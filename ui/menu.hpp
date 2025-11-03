@@ -6,6 +6,7 @@
 
 #define MAIN_WIDTH 50
 #define INFO_X_OFFSET MAIN_WIDTH + 4
+#define INFO_HEIGHT 5
 
 namespace UI { class SetupUI; }
 namespace Core { class SimulationConfig; }

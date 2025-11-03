@@ -127,7 +127,7 @@ SetupUI::~SetupUI() {
 void SetupUI::update() {
   int y = 0;
 
-  task_info.clear();
+  task_info.setTasks(&(config->tasks), INFO_HEIGHT);
   task_info.print(0, y++, "--- Configuração Atual ---");
 
   string alg_str;
@@ -147,8 +147,6 @@ void SetupUI::update() {
   task_info.print(0, y++, "Algoritmo: " + alg_str);
   task_info.print(0, y++, "Quantum:   " + to_string(config->quantum));
   task_info.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
-
-  task_info.setTasks(&(config->tasks), y);
 
   if (!config->tasks.empty())
     for (int i = 0; i < config->tasks.size(); i++)
