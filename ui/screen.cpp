@@ -1,5 +1,6 @@
 #include "screen.hpp"
 #include <algorithm>
+#include <cstdlib>
 
 static int convertRGB(int color) { return ((float)color / 255) * 1000; }
 
@@ -29,6 +30,7 @@ Screen::Screen() {
 
   initscr(); // Inicia uma tela do NCURSES
   noecho(); // Não mostra caracteres digitados pelo usuário
+  atexit([](){ endwin(); });
   start_color();
   init_color(GRAY_INDEX, 250, 250, 250); // Inicia o cinza fora da faixa de tarefas
 
@@ -49,8 +51,8 @@ Screen::Screen() {
 }
 
 Screen::~Screen() {
-  instance = nullptr;
   endwin();
+  instance = nullptr;
 }
 
 Screen *Screen::getInstance() {

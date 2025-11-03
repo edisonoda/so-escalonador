@@ -11,5 +11,7 @@ int main() {
 
     delete system;
 
+    endwin();
+
     return 0;
 }
