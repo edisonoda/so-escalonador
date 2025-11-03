@@ -12,7 +12,7 @@ using namespace UI;
 
 // Mapeia as teclas de navegação e confirmação
 const vector<int> Menu::navigation_keys({KEY_UP, KEY_DOWN});
-const vector<int> Menu::confirm_keys({KEY_ENTER, KEY_RIGHT, '\n', ' '});
+const vector<int> Menu::confirm_keys({KEY_ENTER, '\n', ' '});
 
 Menu::Menu(SetupUI *ui) : Window(), ui(ui) { selected = 0; }
 

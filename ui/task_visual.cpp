@@ -20,15 +20,13 @@ TaskVisual::TaskVisual() : Window() {
 
 TaskVisual::~TaskVisual() { ord_tasks = nullptr; }
 
-void TaskVisual::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
-  ord_tasks = tasks;
-  this->y_offset = y_offset;
+void TaskVisual::printAxis() {
   invertColor(true);
   
   // Busca o tamanho do maior ID e imprime todos os IDs
   int max_lenght = 0;
-  for (size_t i = 0; i < tasks->size(); i++) {
-    Core::TCB *task = (*tasks)[i];
+  for (size_t i = 0; i < ord_tasks->size(); i++) {
+    Core::TCB *task = (*ord_tasks)[i];
     string id_str = task->getId();
     if (id_str.length() >= max_lenght)
       max_lenght = id_str.length();
@@ -43,8 +41,14 @@ void TaskVisual::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
   setColor(DefaultColor::WHITE);
   invertColor(false);
 
-  for (size_t i = 0; i < tasks->size(); i++)
+  for (size_t i = 0; i < ord_tasks->size(); i++)
     print(x_offset, i + y_offset, '|');
+}
+
+void TaskVisual::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
+  ord_tasks = tasks;
+  this->y_offset = y_offset;
+  printAxis();
 }
 
 void TaskVisual::print(int x, int y, string str) {
@@ -113,7 +117,7 @@ void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
     tasks->size() + 3
   );
 
-  TaskVisual::setTasks(tasks, y_offset);
+  printAxis();
 }
 
 void TaskInfo::drawTick(int tick) {
@@ -242,11 +246,7 @@ GanttExporter::~GanttExporter() { tasks = nullptr; }
 
 // Função para registrar cada tarefa em todo tick, enquanto o programa executa
 void GanttExporter::registerEntry(int tick, int task_index, int color) {
-  chart_history.push_back( {
-    tick : tick,
-    task_index : task_index,
-    color : convertColor(color)
-  });
+  chart_history.push_back( {tick, task_index, convertColor(color)});
 }
 
 void GanttExporter::generate(const string &filename, int total_time, int task_count) {
@@ -422,5 +422,5 @@ void GanttChart::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
     0
   );
 
-  TaskVisual::setTasks(tasks, y_offset);
+  printAxis();
 }

@@ -25,6 +25,7 @@ namespace UI {
       int x_offset;
       int y_offset;
 
+      void printAxis();
       void checkEdges(int x, int y);
       
       public:
