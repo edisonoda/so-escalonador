@@ -343,16 +343,15 @@ void SetupManager::deleteTask() {
   while (i != config.tasks.end()) {
     if ((*i)->getId() == str) {
       delete (*i);
-      config.tasks.erase(i++);
+      i = config.tasks.erase(i);
       valid = true;
     } else {
       i++;
     }
   }
 
-  if (!valid) {
+  if (!valid)
     ui.inputError("Digite um ID válido!");
-  }
 
   ui.update();
 }
