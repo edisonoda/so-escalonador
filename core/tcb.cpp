@@ -9,8 +9,9 @@ const map<string, EventType> TCB::events_map({
   {"MU", EventType::MU}
 });
 
-TCB::TCB(string id, int color, int start, int duration, int priority, list<string> events) :
+TCB::TCB(string id, string color_hex, int color, int start, int duration, int priority, list<string> events) :
   id(id),
+  color_hex(color_hex),
   color(color),
   start(start),
   duration(duration),
@@ -56,6 +57,8 @@ void TCB::createEvent(string ev) {
 
 string TCB::getId() const { return id; }
 
+string TCB::getColorHex() const { return color_hex; }
+
 int TCB::getColor() const { return color; }
 
 int TCB::getStart() const { return start; }
@@ -65,6 +68,8 @@ int TCB::getDuration() const { return duration; }
 int TCB::getPriority() const { return priority; }
 
 void TCB::setId(const string _id) { id = _id; }
+
+void TCB::setColorHex(const string _color) { color_hex = _color; }
 
 void TCB::setColor(const int _color) { color = _color; }
 

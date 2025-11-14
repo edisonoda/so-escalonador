@@ -31,7 +31,7 @@ void TaskVisual::printAxis() {
     if (id_str.length() >= max_lenght)
       max_lenght = id_str.length();
 
-    setColor(i);
+    setColor(task->getColor());
 
     print(0, i + y_offset, id_str);
   }
@@ -128,7 +128,7 @@ void TaskInfo::drawTick(int tick) {
     Core::TCB *task = (*ord_tasks)[i];
     x = x_offset;
 
-    setColor(i);
+    setColor(task->getColor());
     invertColor(true);
 
     Core::TCBState status = task->getState();
@@ -175,7 +175,7 @@ void TaskInfo::drawStaticInfo(int i, int offset) {
   int x = x_offset + offset;
   Core::TCB *task = (*ord_tasks)[i];
 
-  string color_str = MONITOR_LABELS["Color"] + to_string(task->getColor());
+  string color_str = MONITOR_LABELS["Color"] + "#" + task->getColorHex();
   string start_str = MONITOR_LABELS["Start"] + to_string(task->getStart());
   string duration_str = MONITOR_LABELS["Duration"] + to_string(task->getDuration());
   string prio_str = MONITOR_LABELS["Priority"] + to_string(task->getPriority());
@@ -185,7 +185,7 @@ void TaskInfo::drawStaticInfo(int i, int offset) {
 
   // Faz a impressão com base no final da anterior
   print(x, i + y_offset, color_str);
-  print(x = x + INFO_SPACE + MONITOR_LABELS["Color"].length(), i + y_offset, start_str);
+  print(x = x + COLOR_SPACE + MONITOR_LABELS["Color"].length(), i + y_offset, start_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Start"].length(), i + y_offset, duration_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Duration"].length(), i + y_offset, prio_str);
 }
@@ -340,6 +340,10 @@ GanttChart::GanttChart(GanttExporter *chart_gen) : TaskVisual() {
 
 GanttChart::~GanttChart() { gantt_exporter = nullptr; }
 
+void GanttChart::registerEntry(int tick, int task_index, int color) {
+  // chart_history.push_back( {tick, task_index, convertColor(color)});
+}
+
 void GanttChart::scrollChart() {
   timeout(-1);
 
@@ -376,7 +380,7 @@ void GanttChart::drawTick(int tick) {
     // Muda a cor dependendo do estado
     switch (task->getState()) {
       case Core::TCBState::RUNNING:
-        color = setColor(i);
+        color = setColor(task->getColor());
         break;
       case Core::TCBState::READY:
         color = setColor(DefaultColor::GRAY);

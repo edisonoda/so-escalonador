@@ -32,6 +32,7 @@ namespace Core {
       const static map<string, EventType> events_map;
 
       string id;
+      string color_hex;
       int color;
       int start;
       int duration;
@@ -44,16 +45,18 @@ namespace Core {
       void createEvent(string ev);
 
     public:
-      TCB(string id, int color, int start, int duration, int priority, list<string> events = {});
+      TCB(string id, string color_hex, int color, int start, int duration, int priority, list<string> events = {});
       ~TCB();
 
       string getId() const;
+      string getColorHex() const;
       int getColor() const;
       int getStart() const;
       int getDuration() const;
       int getPriority() const;
 
       void setId(const string _id);
+      void setColorHex(const string _color);
       void setColor(const int _color);
       void setStart(const int _start);
       void setDuration(const int _duration);

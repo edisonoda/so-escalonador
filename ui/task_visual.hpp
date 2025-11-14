@@ -6,6 +6,7 @@
 #include "../core/tcb.hpp"
 
 #define INFO_SPACE 6
+#define COLOR_SPACE 9
 #define STATS_SPACE 3
 
 #define UNIT_WIDTH 3
@@ -74,12 +75,14 @@ namespace UI {
   class GanttChart : public TaskVisual {
     private:
       static const vector<int> scrollKeys;
+      vector<GanttEntry> chart_history;
       GanttExporter *gantt_exporter;
 
     public:
       GanttChart(GanttExporter *chart_gen);
       ~GanttChart();
 
+      void registerEntry(int tick, int task_index, int color);
       void scrollChart();
 
       virtual void setTasks(vector<Core::TCB*> *tasks, int y_offset = 0);

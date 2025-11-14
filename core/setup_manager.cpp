@@ -16,7 +16,7 @@ bool isNumber(const string &s) {
 // ConfigReader definition
 
 // O alg_map faz o mapeamento dos nomes dos algoritmos com os IDS
-ConfigReader::ConfigReader(SetupUI *ui) : ui(ui), alg_map({
+ConfigReader::ConfigReader(SetupUI *ui) : ui(ui), screen(Screen::getInstance()), alg_map({
   {"FCFS", AlgorithmID::FIFO},
   {"RR", AlgorithmID::FIFO},
   {"FIFO", AlgorithmID::FIFO},
@@ -24,7 +24,11 @@ ConfigReader::ConfigReader(SetupUI *ui) : ui(ui), alg_map({
   {"SRTF", AlgorithmID::SRTF}
 }) {}
 
-ConfigReader::~ConfigReader() { closeFile(); }
+ConfigReader::~ConfigReader() { 
+  closeFile();
+  ui = nullptr;
+  screen = nullptr; 
+}
 
 AlgorithmID ConfigReader::getAlgorithm() const {
   return alg_map.find(algorithm)->second;
@@ -94,7 +98,7 @@ list<TCB *> ConfigReader::readTasks() {
       bool valid = true;
 
       // Testa se as entradas numéricas são válidas
-      for (int i = 1; i < 5; i++) {
+      for (int i = 2; i < 5; i++) {
         if (!isNumber(configs[i]) || (configs[i] == "0" && i > 2)) {
           ui->inputError("Tarefa com formato inválido: " + configs[0]);
           valid = false;
@@ -102,14 +106,23 @@ list<TCB *> ConfigReader::readTasks() {
         }
       }
 
+      int color = screen->initColor(configs[1]);
+
+      if (color == -1) {
+        ui->inputError("Cor inválida: " + configs[1]);
+        valid = false;
+        break;
+      }
+
       if (valid) {
         TCB *tcb = new TCB(
           // id, cor, inicio, duracão e prioridade
-          configs[0], 
-          stoi(configs[1]), 
-          stoi(configs[2]), 
+          configs[0],
+          configs[1],
+          color,
+          stoi(configs[2]),
           stoi(configs[3]),
-          stoi(configs[4]), 
+          stoi(configs[4]),
           list<string>(configs.begin() + 5, configs.end())
         );
     
@@ -131,9 +144,6 @@ SetupManager::SetupManager() : ui(&config), config_reader(&ui), screen(Screen::g
   // Carrega incialmente o arquivo padrão
   loadFromFile(CONFIG_FILE);
   timeout(-1);
-
-  for (TCB *task : config.tasks)
-    screen->initColor(0, task->getColor());
 
   ui.update();
 }
@@ -310,8 +320,12 @@ void SetupManager::addNewTask() {
   string id = ui.promptForField("Id");
 
   string color = ui.promptForField("Cor");
-  if (!validateEntry(color))
+  int index = screen->initColor(color);
+  
+  if (index == -1) {
+    ui.inputError("Digite um valor válido!");
     return;
+  }
 
   string start = ui.promptForField("Início");
   if (!validateEntry(start))
@@ -325,11 +339,9 @@ void SetupManager::addNewTask() {
   if (!validateEntry(priority))
     return;
 
-  TCB *task = new TCB(id, stoi(color), stoi(start), stoi(duration), stoi(priority));
+  TCB *task = new TCB(id, color, index, stoi(start), stoi(duration), stoi(priority));
 
   config.tasks.push_back(task);
-
-  screen->initColor(0, stoi(color));
 
   ui.update();
 }
@@ -373,11 +385,17 @@ void SetupManager::editTask(int index) {
         break;
 
       case '2': // Edita a Cor
+      {
         entry = ui.promptForField("Cor");
-        if (validateEntry(entry))
-          task->setColor(stoi(entry));
+        int index = screen->initColor(entry);
+        if (index != -1) {
+          task->setColorHex(entry);
+          task->setColor(index);
+        }
+        else
+          ui.inputError("Digite um valor válido!");
         break;
-
+      }
       case '3': // Edita o Inicio
         entry = ui.promptForField("Início");
         if (validateEntry(entry))

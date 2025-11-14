@@ -27,6 +27,7 @@ namespace Core {
       string algorithm;
       int quantum;
       SetupUI *ui;
+      Screen* screen;
       const map<string, AlgorithmID> alg_map;
 
       string readLine();

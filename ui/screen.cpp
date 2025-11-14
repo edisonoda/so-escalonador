@@ -27,25 +27,21 @@ void RefreshSubject::update() {
 
 Screen::Screen() {
   color_pair_count = 0;
+  color_count = INITIAL_COLORS;
 
   initscr(); // Inicia uma tela do NCURSES
   noecho(); // Não mostra caracteres digitados pelo usuário
   atexit([](){ endwin(); });
   start_color();
-  init_color(GRAY_INDEX, 250, 250, 250); // Inicia o cinza fora da faixa de tarefas
-
+  
   // Inicializa as cores com um tom mais visível
+  init_color(GRAY_INDEX, 250, 250, 250); // Inicia o cinza fora da faixa de tarefas
   init_color(COLOR_BLACK, 100, 100, 125);
-  init_color(COLOR_BLUE, convertRGB(66), convertRGB(135), convertRGB(245));
-  init_color(COLOR_YELLOW, convertRGB(245), convertRGB(233), convertRGB(66));
-  init_color(COLOR_CYAN, convertRGB(66), convertRGB(245), convertRGB(197));
-  init_color(COLOR_RED, convertRGB(245), convertRGB(66), convertRGB(66));
-  init_color(COLOR_MAGENTA, convertRGB(245), convertRGB(66), convertRGB(135));
 
-  initColor(7, 0);           // branco no preto
-  initColor(0, 0);           // preto no preto
-  initColor(0, GRAY_INDEX);  // preto no cinza
-  initColor(COLOR_GREEN, 0); // verde no preto
+  init_pair(++color_pair_count, 7, 0);            // branco no preto
+  init_pair(++color_pair_count, 0, 0);            // preto no preto
+  init_pair(++color_pair_count, 0, GRAY_INDEX);   // preto no cinza
+  init_pair(++color_pair_count, COLOR_GREEN, 0);  // verde no preto
 
   bkgd(COLOR_PAIR(1)); // Define a cor de fundo para preto
 }
@@ -70,8 +66,25 @@ void Screen::erase() {
 }
 
 // Por padrão o NCURSES inicia as cores em pares, texto e fundo
-void Screen::initColor(int color, int bg_color) {
-  init_pair(++color_pair_count, color, bg_color);
+int Screen::initColor(string color) {
+  string r, g, b;
+  r = color.substr(0, 2);
+  g = color.substr(2, 2);
+  b = color.substr(4, 2);
+
+  if (!isHexa(r) || !isHexa(g) || !isHexa(b))
+    return -1;
+
+  init_color(++color_count, convertRGB(stoi(r, nullptr, 16)), convertRGB(stoi(g, nullptr, 16)), convertRGB(stoi(b, nullptr, 16)));
+  init_pair(++color_pair_count, 0, color_count);
+  return color_pair_count - INITIAL_PAIRS;
+}
+
+bool Screen::isHexa(const string &s) {
+  string::const_iterator it = s.begin();
+  while (it != s.end() && (isdigit(*it) || (*it >= 'A' && *it <= 'F') || (*it >= 'a' && *it <= 'f')))
+    ++it;
+  return !s.empty() && it == s.end();
 }
 
 // Window definition
@@ -166,8 +179,8 @@ int Window::setColor(DefaultColor color) {
 
 // Define a cor com base no index acima das cores padrão
 int Window::setColor(int color_index) {
-  wattron(window, COLOR_PAIR(color_index + INITIAL_COLORS + 1));
-  return color_index + INITIAL_COLORS + 1;
+  wattron(window, COLOR_PAIR(color_index + INITIAL_PAIRS));
+  return color_index + INITIAL_PAIRS;
 }
 
 // Inverte as cores do texto e fundo

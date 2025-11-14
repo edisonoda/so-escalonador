@@ -6,8 +6,9 @@
 
 #define X_PAD 2
 #define Y_PAD 1
-#define INITIAL_COLORS 4
-#define GRAY_INDEX 100
+#define INITIAL_PAIRS 4
+#define INITIAL_COLORS 10
+#define GRAY_INDEX 1
 
 using namespace std;
 
@@ -44,6 +45,7 @@ namespace UI {
     private:
       static Screen* instance;
       int color_pair_count;
+      int color_count;
 
       Screen();
 
@@ -54,7 +56,8 @@ namespace UI {
       void refresh();
       void erase();
       
-      void initColor(int color, int bg_color);
+      int initColor(string color);
+      bool isHexa(const string &s);
   };
 
   class Window {
