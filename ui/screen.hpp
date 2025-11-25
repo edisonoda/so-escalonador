@@ -1,37 +1,109 @@
 #pragma once
+
+#include <ncurses.h>
 #include <string>
+#include <set>
+
+#define X_PAD 2
+#define Y_PAD 1
+#define INITIAL_PAIRS 4
+#define INITIAL_COLORS 10
+#define GRAY_INDEX 1
+
 using namespace std;
 
-namespace UI
-{
-    enum class DefaultColor
-    {
-        WHITE = 1,
-        BLACK = 2,
-        GRAY = 3
-    };
+namespace UI {
+  enum class DefaultColor {
+    WHITE = 1,
+    BLACK = 2,
+    GRAY = 3,
+    GREEN = 4
+  };
 
-    class Screen
-    {
+  class RefreshObserver {
+    public:
+      RefreshObserver() { };
+      virtual ~RefreshObserver() { };
+
+      virtual void update() = 0;
+  };
+
+  class RefreshSubject {
     private:
-        static Screen* instance;
-        int color_pair_count;
-        bool inverted;
-
-        Screen();
+      set<RefreshObserver*> observers;
 
     public:
-        ~Screen();
-        static Screen* getInstance();
-        void print(int x, int y, char ch = '*');
-        void print(int x, int y, string str);
-        void refresh();
-        void clear();
-        void initColor(int color, int bg_color);
-        int setColor(DefaultColor color);
-        int setColor(int color_index);
-        void invertColor();
-        void invertColor(bool inv);
-        int getCh();
-    };
+      RefreshSubject();
+      ~RefreshSubject();
+
+      void attach(RefreshObserver* obs);
+      void detach(RefreshObserver* obs);
+      void update();
+  };
+
+  class Screen : public RefreshSubject {
+    private:
+      static Screen* instance;
+      int color_pair_count;
+      int color_count;
+
+      Screen();
+
+    public:
+      ~Screen();
+      static Screen* getInstance();
+      
+      void refresh();
+      void erase();
+      
+      int initColor(string color);
+      bool isHexa(const string &s);
+  };
+
+  class Window {
+    protected:
+      WINDOW* window;
+      Screen* screen;
+
+      int max_height;
+      int max_width;
+      int height;
+      int width;
+      int x;
+      int y;
+
+      bool inverted;
+
+    public:
+      Window();
+      virtual ~Window();
+
+      void setWindowDimensions(int height, int width, int x, int y);
+      int getHeight() const { return height; }
+      int getWidth() const { return width; }
+      int getX() const { return x; }
+      int getY() const { return y; }
+      void moveWindow(int x, int y);
+
+      void getPos(int* x, int* y);
+      int getPosX();
+      int getPosY();
+
+      void move(int x, int y);
+      void del(int x, int y);
+      void refresh();
+      void clear();
+      void erase();
+      int getCh();
+      
+      int setColor(DefaultColor color);
+      int setColor(int color_index);
+      void invertColor();
+      void invertColor(bool inv);
+      
+      virtual void print(int ch);
+      virtual void print(string str);
+      virtual void print(int x, int y, int ch);
+      virtual void print(int x, int y, string str);
+  };
 } // namespace UI

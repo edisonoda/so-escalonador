@@ -1,92 +1,199 @@
 #include "screen.hpp"
+#include <algorithm>
+#include <cstdlib>
+
+static int convertRGB(int color) { return ((float)color / 255) * 1000; }
 
 using namespace UI;
 
-#include <ncurses.h>
+Screen *Screen::instance(nullptr);
 
-Screen* Screen::instance(nullptr);
+// RefreshSubject definition
 
-Screen::Screen()
-{
-    color_pair_count = 0;
-    inverted = false;
-    initscr();
-    start_color();
-    init_color(8, 400,400,400);
-    initColor(7, 0); // branco no preto
-    initColor(0, 0); // preto no preto
-    initColor(0, 8); // cinza no preto
+RefreshSubject::RefreshSubject() {}
+
+RefreshSubject::~RefreshSubject() { observers.clear(); }
+
+void RefreshSubject::attach(RefreshObserver *obs) { observers.insert(obs); }
+
+void RefreshSubject::detach(RefreshObserver *obs) { observers.erase(obs); }
+
+void RefreshSubject::update() {
+  for (RefreshObserver *obs : observers)
+    obs->update();
 }
 
-Screen::~Screen()
-{
-    instance = nullptr;
-    endwin();
+// Screen definition
+
+Screen::Screen() {
+  color_pair_count = 0;
+  color_count = INITIAL_COLORS;
+
+  initscr(); // Inicia uma tela do NCURSES
+  noecho(); // Não mostra caracteres digitados pelo usuário
+  atexit([](){ endwin(); });
+  start_color();
+  
+  // Inicializa as cores com um tom mais visível
+  init_color(GRAY_INDEX, 250, 250, 250); // Inicia o cinza fora da faixa de tarefas
+  init_color(COLOR_BLACK, 100, 100, 125);
+
+  init_pair(++color_pair_count, 7, 0);            // branco no preto
+  init_pair(++color_pair_count, 0, 0);            // preto no preto
+  init_pair(++color_pair_count, 0, GRAY_INDEX);   // preto no cinza
+  init_pair(++color_pair_count, COLOR_GREEN, 0);  // verde no preto
+
+  bkgd(COLOR_PAIR(1)); // Define a cor de fundo para preto
 }
 
-Screen* Screen::getInstance()
-{
-    if (instance != nullptr)
-        return instance;
+Screen::~Screen() {
+  endwin();
+  instance = nullptr;
+}
 
+Screen *Screen::getInstance() {
+  if (instance == nullptr)
     instance = new Screen();
-    return instance;
+
+  return instance;
 }
 
-void Screen::print(int x, int y, char ch)
-{
-    mvprintw(y, x, "%c", ch);
+void Screen::refresh() { ::refresh(); }
+
+void Screen::erase() {
+  ::erase();
+  update();
 }
 
-void Screen::print(int x, int y, string str)
-{
-    mvprintw(y, x, "%s", str.c_str());
+// Por padrão o NCURSES inicia as cores em pares, texto e fundo
+int Screen::initColor(string color) {
+  string r, g, b;
+  r = color.substr(0, 2);
+  g = color.substr(2, 2);
+  b = color.substr(4, 2);
+
+  if (!isHexa(r) || !isHexa(g) || !isHexa(b))
+    return -1;
+
+  init_color(++color_count, convertRGB(stoi(r, nullptr, 16)), convertRGB(stoi(g, nullptr, 16)), convertRGB(stoi(b, nullptr, 16)));
+  init_pair(++color_pair_count, 0, color_count);
+  return color_pair_count - INITIAL_PAIRS;
 }
 
-void Screen::refresh()
-{
-    ::refresh();
+bool Screen::isHexa(const string &s) {
+  string::const_iterator it = s.begin();
+  while (it != s.end() && (isdigit(*it) || (*it >= 'A' && *it <= 'F') || (*it >= 'a' && *it <= 'f')))
+    ++it;
+  return !s.empty() && it == s.end();
 }
 
-void Screen::clear()
-{
-    ::clear();
+// Window definition
+
+Window::Window() : screen(Screen::getInstance()) {
+  window = newpad(0, 0);
+  getmaxyx(stdscr, max_height, max_width);
+
+  inverted = false;
+  keypad(window, true); // Inicia as macros KEY_ do NCURSES
+  screen->refresh();
 }
 
-void Screen::initColor(int color, int bg_color)
-{
-    init_pair(++color_pair_count, color, bg_color);
+Window::~Window() {
+  clear();
+  refresh();
+  delwin(window);
+  screen->erase();
+  screen->refresh();
+
+  screen = nullptr;
+  window = nullptr;
 }
 
-int Screen::setColor(DefaultColor color)
-{
-    attron(COLOR_PAIR(static_cast<int>(color)));
-    return static_cast<int>(color);
+void Window::setWindowDimensions(int h, int w, int _x, int _y) {
+  // Adiciona uma margem às janelas
+  height = h + (Y_PAD * 2);
+  width = w + (X_PAD * 2);
+  x = _x;
+  y = _y;
+
+  if (window != nullptr)
+    delwin(window);
+
+  window = newpad(height, width);
+  prefresh(window, 0, 0, y, x, min(y + height, max_height - 1), min(x + width, max_width - 1));
+  keypad(window, true); // Inicia as macros KEY_ do NCURSES
+  
+  screen->refresh();
 }
 
-int Screen::setColor(int color_index)
-{
-    attron(COLOR_PAIR(color_index + 4));
-    return color_index + 4;
+void Window::getPos(int *x, int *y) { getyx(window, *y, *x); }
+
+int Window::getPosX() { return getcurx(window); }
+
+int Window::getPosY() { return getcury(window); }
+
+void Window::moveWindow(int _x, int _y) {
+  x = _x;
+  y = _y;
+  refresh();
+  screen->refresh();
 }
 
-void Screen::invertColor()
-{
-    if (inverted)
-        attroff(A_REVERSE);
-    else
-        attron(A_REVERSE);
+void Window::move(int x, int y) { wmove(window, y, x); }
 
-    inverted = !inverted;
+void Window::print(int ch) { wprintw(window, "%c", ch); }
+
+void Window::print(std::string str) { wprintw(window, "%s", str.c_str()); }
+
+// Move o cursor e depois imprime na janela
+void Window::print(int x, int y, int ch) {
+  mvwprintw(window, y + Y_PAD, x + X_PAD, "%c", ch);
 }
 
-void Screen::invertColor(bool inv)
-{
-    inverted = !inv;
-    invertColor();
+void Window::print(int x, int y, std::string str) {
+  mvwprintw(window, y + Y_PAD, x + X_PAD, "%s", str.c_str());
 }
 
-int Screen::getCh()
-{
-    return ::getch();
+void Window::del(int x, int y) {
+  wmove(window, y, x);
+  wdelch(window);
+}
+
+void Window::refresh() {
+  box(window, 0, 0);
+  prefresh(window, 0, 0, y, x, min(y + height, max_height - 1), min(x + width, max_width - 1));
+}
+
+void Window::clear() { wclear(window); }
+
+void Window::erase() { werase(window); }
+
+int Window::getCh() { return wgetch(window); }
+
+// Define a cor com base nas cores padrão
+int Window::setColor(DefaultColor color) {
+  // Função do NCURSES para atribuir cor ao terminal
+  wattron(window, COLOR_PAIR(static_cast<int>(color)));
+  return static_cast<int>(color);
+}
+
+// Define a cor com base no index acima das cores padrão
+int Window::setColor(int color_index) {
+  wattron(window, COLOR_PAIR(color_index + INITIAL_PAIRS));
+  return color_index + INITIAL_PAIRS;
+}
+
+// Inverte as cores do texto e fundo
+void Window::invertColor() {
+  if (inverted)
+    wattroff(window, A_REVERSE);
+  else
+    wattron(window, A_REVERSE);
+
+  inverted = !inverted;
+}
+
+void Window::invertColor(bool inv) {
+  inverted = !inv;
+  invertColor();
 }

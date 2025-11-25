@@ -1,6 +1,6 @@
 #pragma once
 
-#include "clock/tick_observer.hpp"
+#include "clock.hpp"
 
 namespace Core { class TCB; }
 namespace Core { class System; }
