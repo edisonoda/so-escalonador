@@ -54,6 +54,8 @@ namespace Core {
       int getStart() const;
       int getDuration() const;
       int getPriority() const;
+      int getRemaining() const;
+      int getCompletionTime() const;
       TCBState getState() const;
       list<Event*>* getEvents();
 
@@ -65,9 +67,6 @@ namespace Core {
       void setPriority(const int _priority);
       void setCompletionTime(int time);
 
-      int getRemaining() const;
-      TCBState getState() const;
-      int getCompletionTime() const;
 
       void setState(TCBState state);
       void decrementRemaining(int amount = 1);

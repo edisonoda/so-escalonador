@@ -44,20 +44,20 @@ void TCB::createEvent(string ev) {
 
   EventType type = it->second;
   string duration_info = ev.substr(sep + 1, ev.length() - 1);
-  Event event = {type};
+  Event* event = new Event{type, 0, 0};
 
   switch (type) {
     case EventType::IO:
       sep = duration_info.find("-");
-      event.start = stoi(duration_info.substr(0, sep));
-      event.duration = stoi(duration_info.substr(sep + 1, duration_info.length() - 1));
+      event->start = stoi(duration_info.substr(0, sep));
+      event->duration = stoi(duration_info.substr(sep + 1, duration_info.length() - 1));
       break;
     default:
-      event.start = stoi(duration_info);
+      event->start = stoi(duration_info);
       break;
   }
 
-  events.push_back(&event);
+  events.push_back(event);
 }
 
 string TCB::getId() const { return id; }

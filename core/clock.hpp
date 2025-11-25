@@ -52,6 +52,15 @@ namespace Core {
       virtual bool getTick();
   };
 
+  class TickObserver {
+    protected:
+      TickObserver() { }
+
+    public:
+      virtual ~TickObserver() { }
+      virtual void tick() = 0;
+  };
+
   class TickSubject {
     private:
       set<TickObserver*> observers;
@@ -65,15 +74,6 @@ namespace Core {
       void attach(TickObserver* obs);
       void detach(TickObserver* obs);
       void notify();
-  };
-
-  class TickObserver {
-    protected:
-      TickObserver() { }
-
-    public:
-      virtual ~TickObserver() { }
-      virtual void tick() = 0;
   };
 
   class Clock : public TickSubject {

@@ -16,6 +16,22 @@ namespace Core {
     FULL_STOP
   };
 
+  class IOEvent : public TickObserver {
+    private:
+      const int duration;
+      int remaining_time;
+
+      TCB* task;
+      System* system;
+      Clock* clock;
+    
+    public:
+      IOEvent(TCB* task, System* system, Clock* clock, const int duration);
+      ~IOEvent();
+
+      virtual void tick();
+  };
+
   class System : public TickObserver {
     private:
       static System* instance;

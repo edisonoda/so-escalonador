@@ -6,13 +6,38 @@ using namespace Core;
 
 System *System::instance(nullptr);
 
+IOEvent::IOEvent(TCB* task, System* sys, Clock* clock, const int d) : 
+  TickObserver(),
+  task(task),
+  system(sys),
+  clock(clock),
+  duration(d)
+{
+  remaining_time = duration;
+  clock->attach(this);
+}
+
+IOEvent::~IOEvent() {
+  clock->detach(this);
+  task = nullptr;
+  system = nullptr;
+  clock = nullptr;
+}
+
+void IOEvent::tick() {
+  remaining_time--;
+
+  if (remaining_time <= 0)
+    system->handleInterruption(Interruption::FINISH_IO, task);
+}
+
 System::System() : 
-    TickObserver(),
-    scheduler(Scheduler::getInstance()),
-    clock(this),
-    gantt_exporter(&ord_tasks),
-    gantt_chart(&gantt_exporter),
-    screen(Screen::getInstance()) 
+  TickObserver(),
+  scheduler(Scheduler::getInstance()),
+  clock(this),
+  gantt_exporter(&ord_tasks),
+  gantt_chart(&gantt_exporter),
+  screen(Screen::getInstance()) 
 {
   current_task = nullptr;
   task_count = 0;
@@ -61,7 +86,8 @@ void System::tick() {
   if (current_task == nullptr)
     changeState(TCBState::RUNNING);
 
-  checkEvents();
+  if (current_task != nullptr)
+    checkEvents();
 
   // Se existe task em execução, mas o tempo restante de execução é 0, termina a task
   if (current_task != nullptr && current_task->getRemaining() <= 0)
@@ -159,8 +185,8 @@ void System::checkEvents() {
   while (i != (*events).end()) {
     if ((*i)->start <= elapsed) {
       event_list.push_back(new IOEvent(current_task, this, &clock, (*i)->duration));
-      events->erase(i++);
       delete (*i);
+      i = events->erase(i);
       suspendTask();
       return;
     } else {
