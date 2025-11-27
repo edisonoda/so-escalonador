@@ -104,9 +104,20 @@ void TickSubject::detach(TickObserver* obs) {
   observers.erase(obs);
 }
 
+void TickSubject::scheduleDeletion(TickObserver* obs) {
+  deletion_queue.push_back(obs);
+}
+
 void TickSubject::notify() {
   for (TickObserver* obs : observers)
     obs->tick();
+
+  for (TickObserver* obs : deletion_queue) {
+    observers.erase(obs);
+    delete obs;
+  }
+
+  deletion_queue.clear();
 }
 
 // Clock definition

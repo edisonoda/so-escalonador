@@ -386,7 +386,7 @@ void GanttChart::drawTick(int tick) {
         color = setColor(DefaultColor::GRAY);
         break;
       case Core::TCBState::SUSPENDED:
-        color = setColor(DefaultColor::GRAY);
+        color = setColor(DefaultColor::OFFWHITE);
         break;
       default:
         color = setColor(DefaultColor::BLACK);

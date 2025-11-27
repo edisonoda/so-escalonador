@@ -25,10 +25,10 @@ IOEvent::~IOEvent() {
 }
 
 void IOEvent::tick() {
-  remaining_time--;
-
   if (remaining_time <= 0)
     system->handleInterruption(Interruption::FINISH_IO, task);
+  
+  remaining_time--;
 }
 
 System::System() : 
@@ -85,13 +85,13 @@ void System::tick() {
   // Se não existe task em execução, busca uma task
   if (current_task == nullptr)
     changeState(TCBState::RUNNING);
-
-  if (current_task != nullptr)
-    checkEvents();
-
+    
   // Se existe task em execução, mas o tempo restante de execução é 0, termina a task
   if (current_task != nullptr && current_task->getRemaining() <= 0)
     terminateTask();
+  
+  if (current_task != nullptr)
+    checkEvents();
 }
 
 void System::endTick() {
@@ -133,16 +133,8 @@ void System::changeState(TCBState state, PreemptType type) {
 
   // Se o escalonador escolheu uma task, remove ela das listas
   if (current_task != nullptr) {
-    switch (current_task->getState()) {
-      case TCBState::SUSPENDED:
-        suspended_list.remove(current_task);
-        break;
-      case TCBState::READY:
-        ready_list.remove(current_task);
-        break;
-      default:
-        break;
-    }
+    if (current_task->getState() == TCBState::READY)
+      ready_list.remove(current_task);
 
     // Se houve troca de tarefa, reinicia o quantum
     if (previous_task != current_task)
@@ -184,7 +176,9 @@ void System::checkEvents() {
 
   while (i != (*events).end()) {
     if ((*i)->start <= elapsed) {
-      event_list.push_back(new IOEvent(current_task, this, &clock, (*i)->duration));
+      IOEvent* event = new IOEvent(current_task, this, &clock, (*i)->duration);
+      event_list.push_back(event);
+      current_task->setCurrentEvent(event);
       delete (*i);
       i = events->erase(i);
       suspendTask();
@@ -209,7 +203,9 @@ void System::terminateTask() {
 }
 
 void System::suspendTask() {
-  suspended_list.push_back(current_task);
+  if (current_task != nullptr && current_task->getRemaining() > 0)
+    suspended_list.push_back(current_task); 
+
   changeState(TCBState::SUSPENDED);
 }
 
@@ -224,8 +220,11 @@ void System::preemptTask(PreemptType type) {
 void System::readyTask(TCB* task) {
   suspended_list.remove(task);
   ready_list.push_back(task);
+  event_list.remove(task->getCurrentEvent());
+  clock.scheduleDeletion(task->getCurrentEvent());
+  task->setCurrentEvent(nullptr);
   task->setState(TCBState::READY);
-  preemptTask(PreemptType::NONE);
+  preemptTask(PreemptType::NEW_TASK);
 }
 
 void System::loadConfig() {

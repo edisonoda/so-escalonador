@@ -6,9 +6,10 @@
 
 #define X_PAD 2
 #define Y_PAD 1
-#define INITIAL_PAIRS 4
+#define INITIAL_PAIRS 5
 #define INITIAL_COLORS 10
 #define GRAY_INDEX 1
+#define OFFWHITE_INDEX 5
 
 using namespace std;
 
@@ -17,7 +18,8 @@ namespace UI {
     WHITE = 1,
     BLACK = 2,
     GRAY = 3,
-    GREEN = 4
+    GREEN = 4,
+    OFFWHITE = 5
   };
 
   class RefreshObserver {

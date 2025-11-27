@@ -7,6 +7,8 @@
 using namespace std;
 
 namespace Core {
+  class IOEvent;
+
   enum class TCBState {
     NEW,
     READY,
@@ -40,6 +42,7 @@ namespace Core {
       int remaining;
       int completion_time;
       TCBState state;
+      IOEvent* current_event;
       list<Event*> events;
 
       void createEvent(string ev);
@@ -57,6 +60,7 @@ namespace Core {
       int getRemaining() const;
       int getCompletionTime() const;
       TCBState getState() const;
+      IOEvent* getCurrentEvent() const;
       list<Event*>* getEvents();
 
       void setId(const string _id);
@@ -66,7 +70,7 @@ namespace Core {
       void setDuration(const int _duration);
       void setPriority(const int _priority);
       void setCompletionTime(int time);
-
+      void setCurrentEvent(IOEvent* event);
 
       void setState(TCBState state);
       void decrementRemaining(int amount = 1);

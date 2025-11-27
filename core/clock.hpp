@@ -2,6 +2,7 @@
 
 #include <chrono>
 #include <set>
+#include <list>
 
 #define DEFAULT_QUANTUM 5.f
 #define DEFAULT_TICK_INTERVAL 250 // Milisegundos
@@ -64,6 +65,7 @@ namespace Core {
   class TickSubject {
     private:
       set<TickObserver*> observers;
+      list<TickObserver*> deletion_queue;
   
     protected:
       TickSubject();
@@ -73,6 +75,7 @@ namespace Core {
 
       void attach(TickObserver* obs);
       void detach(TickObserver* obs);
+      void scheduleDeletion(TickObserver* obs);
       void notify();
   };
 

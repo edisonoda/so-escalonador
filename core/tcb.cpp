@@ -1,4 +1,6 @@
 #include "tcb.hpp"
+#include "system.hpp"
+
 using namespace Core;
 
 // Faz o mapeamento dos tipos de evento
@@ -19,16 +21,22 @@ TCB::TCB(string id, string color_hex, int color, int start, int duration, int pr
   this->remaining = duration;
   this->state = TCBState::NEW;
 
+  current_event = nullptr;
+
   for (string event : events)
     createEvent(event);
 }
 
-TCB::~TCB()
-{
-    for (Event* ev : events)
-        delete ev;
+TCB::~TCB() {
+  if (current_event != nullptr)
+    delete current_event;
+  
+  current_event = nullptr;
 
-    events.clear();
+  for (Event* ev : events)
+    delete ev;
+
+  events.clear();
 }
 
 void TCB::createEvent(string ev) {
@@ -72,6 +80,8 @@ int TCB::getDuration() const { return duration; }
 
 int TCB::getPriority() const { return priority; }
 
+IOEvent* TCB::getCurrentEvent() const { return current_event; }
+
 void TCB::setId(const string _id) { id = _id; }
 
 void TCB::setColorHex(const string _color) { color_hex = _color; }
@@ -85,6 +95,8 @@ void TCB::setDuration(const int _duration) { duration = _duration; }
 void TCB::setPriority(const int _priority) { priority = _priority; }
 
 void TCB::setCompletionTime(int time) { this->completion_time = time; }
+
+void TCB::setCurrentEvent(IOEvent* event) { current_event = event; }
 
 int TCB::getCompletionTime() const { return this->completion_time; }
 

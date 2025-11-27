@@ -37,11 +37,13 @@ Screen::Screen() {
   // Inicializa as cores com um tom mais visível
   init_color(GRAY_INDEX, 250, 250, 250); // Inicia o cinza fora da faixa de tarefas
   init_color(COLOR_BLACK, 100, 100, 125);
+  init_color(OFFWHITE_INDEX, 500, 500, 500);
 
-  init_pair(++color_pair_count, 7, 0);            // branco no preto
-  init_pair(++color_pair_count, 0, 0);            // preto no preto
-  init_pair(++color_pair_count, 0, GRAY_INDEX);   // preto no cinza
-  init_pair(++color_pair_count, COLOR_GREEN, 0);  // verde no preto
+  init_pair(++color_pair_count, 7, 0);              // branco no preto
+  init_pair(++color_pair_count, 0, 0);              // preto no preto
+  init_pair(++color_pair_count, 0, GRAY_INDEX);     // preto no cinza
+  init_pair(++color_pair_count, COLOR_GREEN, 0);    // verde no preto
+  init_pair(++color_pair_count, 0, OFFWHITE_INDEX); // preto no offwhite
 
   bkgd(COLOR_PAIR(1)); // Define a cor de fundo para preto
 }
