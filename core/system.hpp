@@ -13,6 +13,8 @@ namespace Core {
   enum class Interruption {
     QUANTUM,
     FINISH_IO,
+    MUTEX_LOCK,
+    MUTEX_UNLOCK,
     FULL_STOP
   };
 
@@ -32,6 +34,23 @@ namespace Core {
       virtual void tick();
   };
 
+  class Mutex {
+    private:
+      int id;
+      int counter;
+
+      System* system;
+      list<TCB*> queue;
+    
+    public:
+      Mutex(System* system, int id);
+      ~Mutex();
+
+      void lock(TCB* task);
+      void unlock();
+      int getId();
+  };
+
   class System : public TickObserver {
     private:
       static System* instance;
@@ -43,7 +62,8 @@ namespace Core {
       list<TCB*> new_list;
       list<TCB*> ready_list;
       list<TCB*> suspended_list;
-      list<IOEvent*> event_list;
+      list<IOEvent*> ioevent_list;
+      list<Mutex*> mutex_list;
 
       Screen* screen;
       GanttChart gantt_chart;
@@ -62,7 +82,7 @@ namespace Core {
       void checkEvents();
       void terminateTask();
       void suspendTask();
-      void readyTask(TCB* task);
+      void readyTask(TCB* task, EventType type);
       void preemptTask(PreemptType type);
   
       void endProgram();

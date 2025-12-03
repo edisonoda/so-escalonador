@@ -6,6 +6,8 @@ using namespace Core;
 
 System *System::instance(nullptr);
 
+// IOEvent definition
+
 IOEvent::IOEvent(TCB* task, System* sys, Clock* clock, const int d) : 
   TickObserver(),
   task(task),
@@ -30,6 +32,49 @@ void IOEvent::tick() {
   
   remaining_time--;
 }
+
+// Mutex definition
+
+Mutex::Mutex(System* sys, int id) : 
+  system(sys),
+  id(id)
+{
+  counter = 1;
+}
+
+Mutex::~Mutex() {
+  for (auto task : queue)
+    queue.remove(task);
+  
+  system = nullptr;
+}
+
+void Mutex::lock(TCB* task) {
+  if (counter == 0) {
+    queue.push_back(task);
+    system->handleInterruption(Interruption::MUTEX_LOCK);
+  }
+
+  counter = 0;
+}
+
+void Mutex::unlock() {
+  if (queue.empty())
+    return;
+  
+  TCB* task = queue.front();
+  queue.pop_front();
+  system->handleInterruption(Interruption::MUTEX_UNLOCK, task);
+  
+  if (queue.empty())
+    counter = 1;
+}
+
+int Mutex::getId() {
+  return id;
+}
+
+// System definition
 
 System::System() : 
   TickObserver(),
@@ -60,14 +105,18 @@ System::~System() {
   for (TCB *task : ord_tasks)
     delete task;
 
-  for (IOEvent* ev : event_list)
+  for (IOEvent* ev : ioevent_list)
     delete ev;
+
+  for (Mutex* m : mutex_list)
+    delete m;
 
   ord_tasks.clear();
   new_list.clear();
   ready_list.clear();
   suspended_list.clear();
-  event_list.clear();
+  ioevent_list.clear();
+  mutex_list.clear();
 
   clock.detach(this);
 }
@@ -111,7 +160,14 @@ void System::handleInterruption(Interruption irq, TCB* task) {
       break;
     case Interruption::FINISH_IO:
       if (task != nullptr)
-        readyTask(task);
+        readyTask(task, EventType::IO);
+      break;
+    case Interruption::MUTEX_LOCK:
+      suspendTask();
+      break;
+    case Interruption::MUTEX_UNLOCK:
+      if (task != nullptr)
+        readyTask(task, EventType::MU);
       break;
     case Interruption::FULL_STOP:
       getch();
@@ -176,12 +232,50 @@ void System::checkEvents() {
 
   while (i != (*events).end()) {
     if ((*i)->start <= elapsed) {
-      IOEvent* event = new IOEvent(current_task, this, &clock, (*i)->duration);
-      event_list.push_back(event);
-      current_task->setCurrentEvent(event);
+      switch ((*i)->type) {
+        case EventType::IO: {
+          IOEvent* event = new IOEvent(current_task, this, &clock, (*i)->duration);
+          ioevent_list.push_back(event);
+          current_task->setCurrentEvent(event);
+          suspendTask();
+          break;
+        }
+
+        case EventType::MU: {
+          for (auto m : mutex_list) {
+            if ((*i)->id == m->getId()) {
+              m->unlock();
+            }
+          }
+          break;
+        }
+
+        case EventType::ML: {
+          bool found = false;
+          for (auto m : mutex_list) {
+            if ((*i)->id == m->getId()) {
+              found = true;
+              m->lock(current_task);
+              break;
+            }
+          }
+
+          if (found)
+            break;
+          
+          Mutex* mutex = new Mutex(this, (*i)->id);
+          mutex_list.push_back(mutex);
+          current_task->setMutex(mutex);
+          mutex->lock(current_task);
+          break;
+        }
+
+        default:
+          break;
+      }
+
       delete (*i);
       i = events->erase(i);
-      suspendTask();
       return;
     } else {
       i++;
@@ -193,6 +287,13 @@ void System::terminateTask() {
   // Armazena o tempo em que a task foi terminada para o cálculo dos tempos médios
   current_task->setCompletionTime(clock.getTotalTime());
 
+  if (current_task->getMutex() != nullptr) {
+    for (auto m : mutex_list) {
+      if (current_task->getMutex()->getId() == m->getId())
+        m->unlock();
+    }
+  }
+  
   changeState(TCBState::TERMINATED);
 
   task_count--;
@@ -217,10 +318,25 @@ void System::preemptTask(PreemptType type) {
   changeState(TCBState::READY, type);
 }
 
-void System::readyTask(TCB* task) {
+void System::readyTask(TCB* task, EventType type) {
   suspended_list.remove(task);
   ready_list.push_back(task);
-  event_list.remove(task->getCurrentEvent());
+  
+  // switch (type) {
+  //   case EventType::IO:
+  //     ioevent_list.remove(task->getCurrentEvent());
+  //     break;
+
+  //   case EventType::MU:
+  //     mutex_list.remove(task->getMutex());
+  //     break;
+
+  //   default:
+  //     break;
+  // }
+  if (type == EventType::IO)
+    ioevent_list.remove(task->getCurrentEvent());
+
   clock.scheduleDeletion(task->getCurrentEvent());
   task->setCurrentEvent(nullptr);
   task->setState(TCBState::READY);

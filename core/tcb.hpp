@@ -8,6 +8,7 @@ using namespace std;
 
 namespace Core {
   class IOEvent;
+  class Mutex;
 
   enum class TCBState {
     NEW,
@@ -27,6 +28,7 @@ namespace Core {
     EventType type;
     int start;
     int duration;
+    int id;
   };
 
   class TCB {
@@ -43,6 +45,7 @@ namespace Core {
       int completion_time;
       TCBState state;
       IOEvent* current_event;
+      Mutex* mutex;
       list<Event*> events;
 
       void createEvent(string ev);
@@ -61,6 +64,7 @@ namespace Core {
       int getCompletionTime() const;
       TCBState getState() const;
       IOEvent* getCurrentEvent() const;
+      Mutex* getMutex() const;
       list<Event*>* getEvents();
 
       void setId(const string _id);
@@ -71,6 +75,7 @@ namespace Core {
       void setPriority(const int _priority);
       void setCompletionTime(int time);
       void setCurrentEvent(IOEvent* event);
+      void setMutex(Mutex* mutex);
 
       void setState(TCBState state);
       void decrementRemaining(int amount = 1);
