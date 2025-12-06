@@ -3,6 +3,8 @@
 #include "../core/tcb.hpp"
 
 namespace Core {
+  class Scheduler;
+
   enum class AlgorithmID {
     FIFO,
     SRTF,
@@ -20,10 +22,11 @@ namespace Core {
     protected:
       const AlgorithmID id;
       list<TCB *> *task_list;
+      Scheduler* scheduler;
 
     public:
-      SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list) : id(id), task_list(task_list) {};
-      virtual ~SchedulingAlgorithm() { task_list = nullptr; }
+      SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list);
+      virtual ~SchedulingAlgorithm() { task_list = nullptr; scheduler = nullptr; }
 
       AlgorithmID getID() const { return id; }
 
@@ -65,13 +68,17 @@ namespace Core {
       list<TCB *> *task_list;
       SchedulingAlgorithm *algorithm;
 
+      int alpha;
+
       // Singleton
       Scheduler();
 
     public:
       ~Scheduler();
       static Scheduler *getInstance();
+      int getAlpha();
 
+      void setAlpha(int alpha);
       void setAlgorithm(AlgorithmID id);
       void setTaskList(list<TCB *> *task_list);
       TCB *chooseTask(TCB *current_task = nullptr, PreemptType type = PreemptType::NONE);

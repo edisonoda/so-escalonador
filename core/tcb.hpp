@@ -41,6 +41,7 @@ namespace Core {
       int start;
       int duration;
       int priority;
+      int priority_d;
       int remaining;
       int completion_time;
       TCBState state;
@@ -60,6 +61,7 @@ namespace Core {
       int getStart() const;
       int getDuration() const;
       int getPriority() const;
+      int getPriorityD() const;
       int getRemaining() const;
       int getCompletionTime() const;
       TCBState getState() const;
@@ -73,6 +75,7 @@ namespace Core {
       void setStart(const int _start);
       void setDuration(const int _duration);
       void setPriority(const int _priority);
+      void setPriorityD(const int _priority_d);
       void setCompletionTime(int time);
       void setCurrentEvent(IOEvent* event);
       void setMutex(Mutex* mutex);

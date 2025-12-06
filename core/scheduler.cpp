@@ -1,6 +1,9 @@
 #include "scheduler.hpp"
+#include <ncurses.h>
 
 using namespace Core;
+
+SchedulingAlgorithm::SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list) : id(id), task_list(task_list), scheduler(Scheduler::getInstance()) {}
 
 // FIFO definition
 
@@ -77,11 +80,56 @@ TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
   return current_task;
 }
 
+// PRIOPEnv definition
+
+PRIOPEnv::PRIOPEnv(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PRIOPEnv, task_list) {
+  printw("hur dur");
+      refresh();
+      getch();
+}
+
+PRIOPEnv::~PRIOPEnv() {}
+
+TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
+  // Apenas retorna a task atual caso ela não tenha terminado ainda 
+  if (task_list->empty()) {
+    if (current_task == nullptr || current_task->getState() == TCBState::TERMINATED)
+      return nullptr;
+
+    return current_task;
+  }
+
+  if (type == PreemptType::QUANTUM)
+    return current_task;
+
+  if (type == PreemptType::NEW_TASK || (current_task != nullptr && current_task->getState() == TCBState::TERMINATED)) {
+    for (TCB *task : *task_list) {
+      task->setPriorityD(task->getPriorityD() + scheduler->getAlpha());
+    }
+  }
+
+  // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
+  if (current_task == nullptr || current_task->getState() != TCBState::READY)
+    current_task = task_list->front();
+
+  // Busca a tarefa com maior prioridade
+  for (TCB *task : *task_list) {
+    if (task->getPriorityD() > current_task->getPriorityD())
+      current_task = task;
+  }
+
+  current_task->setPriorityD(current_task->getPriority());
+
+  return current_task;
+}
+
 // Scheduler definition
 
 Scheduler *Scheduler::instance(nullptr);
 
-Scheduler::Scheduler() : task_list(nullptr), algorithm(nullptr) {}
+Scheduler::Scheduler() : task_list(nullptr), algorithm(nullptr) {
+  alpha = 0;
+}
 
 Scheduler::~Scheduler() {
   delete algorithm;
@@ -97,6 +145,10 @@ Scheduler *Scheduler::getInstance() {
   return instance;
 }
 
+int Scheduler::getAlpha() { return alpha; }
+
+void Scheduler::setAlpha(int a) { alpha = a; }
+
 void Scheduler::setAlgorithm(AlgorithmID id) {
   if (algorithm != nullptr)
     delete algorithm;
@@ -110,6 +162,9 @@ void Scheduler::setAlgorithm(AlgorithmID id) {
       break;
     case AlgorithmID::PRIOp:
       algorithm = new PRIOp(task_list);
+      break;
+    case AlgorithmID::PRIOPEnv:
+      algorithm = new PRIOPEnv(task_list);
       break;
     default:
       algorithm = new FIFO(task_list);

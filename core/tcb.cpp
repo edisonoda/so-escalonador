@@ -16,7 +16,8 @@ TCB::TCB(string id, string color_hex, int color, int start, int duration, int pr
   color(color),
   start(start),
   duration(duration),
-  priority(priority)
+  priority(priority),
+  priority_d(priority)
 {
   this->remaining = duration;
   this->state = TCBState::NEW;
@@ -93,6 +94,8 @@ int TCB::getDuration() const { return duration; }
 
 int TCB::getPriority() const { return priority; }
 
+int TCB::getPriorityD() const { return priority_d; }
+
 IOEvent* TCB::getCurrentEvent() const { return current_event; }
 
 Mutex* TCB::getMutex() const { return mutex; }
@@ -107,7 +110,9 @@ void TCB::setStart(const int _start) { start = _start; }
 
 void TCB::setDuration(const int _duration) { duration = _duration; }
 
-void TCB::setPriority(const int _priority) { priority = _priority; }
+void TCB::setPriority(const int _priority) { priority = _priority; setPriorityD(_priority); }
+
+void TCB::setPriorityD(const int _priority_d) { priority_d = _priority_d; }
 
 void TCB::setCompletionTime(int time) { this->completion_time = time; }
 

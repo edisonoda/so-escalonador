@@ -23,7 +23,11 @@ ConfigReader::ConfigReader(SetupUI *ui) : ui(ui), screen(Screen::getInstance()),
   {"PRIOp", AlgorithmID::PRIOp},
   {"PRIOPEnv", AlgorithmID::PRIOPEnv},
   {"SRTF", AlgorithmID::SRTF}
-}) {}
+}) {
+  algorithm = "";
+  quantum = 0;
+  alpha = 0;
+}
 
 ConfigReader::~ConfigReader() { 
   closeFile();
@@ -94,7 +98,6 @@ bool ConfigReader::readPattern() {
 
   return true;
 }
-
 
 list<TCB *> ConfigReader::readTasks() {
   vector<string> configs = {};
@@ -326,6 +329,10 @@ void SetupManager::runAlgorithmEditor() {
         break;
 
       case '3':
+        config.alg_id = AlgorithmID::PRIOPEnv;
+        break;
+
+      case '4':
         config.alg_id = AlgorithmID::SRTF;
         break;
 

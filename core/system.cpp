@@ -321,19 +321,7 @@ void System::preemptTask(PreemptType type) {
 void System::readyTask(TCB* task, EventType type) {
   suspended_list.remove(task);
   ready_list.push_back(task);
-  
-  // switch (type) {
-  //   case EventType::IO:
-  //     ioevent_list.remove(task->getCurrentEvent());
-  //     break;
 
-  //   case EventType::MU:
-  //     mutex_list.remove(task->getMutex());
-  //     break;
-
-  //   default:
-  //     break;
-  // }
   if (type == EventType::IO)
     ioevent_list.remove(task->getCurrentEvent());
 
@@ -355,6 +343,7 @@ void System::loadConfig() {
 
   scheduler->setAlgorithm(configs.alg_id);
   clock.setQuantum(configs.quantum);
+  scheduler->setAlpha(configs.alpha);
 
   ord_tasks = configs.tasks;
   new_list = list<TCB *>(begin(ord_tasks), end(ord_tasks));

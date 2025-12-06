@@ -85,6 +85,7 @@ TaskInfo::TaskInfo() : TaskVisual() {
     {"Start",     "START: "},
     {"Duration",  "DURATION: "},
     {"Priority",  "PRIORITY: "},
+    {"PriorityD",  "DYN. PRIORITY: "},
     {"Remaining", "REMAINING: "}
   };
 
@@ -134,6 +135,7 @@ void TaskInfo::drawTick(int tick) {
     Core::TCBState status = task->getState();
     string status_str;
     string rem_str = MONITOR_LABELS["Remaining"] + to_string(task->getRemaining());
+    string prio_str = MONITOR_LABELS["PriorityD"] + to_string(task->getPriorityD());
 
     switch (status) {
       case Core::TCBState::NEW:
@@ -160,9 +162,10 @@ void TaskInfo::drawTick(int tick) {
     print(x, i + y_offset, status_str);
     invertColor(true);
     print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), i + y_offset, rem_str);
+    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), i + y_offset, prio_str);
 
     // Imprime as informações estáticas da tarefa
-    drawStaticInfo(i, x + INFO_SPACE + MONITOR_LABELS["Remaining"].length() - x_offset);
+    drawStaticInfo(i, x + INFO_SPACE + MONITOR_LABELS["PriorityD"].length() - x_offset);
   }
 
   refresh();
