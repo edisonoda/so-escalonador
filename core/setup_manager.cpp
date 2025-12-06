@@ -21,6 +21,7 @@ ConfigReader::ConfigReader(SetupUI *ui) : ui(ui), screen(Screen::getInstance()),
   {"RR", AlgorithmID::FIFO},
   {"FIFO", AlgorithmID::FIFO},
   {"PRIOp", AlgorithmID::PRIOp},
+  {"PRIOPEnv", AlgorithmID::PRIOPEnv},
   {"SRTF", AlgorithmID::SRTF}
 }) {}
 
@@ -64,12 +65,29 @@ bool ConfigReader::readPattern() {
       if (alg_map.find(algorithm) == alg_map.end())
         ui->inputError("Algoritmo inválido!");
 
-      // Verifica se o quantum lido é um número
       string str = pattern.substr(sep + 1, pattern.length() - 1);
-      if (isNumber(str))
-        quantum = stoi(str);
+      if (str.length() == 0) {
+        ui->inputError("Configuração de quantum incompleta!");
+        return false;
+      }
+      size_t alpha_sep = str.find(';');
+      string quantum_str = str.substr(0, alpha_sep);
+
+      // Verifica se o quantum lido é um número
+      if (isNumber(quantum_str))
+        quantum = stoi(quantum_str);
       else
         ui->inputError("Valor de quantum inválido!");
+
+      if (alpha_sep == string::npos) {
+        ui->inputError("Configuração de alpha incompleta!");
+      } else {
+        str = str.substr(alpha_sep + 1, str.length() - 1);
+        if (isNumber(str))
+          alpha = stoi(str);
+        else
+          ui->inputError("Valor de alpha inválido!");
+      }
 
     } else return false;
   } else return false;
@@ -204,13 +222,11 @@ bool SetupManager::loadFromFile(const string &filename) {
     return false;
   }
 
-  if (!config_reader.readPattern()) {
-    ui.inputError("Informações insuficientes de algoritmo ou quantum!");
-    return false;
-  }
+  config_reader.readPattern();
 
   config.alg_id = config_reader.getAlgorithm();
   config.quantum = config_reader.getQuantum();
+  config.alpha = config_reader.getAlpha();
 
   for (TCB *task : config.tasks)
     delete task;
@@ -228,6 +244,7 @@ void SetupManager::runEditor() {
   int ch;
   bool in_editor;
   string quantum;
+  string alpha;
 
   do {
     ch = ui.showEditor();
@@ -243,7 +260,13 @@ void SetupManager::runEditor() {
           config.quantum = stoi(quantum);
         break;
 
-      case '3': // Executa o editor de tasks
+      case '3': // Edita o alpha
+        alpha = ui.promptForField("Alpha");
+        if (validateEntry(alpha))
+          config.alpha = stoi(alpha);
+        break;
+
+      case '4': // Executa o editor de tasks
         runTaskListEditor();
         break;
 

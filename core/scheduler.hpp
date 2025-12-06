@@ -6,7 +6,8 @@ namespace Core {
   enum class AlgorithmID {
     FIFO,
     SRTF,
-    PRIOp
+    PRIOp,
+    PRIOPEnv
   };
 
   enum class PreemptType {
@@ -47,6 +48,13 @@ namespace Core {
     public:
       PRIOp(list<TCB*>* task_list);
       ~PRIOp();
+      virtual TCB* chooseTask(TCB* current_task = nullptr, PreemptType type = PreemptType::NONE);
+  };
+
+  class PRIOPEnv : public SchedulingAlgorithm {
+    public:
+      PRIOPEnv(list<TCB*>* task_list);
+      ~PRIOPEnv();
       virtual TCB* chooseTask(TCB* current_task = nullptr, PreemptType type = PreemptType::NONE);
   };
 

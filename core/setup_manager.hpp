@@ -17,6 +17,7 @@ namespace Core {
     vector<TCB*> tasks;
 
     int quantum = 2;
+    int alpha = 0;
     char mode = 'A';
     bool simulation_should_run = false;
   };
@@ -26,6 +27,7 @@ namespace Core {
       ifstream file;
       string algorithm;
       int quantum;
+      int alpha;
       SetupUI *ui;
       Screen* screen;
       const map<string, AlgorithmID> alg_map;
@@ -41,6 +43,7 @@ namespace Core {
       bool readPattern();
       AlgorithmID getAlgorithm() const;
       int getQuantum() const { return quantum; }
+      int getAlpha() const { return alpha; }
       list<TCB*> readTasks();
   };
 

@@ -138,6 +138,9 @@ void SetupUI::update() {
     case Core::AlgorithmID::PRIOp:
       alg_str = "PRIOp";
       break;
+    case Core::AlgorithmID::PRIOPEnv:
+      alg_str = "PRIOPEnv";
+      break;
     case Core::AlgorithmID::SRTF:
       alg_str = "SRTF";
       break;
@@ -146,6 +149,7 @@ void SetupUI::update() {
   task_info.print(0, y++, "Modo: " + string(1, config->mode));
   task_info.print(0, y++, "Algoritmo: " + alg_str);
   task_info.print(0, y++, "Quantum:   " + to_string(config->quantum));
+  task_info.print(0, y++, "Alpha:     " + to_string(config->alpha));
   task_info.print(0, y++, "Tasks (" + to_string(config->tasks.size()) + "):");
 
   if (!config->tasks.empty())
@@ -172,7 +176,8 @@ int SetupUI::showMainMenu() {
 int SetupUI::showEditor() {
   menu.setupMenu("--- EDITAR CONFIGURAÇÕES ---", {
     "Algoritmo", 
-    "Quantum", 
+    "Quantum",
+    "Alpha",
     "Tarefas", 
     "Voltar ao Menu Principal"
   });
@@ -195,7 +200,8 @@ int SetupUI::showTaskList() {
 int SetupUI::showAlgorithm() {
   menu.setupMenu("--- ESCOLHER ALGORITMO ---", {
     "FIFO", 
-    "PRIOp", 
+    "PRIOp",
+    "PRIOPEnv", 
     "SRTF", 
     "Voltar"
   });
