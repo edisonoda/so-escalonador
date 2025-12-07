@@ -125,6 +125,7 @@ void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
 
 void TaskInfo::drawTick(int tick) {
   int x;
+  bool is_random = Core::Scheduler::getInstance()->getWasRandomChoice();
 
   // Imprime as informações atuais de cada task
   for (size_t i = 0; i < ord_tasks->size(); i++) {
@@ -148,7 +149,10 @@ void TaskInfo::drawTick(int tick) {
         break;
       case Core::TCBState::RUNNING:
         invertColor(false);
-        status_str = MONITOR_LABELS_STATUS["Running"];
+        if (is_random) {
+          status_str = "RUNNING (S)";
+        } else
+          status_str = MONITOR_LABELS_STATUS["Running"];
         break;
       case Core::TCBState::SUSPENDED:
         status_str = MONITOR_LABELS_STATUS["Suspended"];

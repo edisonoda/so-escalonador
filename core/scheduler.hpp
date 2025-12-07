@@ -31,7 +31,7 @@ namespace Core {
       void setTaskList(list<TCB *> *task_list);
       AlgorithmID getID() const { return id; }
 
-      virtual TCB *tieBraker(TCB* current_task, TCB* t1, TCB* t2);
+      virtual TCB *tieBreaker(TCB* current_task, TCB* t1, TCB* t2);
       virtual TCB *chooseTask(TCB *current_task = nullptr, PreemptType type = PreemptType::NONE) = 0;
   };
 
@@ -60,7 +60,7 @@ namespace Core {
     public:
       PRIOPEnv(list<TCB*>* task_list);
       ~PRIOPEnv();
-      virtual TCB *tieBraker(TCB* current_task, TCB* t1, TCB* t2);
+      virtual TCB *tieBreaker(TCB* current_task, TCB* t1, TCB* t2);
       virtual TCB* chooseTask(TCB* current_task = nullptr, PreemptType type = PreemptType::NONE);
   };
 
@@ -72,6 +72,7 @@ namespace Core {
       SchedulingAlgorithm *algorithm;
 
       int alpha;
+      bool choice_was_random;
 
       // Singleton
       Scheduler();
@@ -80,7 +81,9 @@ namespace Core {
       ~Scheduler();
       static Scheduler *getInstance();
       int getAlpha();
+      bool getWasRandomChoice() const { return choice_was_random; }
 
+      void setRandomFlag(bool b) { choice_was_random = b; }
       void setAlpha(int alpha);
       void setAlgorithm(AlgorithmID id);
       void setTaskList(list<TCB *> *task_list);

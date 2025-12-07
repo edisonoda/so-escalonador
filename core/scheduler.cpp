@@ -9,7 +9,7 @@ void SchedulingAlgorithm::setTaskList(list<TCB *> *task_list) {
   this->task_list = task_list;
 }
 
-TCB *SchedulingAlgorithm::tieBraker(TCB* current_task, TCB* t1, TCB* t2) {
+TCB *SchedulingAlgorithm::tieBreaker(TCB* current_task, TCB* t1, TCB* t2) {
   // Quem estava executando é escolhida
   if (t1 == current_task)
     return t1;
@@ -29,6 +29,7 @@ TCB *SchedulingAlgorithm::tieBraker(TCB* current_task, TCB* t1, TCB* t2) {
     return t2;
 
   // Sorteio
+  scheduler->setRandomFlag(true);
   return rand() % 2 ? t1 : t2;
 }
 
@@ -76,7 +77,7 @@ TCB *SRTF::chooseTask(TCB *current_task, PreemptType type) {
     if (task->getRemaining() < chosen->getRemaining())
       chosen = task;
     else if (task->getRemaining() == chosen->getRemaining())
-      chosen = tieBraker(current_task, chosen, task);
+      chosen = tieBreaker(current_task, chosen, task);
   }
 
   return chosen;
@@ -107,7 +108,7 @@ TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
     if (task->getPriority() > chosen->getPriority())
       chosen = task;
     else if (task->getPriority() == chosen->getPriority())
-      chosen = tieBraker(current_task, chosen, task);
+      chosen = tieBreaker(current_task, chosen, task);
   }
 
   return chosen;
@@ -119,13 +120,13 @@ PRIOPEnv::PRIOPEnv(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PR
 
 PRIOPEnv::~PRIOPEnv() {}
 
-TCB *PRIOPEnv::tieBraker(TCB* current_task, TCB* t1, TCB* t2) {
+TCB *PRIOPEnv::tieBreaker(TCB* current_task, TCB* t1, TCB* t2) {
   if (t1->getPriority() > t2->getPriority())
     return t1;
   if (t2->getPriority() > t1->getPriority())
     return t2;
 
-  return SchedulingAlgorithm::tieBraker(current_task, t1, t2);
+  return SchedulingAlgorithm::tieBreaker(current_task, t1, t2);
 }
 
 TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
@@ -155,7 +156,7 @@ TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
     if (task->getPriorityD() > chosen->getPriorityD())
       chosen = task;
     else if (task->getPriorityD() == chosen->getPriorityD())
-      chosen = tieBraker(current_task, chosen, task);
+      chosen = tieBreaker(current_task, chosen, task);
   }
 
   chosen->setPriorityD(chosen->getPriority());
@@ -169,6 +170,7 @@ Scheduler *Scheduler::instance(nullptr);
 
 Scheduler::Scheduler() : task_list(nullptr), algorithm(nullptr) {
   alpha = 0;
+  choice_was_random = false;
 }
 
 Scheduler::~Scheduler() {
@@ -219,5 +221,6 @@ void Scheduler::setTaskList(list<TCB *> *task_list) {
 }
 
 TCB *Scheduler::chooseTask(TCB *current_task, PreemptType type) {
+  choice_was_random = false;
   return algorithm->chooseTask(current_task, type);
 }
