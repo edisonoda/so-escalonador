@@ -59,6 +59,7 @@ namespace Core {
       int clock_time;
       int clock_quantum;
       int task_count;
+      bool was_random;
 
       vector<TCB*> tasks;
 
@@ -74,6 +75,7 @@ namespace Core {
         int clock_time,
         int clock_quantum,
         int task_count,
+        bool was_random,
         vector<TCB*>& tasks,
         TCB* current_task,
         list<TCB*>& ready_list,

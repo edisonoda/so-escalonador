@@ -295,6 +295,7 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
       int y = i * TASK_HEIGHT;
 
       string color = convertColor(0);
+      Core::TCBState state = tick->tasks[i]->getState();
       // Muda a cor dependendo do estado
       switch (tick->tasks[i]->getState()) {
         case Core::TCBState::RUNNING:
@@ -314,6 +315,11 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
       file << "  <rect x='" << x << "' y='" << y << "' width='" << TICK_WIDTH
       << "' height='" << TASK_HEIGHT << "' fill='" << color
       << "' stroke='black' stroke-width='0.5'/>\n";
+
+      if (state == Core::TCBState::RUNNING && tick->was_random) {
+          file << "  <text x='" << (x + TICK_WIDTH/2) << "' y='" << (y + TASK_HEIGHT/2 + 4) 
+               << "' font-size='12' fill='black' text-anchor='middle' font-weight='bold'>s</text>\n";
+      }
     }
   }
 

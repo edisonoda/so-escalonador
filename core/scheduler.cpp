@@ -10,6 +10,8 @@ void SchedulingAlgorithm::setTaskList(list<TCB *> *task_list) {
 }
 
 TCB *SchedulingAlgorithm::tieBreaker(TCB* current_task, TCB* t1, TCB* t2) {
+  if (t1 == t2) return t1;
+
   // Quem estava executando é escolhida
   if (t1 == current_task)
     return t1;
@@ -221,6 +223,5 @@ void Scheduler::setTaskList(list<TCB *> *task_list) {
 }
 
 TCB *Scheduler::chooseTask(TCB *current_task, PreemptType type) {
-  choice_was_random = false;
   return algorithm->chooseTask(current_task, type);
 }

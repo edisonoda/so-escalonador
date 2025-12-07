@@ -80,6 +80,7 @@ SystemMemento::SystemMemento(
   int clock_time,
   int clock_quantum,
   int task_count,
+  bool was_random,
   vector<TCB*>& tasks,
   TCB* current_task,
   list<TCB*>& ready_list,
@@ -91,6 +92,7 @@ SystemMemento::SystemMemento(
   this->clock_time = clock_time;
   this->clock_quantum = clock_quantum;
   this->task_count = task_count;
+  this->was_random = was_random;
 
   // 1. Mapa de Tradução: Ponteiro Antigo -> Ponteiro Novo
   map<TCB*, TCB*> ptr_map;
@@ -237,6 +239,7 @@ System *System::getInstance() {
 }
 
 void System::tick() {
+  scheduler->setRandomFlag(false);
   saveState(&history);
 
   checkNewTasks();
@@ -444,10 +447,12 @@ void System::readyTask(TCB* task, EventType type) {
 }
 
 void System::saveState(vector<SystemMemento*>* history) {
+  bool is_random = scheduler->getWasRandomChoice();
   SystemMemento* snap = new SystemMemento(
     clock.getTotalTime(),
     clock.getCurrentQ(),
     task_count,
+    is_random,
     ord_tasks,
     current_task,
     ready_list,
@@ -480,6 +485,7 @@ void System::restoreState() {
   clock.setTotalTime(snap->clock_time - 1);
   clock.setCurrentQuantum(snap->clock_quantum - 1);
   task_count = snap->task_count;
+  scheduler->setRandomFlag(snap->was_random);
 
   this->ord_tasks = snap->tasks;
   this->current_task = snap->current_task;
