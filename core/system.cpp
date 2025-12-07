@@ -76,6 +76,7 @@ int Mutex::getId() {
 
 // System Memento definition
 
+// Realiza Deep Copy (clonagem) do estado para permitir Undo seguro
 SystemMemento::SystemMemento(
   int clock_time,
   int clock_quantum,
@@ -94,24 +95,20 @@ SystemMemento::SystemMemento(
   this->task_count = task_count;
   this->was_random = was_random;
 
-  // 1. Mapa de Tradução: Ponteiro Antigo -> Ponteiro Novo
+  // Mapeia ponteiros originais -> cópias para reconstruir referências
   map<TCB*, TCB*> ptr_map;
   map<IOEvent*, IOEvent*> ioevent_map;
   map<Mutex*, Mutex*> mutex_map;
 
-  // 2. CLONAGEM (Deep Copy das Tarefas)
   for (TCB* original : tasks) {
-    // Cria um NOVO objeto na memória copiando os dados do original
     TCB* copy = new TCB(*original);
+    // Limpa eventos copiados por padrão para evitar Double Free na destruição
     copy->getEvents()->clear();
 
     this->tasks.push_back(copy);
-    ptr_map[original] = copy; // Registra no mapa
+    ptr_map[original] = copy;
   }
-
-  // 3. RECONSTRUÇÃO DOS PONTEIROS (Usando o mapa)
   
-  // Current Task
   if (current_task != nullptr) {
     this->current_task = ptr_map[current_task];
   } else {
@@ -146,24 +143,20 @@ SystemMemento::SystemMemento(
       ptr_map[original]->getEvents()->push_back(new Event(*event));
   }
 
-  // Ready List
   for (TCB* t : ready_list) {
     this->ready_list.push_back(ptr_map[t]);
   }
 
-  // Suspended List
   for (TCB* t : suspended_list) {
     this->suspended_list.push_back(ptr_map[t]);
   }
   
-  // New List
   for (TCB* t : new_list) {
     this->new_list.push_back(ptr_map[t]);
   }
 }
 
 SystemMemento::~SystemMemento() {
-  // Quando apagamos o snapshot, apagamos as tarefas clonadas
   for (TCB* t : tasks) {
     delete t;
   }
@@ -239,6 +232,7 @@ System *System::getInstance() {
 }
 
 void System::tick() {
+  // Reseta flag de sorteio a cada ciclo;
   scheduler->setRandomFlag(false);
   saveState(&history);
 
@@ -468,10 +462,9 @@ void System::saveState(vector<SystemMemento*>* history) {
 void System::restoreState() {
   if (history.empty()) return;
 
-  // Pega o último estado
   SystemMemento* snap = history.back();
 
-  // 1. Limpa o estado ATUAL do sistema (Deleta tarefas atuais)
+  // Limpa memória do estado atual antes de carregar o backup
   for (TCB* t : ord_tasks) delete t;
   for (IOEvent* e : ioevent_list) delete e;
   for (Mutex* e : mutex_list) delete e;
@@ -482,9 +475,14 @@ void System::restoreState() {
   ioevent_list.clear();
   mutex_list.clear();
 
+  // Restaura tempo com -1 para compensar incremento incondicional do loop Clock::run
   clock.setTotalTime(snap->clock_time - 1);
+
+  // Restaura contador do Quantum ajustado (evita preempção incorreta ao retomar)
   clock.setCurrentQuantum(snap->clock_quantum - 1);
   task_count = snap->task_count;
+
+  // Restaura flag de sorteio para manter consistência visual
   scheduler->setRandomFlag(snap->was_random);
 
   this->ord_tasks = snap->tasks;
@@ -499,9 +497,6 @@ void System::restoreState() {
     clock.attach(e);
   }
 
-  // scheduler->setTaskList(&ready_list);
-  // gantt_chart.setTasks(&ord_tasks);
-  // task_info.setTasks(&ord_tasks);
   task_info.drawTick(clock.getTotalTime());
   task_info.drawTick(snap->clock_time);
   gantt_chart.previousTick();

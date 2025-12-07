@@ -10,6 +10,7 @@ void SchedulingAlgorithm::setTaskList(list<TCB *> *task_list) {
 }
 
 TCB *SchedulingAlgorithm::tieBreaker(TCB* current_task, TCB* t1, TCB* t2) {
+  // Evita auto comparação
   if (t1 == t2) return t1;
 
   // Quem estava executando é escolhida
