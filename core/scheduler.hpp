@@ -31,6 +31,7 @@ namespace Core {
       void setTaskList(list<TCB *> *task_list);
       AlgorithmID getID() const { return id; }
 
+      virtual TCB *tieBraker(TCB* current_task, TCB* t1, TCB* t2);
       virtual TCB *chooseTask(TCB *current_task = nullptr, PreemptType type = PreemptType::NONE) = 0;
   };
 
@@ -59,6 +60,7 @@ namespace Core {
     public:
       PRIOPEnv(list<TCB*>* task_list);
       ~PRIOPEnv();
+      virtual TCB *tieBraker(TCB* current_task, TCB* t1, TCB* t2);
       virtual TCB* chooseTask(TCB* current_task = nullptr, PreemptType type = PreemptType::NONE);
   };
 

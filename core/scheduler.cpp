@@ -9,6 +9,29 @@ void SchedulingAlgorithm::setTaskList(list<TCB *> *task_list) {
   this->task_list = task_list;
 }
 
+TCB *SchedulingAlgorithm::tieBraker(TCB* current_task, TCB* t1, TCB* t2) {
+  // Quem estava executando é escolhida
+  if (t1 == current_task)
+    return t1;
+  if (t2 == current_task)
+    return t2;
+
+  // Quem iniciou primeiro é escolhida
+  if (t1->getStart() < t2->getStart())
+    return t1;
+  if (t2->getStart() < t1->getStart())
+    return t2;
+
+  // Quem tem a menor duração é escolhida
+  if (t1->getDuration() < t2->getDuration())
+    return t1;
+  if (t2->getDuration() < t1->getDuration())
+    return t2;
+
+  // Sorteio
+  return rand() % 2 ? t1 : t2;
+}
+
 // FIFO definition
 
 FIFO::FIFO(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::FIFO, task_list) {}
@@ -43,17 +66,20 @@ TCB *SRTF::chooseTask(TCB *current_task, PreemptType type) {
     return current_task;
   }
 
+  TCB* chosen = current_task;
   // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
-    current_task = task_list->front();
+    chosen = task_list->front();
 
   // Busca a tarefa com menor tempo restante
   for (TCB *task : *task_list) {
-    if (task->getRemaining() < current_task->getRemaining())
-      current_task = task;
+    if (task->getRemaining() < chosen->getRemaining())
+      chosen = task;
+    else if (task->getRemaining() == chosen->getRemaining())
+      chosen = tieBraker(current_task, chosen, task);
   }
 
-  return current_task;
+  return chosen;
 }
 
 // PRIOp definition
@@ -71,17 +97,20 @@ TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
     return current_task;
   }
 
+  TCB* chosen = current_task;
   // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
-    current_task = task_list->front();
+    chosen = task_list->front();
 
   // Busca a tarefa com maior prioridade
   for (TCB *task : *task_list) {
-    if (task->getPriority() > current_task->getPriority())
-      current_task = task;
+    if (task->getPriority() > chosen->getPriority())
+      chosen = task;
+    else if (task->getPriority() == chosen->getPriority())
+      chosen = tieBraker(current_task, chosen, task);
   }
 
-  return current_task;
+  return chosen;
 }
 
 // PRIOPEnv definition
@@ -89,6 +118,15 @@ TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
 PRIOPEnv::PRIOPEnv(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PRIOPEnv, task_list) {}
 
 PRIOPEnv::~PRIOPEnv() {}
+
+TCB *PRIOPEnv::tieBraker(TCB* current_task, TCB* t1, TCB* t2) {
+  if (t1->getPriority() > t2->getPriority())
+    return t1;
+  if (t2->getPriority() > t1->getPriority())
+    return t2;
+
+  return SchedulingAlgorithm::tieBraker(current_task, t1, t2);
+}
 
 TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
   // Apenas retorna a task atual caso ela não tenha terminado ainda 
@@ -103,24 +141,26 @@ TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
     return current_task;
 
   if (type == PreemptType::NEW_TASK || (current_task != nullptr && current_task->getState() == TCBState::TERMINATED)) {
-    for (TCB *task : *task_list) {
+    for (TCB *task : *task_list)
       task->setPriorityD(task->getPriorityD() + scheduler->getAlpha());
-    }
   }
 
+  TCB* chosen = current_task;
   // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
-    current_task = task_list->front();
+    chosen = task_list->front();
 
   // Busca a tarefa com maior prioridade
   for (TCB *task : *task_list) {
-    if (task->getPriorityD() > current_task->getPriorityD())
-      current_task = task;
+    if (task->getPriorityD() > chosen->getPriorityD())
+      chosen = task;
+    else if (task->getPriorityD() == chosen->getPriorityD())
+      chosen = tieBraker(current_task, chosen, task);
   }
 
-  current_task->setPriorityD(current_task->getPriority());
+  chosen->setPriorityD(chosen->getPriority());
 
-  return current_task;
+  return chosen;
 }
 
 // Scheduler definition
