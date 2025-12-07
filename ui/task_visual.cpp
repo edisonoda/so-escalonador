@@ -1,5 +1,6 @@
 #include "task_visual.hpp"
 #include "../core/system.hpp"
+#include "screen.hpp"
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -288,7 +289,23 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
     for (int i = 0; i < tick->tasks.size(); i++) {
       int x = (tick->clock_time * TICK_WIDTH) + max_id;
       int y = i * TASK_HEIGHT;
-      string color = tick->tasks[i]->getColorHex();
+
+      string color = convertColor(0);
+      // Muda a cor dependendo do estado
+      switch (tick->tasks[i]->getState()) {
+        case Core::TCBState::RUNNING:
+          color = "#" + tick->tasks[i]->getColorHex();
+          break;
+        case Core::TCBState::READY:
+          color = convertColor(GRAY_INDEX);
+          break;
+        case Core::TCBState::SUSPENDED:
+          color = convertColor(OFFWHITE_INDEX);
+          break;
+        default:
+          color = convertColor(0);
+          break;
+      }
       
       file << "  <rect x='" << x << "' y='" << y << "' width='" << TICK_WIDTH
       << "' height='" << TASK_HEIGHT << "' fill='" << color
