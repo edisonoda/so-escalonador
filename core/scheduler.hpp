@@ -28,6 +28,7 @@ namespace Core {
       SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list);
       virtual ~SchedulingAlgorithm() { task_list = nullptr; scheduler = nullptr; }
 
+      void setTaskList(list<TCB *> *task_list);
       AlgorithmID getID() const { return id; }
 
       virtual TCB *chooseTask(TCB *current_task = nullptr, PreemptType type = PreemptType::NONE) = 0;

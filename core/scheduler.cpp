@@ -5,6 +5,10 @@ using namespace Core;
 
 SchedulingAlgorithm::SchedulingAlgorithm(AlgorithmID id, list<TCB *> *task_list) : id(id), task_list(task_list), scheduler(Scheduler::getInstance()) {}
 
+void SchedulingAlgorithm::setTaskList(list<TCB *> *task_list) {
+  this->task_list = task_list;
+}
+
 // FIFO definition
 
 FIFO::FIFO(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::FIFO, task_list) {}
@@ -82,11 +86,7 @@ TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
 
 // PRIOPEnv definition
 
-PRIOPEnv::PRIOPEnv(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PRIOPEnv, task_list) {
-  printw("hur dur");
-      refresh();
-      getch();
-}
+PRIOPEnv::PRIOPEnv(list<TCB *> *task_list) : SchedulingAlgorithm(AlgorithmID::PRIOPEnv, task_list) {}
 
 PRIOPEnv::~PRIOPEnv() {}
 
@@ -174,6 +174,8 @@ void Scheduler::setAlgorithm(AlgorithmID id) {
 
 void Scheduler::setTaskList(list<TCB *> *task_list) {
   this->task_list = task_list;
+  if (algorithm != nullptr)
+    algorithm->setTaskList(task_list); 
 }
 
 TCB *Scheduler::chooseTask(TCB *current_task, PreemptType type) {

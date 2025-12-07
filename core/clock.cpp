@@ -80,6 +80,11 @@ bool ManualClock::getTick() {
   timeout(-1);
   int ch = getch();
 
+  if (ch == 'b') {
+    system->restoreState();
+    return false;
+  }
+
   if (ch == ' ') {
     clock->selectMode('A');
     return false;

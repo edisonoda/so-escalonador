@@ -74,6 +74,110 @@ int Mutex::getId() {
   return id;
 }
 
+// System Memento definition
+
+SystemMemento::SystemMemento(
+  int clock_time,
+  int clock_quantum,
+  int task_count,
+  vector<TCB*>& tasks,
+  TCB* current_task,
+  list<TCB*>& ready_list,
+  list<TCB*>& suspended_list,
+  list<TCB*>& new_list,
+  list<IOEvent*>& ioevent_list,
+  list<Mutex*>& mutex_list
+) {
+  this->clock_time = clock_time;
+  this->clock_quantum = clock_quantum;
+  this->task_count = task_count;
+
+  // 1. Mapa de Tradução: Ponteiro Antigo -> Ponteiro Novo
+  map<TCB*, TCB*> ptr_map;
+  map<IOEvent*, IOEvent*> ioevent_map;
+  map<Mutex*, Mutex*> mutex_map;
+
+  // 2. CLONAGEM (Deep Copy das Tarefas)
+  for (TCB* original : tasks) {
+    // Cria um NOVO objeto na memória copiando os dados do original
+    TCB* copy = new TCB(*original);
+    copy->getEvents()->clear();
+
+    this->tasks.push_back(copy);
+    ptr_map[original] = copy; // Registra no mapa
+  }
+
+  // 3. RECONSTRUÇÃO DOS PONTEIROS (Usando o mapa)
+  
+  // Current Task
+  if (current_task != nullptr) {
+    this->current_task = ptr_map[current_task];
+  } else {
+    this->current_task = nullptr;
+  }
+
+  for (IOEvent* e : ioevent_list) {
+    IOEvent* copy = new IOEvent(*e);
+    copy->setTask(ptr_map[e->getTask()]);
+    this->ioevent_list.push_back(copy);
+    ioevent_map[e] = copy;
+  }
+  
+  for (Mutex* e : mutex_list) {
+    Mutex* copy = new Mutex(*e);
+    copy->getTasks()->clear();
+    for (TCB* t : *(e->getTasks()))
+      copy->getTasks()->push_back(ptr_map[t]);
+
+    this->mutex_list.push_back(copy);
+    mutex_map[e] = copy;
+  }
+
+  for (TCB* original : tasks) {
+    if (original->getCurrentEvent() != nullptr)
+      ptr_map[original]->setCurrentEvent(ioevent_map[original->getCurrentEvent()]);
+    
+    if (original->getMutex() != nullptr)
+      ptr_map[original]->setMutex(mutex_map[original->getMutex()]);
+
+    for (Event* event : *(original->getEvents()))
+      ptr_map[original]->getEvents()->push_back(new Event(*event));
+  }
+
+  // Ready List
+  for (TCB* t : ready_list) {
+    this->ready_list.push_back(ptr_map[t]);
+  }
+
+  // Suspended List
+  for (TCB* t : suspended_list) {
+    this->suspended_list.push_back(ptr_map[t]);
+  }
+  
+  // New List
+  for (TCB* t : new_list) {
+    this->new_list.push_back(ptr_map[t]);
+  }
+}
+
+SystemMemento::~SystemMemento() {
+  // Quando apagamos o snapshot, apagamos as tarefas clonadas
+  for (TCB* t : tasks) {
+    delete t;
+  }
+  tasks.clear();
+
+  for (IOEvent* e : ioevent_list) {
+    delete e;
+  }
+  ioevent_list.clear();
+
+  for (Mutex* e : mutex_list) {
+    delete e;
+  }
+  mutex_list.clear();
+}
+
 // System definition
 
 System::System() : 
@@ -111,12 +215,16 @@ System::~System() {
   for (Mutex* m : mutex_list)
     delete m;
 
+  for (SystemMemento* s : history)
+    delete s;
+
   ord_tasks.clear();
   new_list.clear();
   ready_list.clear();
   suspended_list.clear();
   ioevent_list.clear();
   mutex_list.clear();
+  history.clear();
 
   clock.detach(this);
 }
@@ -129,6 +237,8 @@ System *System::getInstance() {
 }
 
 void System::tick() {
+  saveState(&history);
+
   checkNewTasks();
 
   // Se não existe task em execução, busca uma task
@@ -151,6 +261,8 @@ void System::endTick() {
   // Atualiza o gráfico e as informações das tarefas
   gantt_chart.drawTick(clock.getTotalTime());
   task_info.drawTick(clock.getTotalTime());
+
+  saveState(&chart_history);
 }
 
 void System::handleInterruption(Interruption irq, TCB* task) {
@@ -331,6 +443,80 @@ void System::readyTask(TCB* task, EventType type) {
   preemptTask(PreemptType::NEW_TASK);
 }
 
+void System::saveState(vector<SystemMemento*>* history) {
+  SystemMemento* snap = new SystemMemento(
+    clock.getTotalTime(),
+    clock.getCurrentQ(),
+    task_count,
+    ord_tasks,
+    current_task,
+    ready_list,
+    suspended_list,
+    new_list,
+    ioevent_list,
+    mutex_list
+  );
+    
+  history->push_back(snap);
+}
+
+void System::restoreState() {
+  if (history.empty()) return;
+
+  // Pega o último estado
+  SystemMemento* snap = history.back();
+
+  // 1. Limpa o estado ATUAL do sistema (Deleta tarefas atuais)
+  for (TCB* t : ord_tasks) delete t;
+  for (IOEvent* e : ioevent_list) delete e;
+  for (Mutex* e : mutex_list) delete e;
+  ord_tasks.clear();
+  ready_list.clear();
+  suspended_list.clear();
+  new_list.clear();
+  ioevent_list.clear();
+  mutex_list.clear();
+
+  clock.setTotalTime(snap->clock_time - 1);
+  clock.setCurrentQuantum(snap->clock_quantum - 1);
+  task_count = snap->task_count;
+
+  this->ord_tasks = snap->tasks;
+  this->current_task = snap->current_task;
+  this->ready_list = snap->ready_list;
+  this->suspended_list = snap->suspended_list;
+  this->new_list = snap->new_list;
+  this->ioevent_list = snap->ioevent_list;
+  this->mutex_list = snap->mutex_list;
+
+  for (IOEvent* e : ioevent_list) {
+    clock.attach(e);
+  }
+
+  // scheduler->setTaskList(&ready_list);
+  // gantt_chart.setTasks(&ord_tasks);
+  // task_info.setTasks(&ord_tasks);
+  task_info.drawTick(clock.getTotalTime());
+  task_info.drawTick(snap->clock_time);
+  gantt_chart.previousTick();
+
+  restoreState(&history);
+  restoreState(&chart_history);
+}
+
+void System::restoreState(vector<SystemMemento*>* history) {
+  // Pega o último estado
+  SystemMemento* snap = history->back();
+  history->pop_back();
+
+  // Evita que o destrutor do snapshot apague as tasks que agora são nossas
+  snap->tasks.clear(); 
+  snap->ioevent_list.clear();
+  snap->mutex_list.clear();
+
+  delete snap;
+}
+
 void System::loadConfig() {
   // Executa o menu de configurações
   SimulationConfig configs = setup.run();
@@ -363,7 +549,7 @@ void System::endProgram() {
   endTick();
   
   clock.stop();
-  gantt_exporter.generate("chart.svg", clock.getTotalTime(), ord_tasks.size());
+  gantt_exporter.generate("chart.svg", clock.getTotalTime(), ord_tasks.size(), &chart_history);
   task_info.displayFinalStatistics();
   gantt_chart.scrollChart();
 

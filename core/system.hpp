@@ -31,6 +31,8 @@ namespace Core {
       IOEvent(TCB* task, System* system, Clock* clock, const int duration);
       ~IOEvent();
 
+      TCB* getTask() { return task; }
+      void setTask(TCB* task) { this->task = task; }
       virtual void tick();
   };
 
@@ -46,9 +48,42 @@ namespace Core {
       Mutex(System* system, int id);
       ~Mutex();
 
+      list<TCB*>* getTasks() { return &queue; }
       void lock(TCB* task);
       void unlock();
       int getId();
+  };
+
+  class SystemMemento {
+    public:
+      int clock_time;
+      int clock_quantum;
+      int task_count;
+
+      vector<TCB*> tasks;
+
+      TCB* current_task;
+      list<TCB*> ready_list;
+      list<TCB*> suspended_list;
+      list<TCB*> new_list;
+      
+      list<IOEvent*> ioevent_list;
+      list<Mutex*> mutex_list;
+
+      SystemMemento(
+        int clock_time,
+        int clock_quantum,
+        int task_count,
+        vector<TCB*>& tasks,
+        TCB* current_task,
+        list<TCB*>& ready_list,
+        list<TCB*>& suspended_list,
+        list<TCB*>& new_list,
+        list<IOEvent*>& ioevent_list,
+        list<Mutex*>& mutex_list
+      );
+
+      ~SystemMemento();
   };
 
   class System : public TickObserver {
@@ -58,6 +93,8 @@ namespace Core {
       Scheduler* scheduler;
       Clock clock;
       TCB* current_task;
+      vector<SystemMemento*> history;
+      vector<SystemMemento*> chart_history;
       vector<TCB*> ord_tasks;
       list<TCB*> new_list;
       list<TCB*> ready_list;
@@ -91,6 +128,9 @@ namespace Core {
       ~System();
       static System* getInstance();
 
+      void saveState(vector<SystemMemento*>* history);
+      void restoreState(vector<SystemMemento*>* history);
+      void restoreState();
       void loadConfig();
       void handleInterruption(Interruption irq, TCB* task = nullptr);  
       void endTick();

@@ -1,4 +1,5 @@
 #include "task_visual.hpp"
+#include "../core/system.hpp"
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -247,12 +248,7 @@ GanttExporter::GanttExporter(vector<Core::TCB *> *task_list) {
 
 GanttExporter::~GanttExporter() { tasks = nullptr; }
 
-// Função para registrar cada tarefa em todo tick, enquanto o programa executa
-void GanttExporter::registerEntry(int tick, int task_index, int color) {
-  chart_history.push_back( {tick, task_index, convertColor(color)});
-}
-
-void GanttExporter::generate(const string &filename, int total_time, int task_count) {
+void GanttExporter::generate(const string &filename, int total_time, int task_count, vector<Core::SystemMemento*>* history) {
   int max_id = TICK_WIDTH;
   for (int i = 0; i < tasks->size(); i++) {
     string id = (*tasks)[i]->getId();
@@ -288,14 +284,16 @@ void GanttExporter::generate(const string &filename, int total_time, int task_co
   }
 
   // Cada entrada do gráfico
-  for (const auto &entry : chart_history) {
-    int x = (entry.tick * TICK_WIDTH) + max_id;
-    int y = entry.task_index * TASK_HEIGHT;
-    string color = entry.color;
-
-    file << "  <rect x='" << x << "' y='" << y << "' width='" << TICK_WIDTH
-         << "' height='" << TASK_HEIGHT << "' fill='" << color
-         << "' stroke='black' stroke-width='0.5'/>\n";
+  for (const auto &tick : *history) {
+    for (int i = 0; i < tick->tasks.size(); i++) {
+      int x = (tick->clock_time * TICK_WIDTH) + max_id;
+      int y = i * TASK_HEIGHT;
+      string color = tick->tasks[i]->getColorHex();
+      
+      file << "  <rect x='" << x << "' y='" << y << "' width='" << TICK_WIDTH
+      << "' height='" << TASK_HEIGHT << "' fill='" << color
+      << "' stroke='black' stroke-width='0.5'/>\n";
+    }
   }
 
   // Eixo horizontal (ticks)
@@ -343,10 +341,6 @@ GanttChart::GanttChart(GanttExporter *chart_gen) : TaskVisual() {
 
 GanttChart::~GanttChart() { gantt_exporter = nullptr; }
 
-void GanttChart::registerEntry(int tick, int task_index, int color) {
-  // chart_history.push_back( {tick, task_index, convertColor(color)});
-}
-
 void GanttChart::scrollChart() {
   timeout(-1);
 
@@ -369,6 +363,19 @@ void GanttChart::scrollChart() {
 
     ch = wgetch(window);
   }
+}
+
+void GanttChart::previousTick() {
+  int x = visual_edge_x - UNIT_WIDTH;
+  string unit = string(UNIT_WIDTH, ' ');
+  setColor(DefaultColor::WHITE); // branco no preto
+
+  for (size_t i = 0; i < ord_tasks->size(); i++)
+    print(x, i + y_offset, unit);
+
+  print(x, ord_tasks->size() + y_offset, unit);
+  visual_edge_x = x;
+  refresh();
 }
 
 void GanttChart::drawTick(int tick) {
@@ -396,8 +403,6 @@ void GanttChart::drawTick(int tick) {
         break;
     }
 
-    // Registra como está a task no ponto do tick para criação da imagem final
-    gantt_exporter->registerEntry(tick, i, color);
     print(x, i + y_offset, unit);
   }
 
@@ -407,7 +412,7 @@ void GanttChart::drawTick(int tick) {
 }
 
 // Define o tamanho do gráfico dinâmicamente com base na quantidade de tasks e duração
-void GanttChart::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
+void GanttChart::setTasks(vector<Core::TCB *> *tasks, bool reset, int y_offset) {
   TaskVisual::setTasks(tasks, y_offset);
 
   int total_time = 0;
@@ -422,12 +427,13 @@ void GanttChart::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
   total_time += latest_start;
 
   // Largura com base no offset e total máximo de ticks
-  setWindowDimensions(
-    tasks->size() + 1,
-    ((total_time + 1) * UNIT_WIDTH) + x_offset,
-    0,
-    0
-  );
+  if (reset)
+    setWindowDimensions(
+      tasks->size() + 1,
+      ((total_time + 1) * UNIT_WIDTH) + x_offset,
+      0,
+      0
+    );
 
   printAxis();
 }

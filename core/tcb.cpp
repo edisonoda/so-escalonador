@@ -30,9 +30,6 @@ TCB::TCB(string id, string color_hex, int color, int start, int duration, int pr
 }
 
 TCB::~TCB() {
-  if (current_event != nullptr)
-    delete current_event;
-  
   current_event = nullptr;
   mutex = nullptr;
 

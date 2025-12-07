@@ -95,7 +95,9 @@ namespace Core {
 
       int getQuantum() const { return quantum_interval; }
       int getCurrentQ() const { return quantum; }
+      void setTotalTime(const int t) { total_time = t; }
       void setQuantum(const int q) { quantum_interval = q; }
+      void setCurrentQuantum(const int q) { quantum = q; }
       void resetQuantum() { quantum = 0; }
       int getTotalTime() const { return total_time; }
 

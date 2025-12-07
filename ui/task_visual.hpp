@@ -11,6 +11,8 @@
 
 #define UNIT_WIDTH 3
 
+namespace Core { class SystemMemento; }
+
 namespace UI {
   struct GanttEntry {
     int tick;
@@ -61,31 +63,28 @@ namespace UI {
     private:
       const int TICK_WIDTH = 30;  // Largura de cada tick
       const int TASK_HEIGHT = 30; // Altura de cada tarefa
-      vector<GanttEntry> chart_history;
       vector<Core::TCB*> *tasks;
       
     public:
       GanttExporter(vector<Core::TCB*> *task_list);
       ~GanttExporter();
-      void registerEntry(int tick, int task_index, int color);
-      void generate(const string& filename, int total_time, int task_count);
+      void generate(const string& filename, int total_time, int task_count, vector<Core::SystemMemento*>* history);
       string convertColor(int color);
   };
   
   class GanttChart : public TaskVisual {
     private:
       static const vector<int> scrollKeys;
-      vector<GanttEntry> chart_history;
       GanttExporter *gantt_exporter;
 
     public:
       GanttChart(GanttExporter *chart_gen);
       ~GanttChart();
 
-      void registerEntry(int tick, int task_index, int color);
       void scrollChart();
+      void previousTick();
 
-      virtual void setTasks(vector<Core::TCB*> *tasks, int y_offset = 0);
+      virtual void setTasks(vector<Core::TCB*> *tasks, bool reset = true, int y_offset = 0);
       virtual void drawTick(int tick);
   };
 } // namespace UI
