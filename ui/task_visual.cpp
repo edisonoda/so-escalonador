@@ -1,5 +1,6 @@
 #include "task_visual.hpp"
 #include "../core/system.hpp"
+#include "../core/scheduler.hpp"
 #include "screen.hpp"
 #include <fstream>
 #include <iomanip>
@@ -414,12 +415,12 @@ string GanttExporter::convertColor(int color) {
 
 const vector<int> GanttChart::scrollKeys({KEY_LEFT, KEY_RIGHT});
 
-GanttChart::GanttChart(GanttExporter *chart_gen) : TaskVisual() {
+GanttChart::GanttChart(GanttExporter *chart_gen) : TaskVisual(), scheduler(Core::Scheduler::getInstance()) {
   gantt_exporter = chart_gen;
   // scrollok(window, true);
 }
 
-GanttChart::~GanttChart() { gantt_exporter = nullptr; }
+GanttChart::~GanttChart() { gantt_exporter = nullptr; scheduler= nullptr; }
 
 void GanttChart::scrollChart() {
   timeout(-1);
@@ -465,12 +466,17 @@ void GanttChart::drawTick(int tick) {
 
   for (size_t i = 0; i < ord_tasks->size(); i++) {
     Core::TCB *task = (*ord_tasks)[i];
+    unit = string(UNIT_WIDTH, ' ');
     int color;
 
     // Muda a cor dependendo do estado
     switch (task->getState()) {
       case Core::TCBState::RUNNING:
         color = setColor(task->getColor());
+
+        if (scheduler->getWasRandomChoice())
+          unit = " S ";
+        
         break;
       case Core::TCBState::READY:
         color = setColor(DefaultColor::GRAY);

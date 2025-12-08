@@ -12,7 +12,7 @@
 
 #define UNIT_WIDTH 3
 
-namespace Core { class SystemMemento; class IOEvent; class Mutex; }
+namespace Core { class SystemMemento; class IOEvent; class Mutex; class Scheduler; }
 
 namespace UI {
   struct GanttEntry {
@@ -81,6 +81,7 @@ namespace UI {
     private:
       static const vector<int> scrollKeys;
       GanttExporter *gantt_exporter;
+      Core::Scheduler* scheduler;
 
     public:
       GanttChart(GanttExporter *chart_gen);
