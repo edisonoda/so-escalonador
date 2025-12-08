@@ -70,17 +70,22 @@ TCB *SRTF::chooseTask(TCB *current_task, PreemptType type) {
     return current_task;
   }
 
-  TCB* chosen = current_task;
+  TCB *chosen = current_task, *previous = nullptr;
   // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
     chosen = task_list->front();
 
   // Busca a tarefa com menor tempo restante
   for (TCB *task : *task_list) {
+    if (previous != chosen)
+      scheduler->setRandomFlag(false);
+
     if (task->getRemaining() < chosen->getRemaining())
       chosen = task;
     else if (task->getRemaining() == chosen->getRemaining())
       chosen = tieBreaker(current_task, chosen, task);
+    
+    previous = chosen;
   }
 
   return chosen;
@@ -101,17 +106,22 @@ TCB *PRIOp::chooseTask(TCB *current_task, PreemptType type) {
     return current_task;
   }
 
-  TCB* chosen = current_task;
+  TCB *chosen = current_task, *previous = nullptr;
   // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual
   if (current_task == nullptr || current_task->getState() != TCBState::READY)
     chosen = task_list->front();
 
   // Busca a tarefa com maior prioridade
   for (TCB *task : *task_list) {
+    if (previous != chosen)
+      scheduler->setRandomFlag(false);
+
     if (task->getPriority() > chosen->getPriority())
       chosen = task;
     else if (task->getPriority() == chosen->getPriority())
       chosen = tieBreaker(current_task, chosen, task);
+
+    previous = chosen;
   }
 
   return chosen;
@@ -153,7 +163,7 @@ TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
   for (TCB *task : *task_list) {
     if (previous != chosen)
       scheduler->setRandomFlag(false);
-    
+
     if (task->getPriorityD() > chosen->getPriorityD())
       chosen = task;
     else if (task->getPriorityD() == chosen->getPriorityD())
