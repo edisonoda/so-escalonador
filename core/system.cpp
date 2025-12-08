@@ -65,12 +65,16 @@ void Mutex::lock(TCB* task) {
 }
 
 void Mutex::unlock() {
+  if (task != nullptr) {
+    task->removeMutex(this);
+    task = nullptr;
+  }
+
   if (queue.empty()) {
     counter = 1;
     return;
   }
   
-  task->removeMutex(this);
   task = queue.front();
   queue.pop_front();
   system->handleInterruption(Interruption::MUTEX_UNLOCK, task);
