@@ -48,6 +48,7 @@ namespace Core {
       IOEvent* current_event;
       list<Mutex*> mutex_list;
       list<Event*> events;
+      list<string> string_events;
 
       void createEvent(string ev);
 
@@ -68,6 +69,7 @@ namespace Core {
       IOEvent* getCurrentEvent() const;
       list<Mutex*>* getMutexList();
       list<Event*>* getEvents();
+      list<string>* getStringEvents();
       bool isAvailable();
 
       void setId(const string _id);

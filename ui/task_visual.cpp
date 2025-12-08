@@ -96,7 +96,8 @@ TaskInfo::TaskInfo() : TaskVisual() {
     {"Duration",  "DURATION: "},
     {"Priority",  "PRIORITY: "},
     {"PriorityD",  "DYN. PRIORITY: "},
-    {"Remaining", "REMAINING: "}
+    {"Remaining", "REMAINING: "},
+    {"Events", "EVENTS: "}
   };
 
   // Faz o mapeamento dos possíveis status das tasks
@@ -123,7 +124,7 @@ void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
 
   setWindowDimensions(
     tasks->size() + y_offset + STATS_SPACE,
-    width + x_offset,
+    width + x_offset + EVENTS_PAD,
     0,
     tasks->size() + 3
   );
@@ -175,8 +176,10 @@ void TaskInfo::drawTick(int tick) {
 
     print(x, y, status_str);
     invertColor(true);
-    print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), y, rem_str);
-    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), y, prio_str);
+    print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), y, string(INFO_SPACE + 1, ' '));
+    print(x, y, rem_str);
+    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), y, string(INFO_SPACE + 1, ' '));
+    print(x, y, prio_str);
 
     // Imprime as informações estáticas da tarefa
     drawStaticInfo(i, x + INFO_SPACE + MONITOR_LABELS["PriorityD"].length() - x_offset);
@@ -230,6 +233,13 @@ void TaskInfo::drawStaticInfo(int i, int offset) {
   string start_str = MONITOR_LABELS["Start"] + to_string(task->getStart());
   string duration_str = MONITOR_LABELS["Duration"] + to_string(task->getDuration());
   string prio_str = MONITOR_LABELS["Priority"] + to_string(task->getPriority());
+  string event_str = MONITOR_LABELS["Events"];
+
+  for (string ev : *(task->getStringEvents())) {
+    event_str += ev;
+    if (ev != task->getStringEvents()->back())
+      event_str += ", ";
+  }
 
   setColor(DefaultColor::WHITE);
   invertColor(false);
@@ -239,6 +249,7 @@ void TaskInfo::drawStaticInfo(int i, int offset) {
   print(x = x + COLOR_SPACE + MONITOR_LABELS["Color"].length(), i + y_offset, start_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Start"].length(), i + y_offset, duration_str);
   print(x = x + INFO_SPACE + MONITOR_LABELS["Duration"].length(), i + y_offset, prio_str);
+  print(x = x + INFO_SPACE + MONITOR_LABELS["Events"].length(), i + y_offset, event_str);
 }
 
 // Faz o cálculo dos tempos médios

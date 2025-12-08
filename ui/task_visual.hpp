@@ -5,7 +5,8 @@
 #include "screen.hpp"
 #include "../core/tcb.hpp"
 
-#define INFO_SPACE 6
+#define INFO_SPACE 5
+#define EVENTS_PAD 40
 #define COLOR_SPACE 9
 #define STATS_SPACE 5
 

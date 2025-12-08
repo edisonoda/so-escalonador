@@ -25,6 +25,7 @@ TCB::TCB(string id, string color_hex, int color, int start, int duration, int pr
 
   current_event = nullptr;
 
+  string_events = events;
   for (string event : events)
     createEvent(event);
 }
@@ -37,6 +38,7 @@ TCB::~TCB() {
 
   mutex_list.clear();
   events.clear();
+  string_events.clear();
 }
 
 void TCB::createEvent(string ev) {
@@ -126,6 +128,8 @@ int TCB::getRemaining() const { return remaining; }
 TCBState TCB::getState() const { return state; }
 
 list<Event*>* TCB::getEvents() { return &events; }
+
+list<string>* TCB::getStringEvents() { return &string_events; }
 
 void TCB::setState(TCBState state) { this->state = state; }
 
