@@ -85,6 +85,11 @@ bool ManualClock::getTick() {
     return false;
   }
 
+  if (ch == 'q') {
+    system->endProgram();
+    return false;
+  }
+
   if (ch == ' ') {
     clock->selectMode('A');
     return false;

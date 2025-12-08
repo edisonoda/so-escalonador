@@ -127,8 +127,6 @@ namespace Core {
       void suspendTask();
       void readyTask(TCB* task, EventType type);
       void preemptTask(PreemptType type);
-  
-      void endProgram();
       
     public:
       ~System();
@@ -140,6 +138,7 @@ namespace Core {
       void loadConfig();
       void handleInterruption(Interruption irq, TCB* task = nullptr);  
       void endTick();
+      void endProgram();
       virtual void tick();
   };
 } // namespace Core
