@@ -46,7 +46,7 @@ namespace Core {
       int completion_time;
       TCBState state;
       IOEvent* current_event;
-      Mutex* mutex;
+      list<Mutex*> mutex_list;
       list<Event*> events;
 
       void createEvent(string ev);
@@ -66,8 +66,9 @@ namespace Core {
       int getCompletionTime() const;
       TCBState getState() const;
       IOEvent* getCurrentEvent() const;
-      Mutex* getMutex() const;
+      list<Mutex*>* getMutexList();
       list<Event*>* getEvents();
+      bool isAvailable();
 
       void setId(const string _id);
       void setColorHex(const string _color);
@@ -78,7 +79,8 @@ namespace Core {
       void setPriorityD(const int _priority_d);
       void setCompletionTime(int time);
       void setCurrentEvent(IOEvent* event);
-      void setMutex(Mutex* mutex);
+      void addMutex(Mutex* mutex);
+      void removeMutex(Mutex* mutex);
 
       void setState(TCBState state);
       void decrementRemaining(int amount = 1);

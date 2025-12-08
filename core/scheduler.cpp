@@ -141,13 +141,8 @@ TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
     return current_task;
   }
 
-  if (type == PreemptType::QUANTUM)
-    return current_task;
-
-  if (type == PreemptType::NEW_TASK || (current_task != nullptr && current_task->getState() == TCBState::TERMINATED)) {
-    for (TCB *task : *task_list)
-      task->setPriorityD(task->getPriorityD() + scheduler->getAlpha());
-  }
+  for (TCB *task : *task_list)
+    task->setPriorityD(task->getPriorityD() + scheduler->getAlpha());
 
   TCB* chosen = current_task;
   // Se não tem uma task ativa ou a task ativa não estiver pronta, desconsidera a task atual

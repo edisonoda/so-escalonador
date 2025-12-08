@@ -40,12 +40,14 @@ Mutex::Mutex(System* sys, int id) :
   id(id)
 {
   counter = 1;
+  task = nullptr;
 }
 
 Mutex::~Mutex() {
   for (auto task : queue)
     queue.remove(task);
   
+  task = nullptr;
   system = nullptr;
 }
 
@@ -53,21 +55,24 @@ void Mutex::lock(TCB* task) {
   if (counter == 0) {
     queue.push_back(task);
     system->handleInterruption(Interruption::MUTEX_LOCK);
+  } else {
+    this->task = task;
   }
 
+  task->addMutex(this);
   counter = 0;
 }
 
 void Mutex::unlock() {
-  if (queue.empty())
+  if (queue.empty()) {
+    counter = 1;
     return;
+  }
   
-  TCB* task = queue.front();
+  task->removeMutex(this);
+  task = queue.front();
   queue.pop_front();
   system->handleInterruption(Interruption::MUTEX_UNLOCK, task);
-  
-  if (queue.empty())
-    counter = 1;
 }
 
 int Mutex::getId() {
@@ -124,6 +129,8 @@ SystemMemento::SystemMemento(
   
   for (Mutex* e : mutex_list) {
     Mutex* copy = new Mutex(*e);
+    copy->setTask(ptr_map[e->getTask()]);
+
     copy->getTasks()->clear();
     for (TCB* t : *(e->getTasks()))
       copy->getTasks()->push_back(ptr_map[t]);
@@ -136,8 +143,8 @@ SystemMemento::SystemMemento(
     if (original->getCurrentEvent() != nullptr)
       ptr_map[original]->setCurrentEvent(ioevent_map[original->getCurrentEvent()]);
     
-    if (original->getMutex() != nullptr)
-      ptr_map[original]->setMutex(mutex_map[original->getMutex()]);
+    for (Mutex* mutex : *(original->getMutexList()))
+      ptr_map[original]->getMutexList()->push_back(new Mutex(*mutex));
 
     for (Event* event : *(original->getEvents()))
       ptr_map[original]->getEvents()->push_back(new Event(*event));
@@ -235,19 +242,22 @@ void System::tick() {
   // Reseta flag de sorteio a cada ciclo;
   scheduler->setRandomFlag(false);
   saveState(&history);
+  
+  if (current_task != nullptr)
+    checkEvents();
 
   checkNewTasks();
 
   // Se não existe task em execução, busca uma task
   if (current_task == nullptr)
     changeState(TCBState::RUNNING);
+  
+  if (current_task != nullptr)
+    checkEvents();
     
   // Se existe task em execução, mas o tempo restante de execução é 0, termina a task
   if (current_task != nullptr && current_task->getRemaining() <= 0)
     terminateTask();
-  
-  if (current_task != nullptr)
-    checkEvents();
 }
 
 void System::endTick() {
@@ -298,8 +308,16 @@ void System::changeState(TCBState state, PreemptType type) {
 
   // Se o escalonador escolheu uma task, remove ela das listas
   if (current_task != nullptr) {
-    if (current_task->getState() == TCBState::READY)
-      ready_list.remove(current_task);
+    if (current_task->getState() == TCBState::READY) {
+      bool is_ready = false;
+
+      for (TCB* ready : ready_list)
+        if (current_task == ready)
+          is_ready = true;
+
+      if (is_ready)
+        ready_list.remove(current_task);
+    }
 
     // Se houve troca de tarefa, reinicia o quantum
     if (previous_task != current_task)
@@ -331,31 +349,30 @@ void System::checkNewTasks() {
 }
 
 void System::checkEvents() {
-  list<Event*>* events = current_task->getEvents();
+  TCB* task = current_task;
+  list<Event*>* events = task->getEvents();
 
   if (!events || events->empty())
     return;
 
   list<Event*>::iterator i = (*events).begin();
-  int elapsed = current_task->getDuration() - current_task->getRemaining();
+  int elapsed = task->getDuration() - task->getRemaining();
 
   while (i != (*events).end()) {
     if ((*i)->start <= elapsed) {
       switch ((*i)->type) {
         case EventType::IO: {
-          IOEvent* event = new IOEvent(current_task, this, &clock, (*i)->duration);
+          IOEvent* event = new IOEvent(task, this, &clock, (*i)->duration);
           ioevent_list.push_back(event);
-          current_task->setCurrentEvent(event);
+          task->setCurrentEvent(event);
           suspendTask();
           break;
         }
 
         case EventType::MU: {
-          for (auto m : mutex_list) {
-            if ((*i)->id == m->getId()) {
+          for (auto m : mutex_list)
+            if ((*i)->id == m->getId())
               m->unlock();
-            }
-          }
           break;
         }
 
@@ -364,7 +381,7 @@ void System::checkEvents() {
           for (auto m : mutex_list) {
             if ((*i)->id == m->getId()) {
               found = true;
-              m->lock(current_task);
+              m->lock(task);
               break;
             }
           }
@@ -374,8 +391,7 @@ void System::checkEvents() {
           
           Mutex* mutex = new Mutex(this, (*i)->id);
           mutex_list.push_back(mutex);
-          current_task->setMutex(mutex);
-          mutex->lock(current_task);
+          mutex->lock(task);
           break;
         }
 
@@ -385,7 +401,9 @@ void System::checkEvents() {
 
       delete (*i);
       i = events->erase(i);
-      return;
+      
+      if (task != current_task)
+        return;
     } else {
       i++;
     }
@@ -396,13 +414,18 @@ void System::terminateTask() {
   // Armazena o tempo em que a task foi terminada para o cálculo dos tempos médios
   current_task->setCompletionTime(clock.getTotalTime());
 
-  if (current_task->getMutex() != nullptr) {
-    for (auto m : mutex_list) {
-      if (current_task->getMutex()->getId() == m->getId())
-        m->unlock();
-    }
+  list<Mutex*> unlock_queue;
+
+  for (Mutex* m : *(current_task->getMutexList())) {
+    if (m->getTask() == current_task)
+      unlock_queue.push_back(m);
   }
-  
+
+  for (Mutex* m : unlock_queue)
+    m->unlock();
+
+  unlock_queue.clear();
+
   changeState(TCBState::TERMINATED);
 
   task_count--;
@@ -421,22 +444,25 @@ void System::suspendTask() {
 
 void System::preemptTask(PreemptType type) {
   // Se a task em execução ainda não tiver terminado, coloca ela de volta na lista de prontas
-  if (current_task != nullptr && current_task->getRemaining() > 0)
+  if (current_task != nullptr && current_task->getRemaining() > 0) {
     ready_list.push_back(current_task);
-
-  changeState(TCBState::READY, type);
+    changeState(TCBState::READY, type);
+  }
 }
 
 void System::readyTask(TCB* task, EventType type) {
-  suspended_list.remove(task);
-  ready_list.push_back(task);
-
-  if (type == EventType::IO)
+  if (type == EventType::IO) {
     ioevent_list.remove(task->getCurrentEvent());
+    clock.scheduleDeletion(task->getCurrentEvent());
+    task->setCurrentEvent(nullptr);
+  }
 
-  clock.scheduleDeletion(task->getCurrentEvent());
-  task->setCurrentEvent(nullptr);
-  task->setState(TCBState::READY);
+  if (task->isAvailable()) {
+    suspended_list.remove(task);
+    ready_list.push_back(task);
+    task->setState(TCBState::READY);
+  }
+
   preemptTask(PreemptType::NEW_TASK);
 }
 
@@ -493,9 +519,8 @@ void System::restoreState() {
   this->ioevent_list = snap->ioevent_list;
   this->mutex_list = snap->mutex_list;
 
-  for (IOEvent* e : ioevent_list) {
+  for (IOEvent* e : ioevent_list)
     clock.attach(e);
-  }
 
   task_info.drawTick(clock.getTotalTime());
   task_info.drawTick(snap->clock_time);
@@ -537,7 +562,9 @@ void System::loadConfig() {
   task_count = new_list.size();
 
   gantt_chart.setTasks(&ord_tasks);
+  gantt_chart.setEvents(&ioevent_list, &mutex_list);
   task_info.setTasks(&ord_tasks);
+  task_info.setEvents(&ioevent_list, &mutex_list);
   task_info.moveWindow(0, gantt_chart.getHeight());
   task_info.drawTick(0);
   

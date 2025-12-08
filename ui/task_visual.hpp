@@ -7,11 +7,11 @@
 
 #define INFO_SPACE 6
 #define COLOR_SPACE 9
-#define STATS_SPACE 3
+#define STATS_SPACE 5
 
 #define UNIT_WIDTH 3
 
-namespace Core { class SystemMemento; }
+namespace Core { class SystemMemento; class IOEvent; class Mutex; }
 
 namespace UI {
   struct GanttEntry {
@@ -23,6 +23,8 @@ namespace UI {
   class TaskVisual : public Window {
     protected:
       vector<Core::TCB*> *ord_tasks;
+      list<Core::IOEvent*>* ioevent_list;
+      list<Core::Mutex*>* mutex_list;
       int visual_edge_x;
       int visual_edge_y;
       int x_offset;
@@ -35,6 +37,7 @@ namespace UI {
       TaskVisual();
       virtual ~TaskVisual();
 
+      void setEvents(list<Core::IOEvent*>* io, list<Core::Mutex*>* mutex);
       virtual void setTasks(vector<Core::TCB*> *tasks, int y_offset = 0);
       
       virtual void print(int x, int y, string str);
@@ -51,6 +54,7 @@ namespace UI {
       TaskInfo();
       ~TaskInfo();
       
+      void drawEvents(int y);
       void drawStaticInfo(int index, int offset = 0);
       void calcFinalStatistics(double *avg_turnaround, double *avg_wait);
       void displayFinalStatistics();
@@ -84,7 +88,7 @@ namespace UI {
       void scrollChart();
       void previousTick();
 
-      virtual void setTasks(vector<Core::TCB*> *tasks, bool reset = true, int y_offset = 0);
+      virtual void setTasks(vector<Core::TCB*> *tasks, int y_offset = 0);
       virtual void drawTick(int tick);
   };
 } // namespace UI

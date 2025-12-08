@@ -1,5 +1,6 @@
 #include "tcb.hpp"
 #include "system.hpp"
+#include <ncurses.h>
 
 using namespace Core;
 
@@ -23,7 +24,6 @@ TCB::TCB(string id, string color_hex, int color, int start, int duration, int pr
   this->state = TCBState::NEW;
 
   current_event = nullptr;
-  mutex = nullptr;
 
   for (string event : events)
     createEvent(event);
@@ -31,11 +31,11 @@ TCB::TCB(string id, string color_hex, int color, int start, int duration, int pr
 
 TCB::~TCB() {
   current_event = nullptr;
-  mutex = nullptr;
-
+  
   for (Event* ev : events)
     delete ev;
 
+  mutex_list.clear();
   events.clear();
 }
 
@@ -95,7 +95,7 @@ int TCB::getPriorityD() const { return priority_d; }
 
 IOEvent* TCB::getCurrentEvent() const { return current_event; }
 
-Mutex* TCB::getMutex() const { return mutex; }
+list<Mutex*>* TCB::getMutexList() { return &mutex_list; }
 
 void TCB::setId(const string _id) { id = _id; }
 
@@ -115,7 +115,9 @@ void TCB::setCompletionTime(int time) { this->completion_time = time; }
 
 void TCB::setCurrentEvent(IOEvent* event) { current_event = event; }
 
-void TCB::setMutex(Mutex* m) { mutex = m; }
+void TCB::addMutex(Mutex* m) { mutex_list.push_back(m); }
+
+void TCB::removeMutex(Mutex* m) { mutex_list.remove(m); }
 
 int TCB::getCompletionTime() const { return this->completion_time; }
 
@@ -128,3 +130,14 @@ list<Event*>* TCB::getEvents() { return &events; }
 void TCB::setState(TCBState state) { this->state = state; }
 
 void TCB::decrementRemaining(int amount) { this->remaining -= amount; }
+
+bool TCB::isAvailable() {
+  bool mutex_locked = false;
+
+  for (Mutex* m : mutex_list) {
+    if (m->getTask() != this)
+      mutex_locked = true;
+  }
+
+  return current_event == nullptr && !mutex_locked;
+}

@@ -31,6 +31,7 @@ namespace Core {
       IOEvent(TCB* task, System* system, Clock* clock, const int duration);
       ~IOEvent();
 
+      int getRemaining() { return remaining_time; };
       TCB* getTask() { return task; }
       void setTask(TCB* task) { this->task = task; }
       virtual void tick();
@@ -42,13 +43,16 @@ namespace Core {
       int counter;
 
       System* system;
+      TCB* task;
       list<TCB*> queue;
     
     public:
       Mutex(System* system, int id);
       ~Mutex();
 
+      TCB* getTask() { return task; }
       list<TCB*>* getTasks() { return &queue; }
+      void setTask(TCB* task) { this->task = task; };
       void lock(TCB* task);
       void unlock();
       int getId();

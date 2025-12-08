@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <algorithm>
+#include <string>
 
 using namespace UI;
 
@@ -20,7 +21,9 @@ TaskVisual::TaskVisual() : Window() {
   ord_tasks = nullptr;
 }
 
-TaskVisual::~TaskVisual() { ord_tasks = nullptr; }
+TaskVisual::~TaskVisual() {
+  ord_tasks = nullptr;
+}
 
 void TaskVisual::printAxis() {
   invertColor(true);
@@ -45,6 +48,11 @@ void TaskVisual::printAxis() {
 
   for (size_t i = 0; i < ord_tasks->size(); i++)
     print(x_offset, i + y_offset, '|');
+}
+
+void TaskVisual::setEvents(list<Core::IOEvent*>* io, list<Core::Mutex*>* mutex) {
+  ioevent_list = io;
+  mutex_list = mutex;
 }
 
 void TaskVisual::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
@@ -124,11 +132,11 @@ void TaskInfo::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
 }
 
 void TaskInfo::drawTick(int tick) {
-  int x;
+  int x, y = y_offset;
   bool is_random = Core::Scheduler::getInstance()->getWasRandomChoice();
 
   // Imprime as informações atuais de cada task
-  for (size_t i = 0; i < ord_tasks->size(); i++) {
+  for (size_t i = 0; i < ord_tasks->size(); i++, y++) {
     Core::TCB *task = (*ord_tasks)[i];
     x = x_offset;
 
@@ -165,16 +173,50 @@ void TaskInfo::drawTick(int tick) {
         break;
     }
 
-    print(x, i + y_offset, status_str);
+    print(x, y, status_str);
     invertColor(true);
-    print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), i + y_offset, rem_str);
-    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), i + y_offset, prio_str);
+    print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), y, rem_str);
+    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), y, prio_str);
 
     // Imprime as informações estáticas da tarefa
     drawStaticInfo(i, x + INFO_SPACE + MONITOR_LABELS["PriorityD"].length() - x_offset);
   }
-
+  
+  drawEvents(y);
   refresh();
+}
+
+void TaskInfo::drawEvents(int y) {
+  string str = "";
+
+  for (Core::IOEvent* ev : *ioevent_list)
+    str += "[" + ev->getTask()->getId() + ", " + to_string(ev->getRemaining()) + "] ";
+
+  print(0, y, string(width, ' '));
+  print(0, y++, "I/O events: " + str);
+
+  str = "";
+
+  for (Core::Mutex* m : *mutex_list) {
+    str += "[M" + to_string(m->getId());
+
+    if (m->getTask() != nullptr)
+      str += " | Ativa: " + m->getTask()->getId();
+
+    if (!m->getTasks()->empty())
+      str += " | ";
+
+    for (Core::TCB* t : *(m->getTasks())) {
+      str += t->getId();
+      if (t != m->getTasks()->back())
+        str += ", ";
+    }
+
+    str += "] ";
+  }
+
+  print(0, y, string(width, ' '));
+  print(0, y, "Mutex events: " + str);
 }
 
 void TaskInfo::drawStaticInfo(int i, int offset) {
@@ -231,7 +273,7 @@ void TaskInfo::displayFinalStatistics() {
   invertColor(false);
 
   // Posição Y: 1 linha abaixo da última task
-  int stats_y_pos = y_offset + ord_tasks->size() + 1;
+  int stats_y_pos = y_offset + ord_tasks->size() + 3;
   double avg_turnaround = 0;
   double avg_wait = 0;
 
@@ -439,7 +481,7 @@ void GanttChart::drawTick(int tick) {
 }
 
 // Define o tamanho do gráfico dinâmicamente com base na quantidade de tasks e duração
-void GanttChart::setTasks(vector<Core::TCB *> *tasks, bool reset, int y_offset) {
+void GanttChart::setTasks(vector<Core::TCB *> *tasks, int y_offset) {
   TaskVisual::setTasks(tasks, y_offset);
 
   int total_time = 0;
@@ -454,13 +496,12 @@ void GanttChart::setTasks(vector<Core::TCB *> *tasks, bool reset, int y_offset) 
   total_time += latest_start;
 
   // Largura com base no offset e total máximo de ticks
-  if (reset)
-    setWindowDimensions(
-      tasks->size() + 1,
-      ((total_time + 1) * UNIT_WIDTH) + x_offset,
-      0,
-      0
-    );
+  setWindowDimensions(
+    tasks->size() + 1,
+    ((total_time + 1) * UNIT_WIDTH) + x_offset,
+    0,
+    0
+  );
 
   printAxis();
 }
