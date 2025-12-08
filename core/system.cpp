@@ -1,6 +1,7 @@
 #include "system.hpp"
 
 #include "clock.hpp"
+#include "tcb.hpp"
 
 using namespace Core;
 
@@ -306,8 +307,11 @@ void System::changeState(TCBState state, PreemptType type) {
   // Chama o escalonador
   current_task = scheduler->chooseTask(current_task, type);
 
-  // Se o escalonador escolheu uma task, remove ela das listas
+  if (current_task != nullptr && current_task->getState() == TCBState::SUSPENDED)
+    current_task = nullptr;
+  
   if (current_task != nullptr) {
+    // Se o escalonador escolheu uma task, remove ela das lista da ready
     if (current_task->getState() == TCBState::READY) {
       bool is_ready = false;
 
@@ -362,6 +366,9 @@ void System::checkEvents() {
     if ((*i)->start <= elapsed) {
       switch ((*i)->type) {
         case EventType::IO: {
+          if (task->getRemaining() <= 0)
+            break;
+
           IOEvent* event = new IOEvent(task, this, &clock, (*i)->duration);
           ioevent_list.push_back(event);
           task->setCurrentEvent(event);
@@ -444,10 +451,11 @@ void System::suspendTask() {
 
 void System::preemptTask(PreemptType type) {
   // Se a task em execução ainda não tiver terminado, coloca ela de volta na lista de prontas
-  if (current_task != nullptr && current_task->getRemaining() > 0) {
+  if (current_task != nullptr && current_task->getRemaining() > 0)
     ready_list.push_back(current_task);
+
+  if (current_task == nullptr || current_task->getRemaining() > 0)
     changeState(TCBState::READY, type);
-  }
 }
 
 void System::readyTask(TCB* task, EventType type) {
