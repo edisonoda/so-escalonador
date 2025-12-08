@@ -176,9 +176,9 @@ void TaskInfo::drawTick(int tick) {
 
     print(x, y, status_str);
     invertColor(true);
-    print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), y, string(INFO_SPACE + 1, ' '));
+    print(x = x + INFO_SPACE + MONITOR_LABELS_STATUS["Terminated"].length(), y, string(INFO_SPACE + MONITOR_LABELS["Remaining"].length(), ' '));
     print(x, y, rem_str);
-    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), y, string(INFO_SPACE + 1, ' '));
+    print(x = x + INFO_SPACE + MONITOR_LABELS["Remaining"].length(), y, string(INFO_SPACE + MONITOR_LABELS["PriorityD"].length(), ' '));
     print(x, y, prio_str);
 
     // Imprime as informações estáticas da tarefa
