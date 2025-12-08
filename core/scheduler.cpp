@@ -151,6 +151,8 @@ TCB *PRIOPEnv::chooseTask(TCB *current_task, PreemptType type) {
 
   // Busca a tarefa com maior prioridade
   for (TCB *task : *task_list) {
+    scheduler->setRandomFlag(false);
+
     if (task->getPriorityD() > chosen->getPriorityD())
       chosen = task;
     else if (task->getPriorityD() == chosen->getPriorityD())
