@@ -45,9 +45,7 @@ Mutex::Mutex(System* sys, int id) :
 }
 
 Mutex::~Mutex() {
-  for (auto task : queue)
-    queue.remove(task);
-  
+  queue.clear();
   task = nullptr;
   system = nullptr;
 }
@@ -114,6 +112,7 @@ SystemMemento::SystemMemento(
     TCB* copy = new TCB(*original);
     // Limpa eventos copiados por padrão para evitar Double Free na destruição
     copy->getEvents()->clear();
+    copy->getMutexList()->clear();
 
     this->tasks.push_back(copy);
     ptr_map[original] = copy;
